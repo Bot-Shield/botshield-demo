@@ -548,8 +548,8 @@ export default {
         window.open(webUrl, '_blank');
         setWidgetState('verifying', 'Waiting for verification...');
 
-        // Step 4: Subscribe to status via SSE
-        subscribeStatus(requestId);
+        // Step 4: Poll for completion (Heroku kills SSE after 30s)
+        pollStatus(requestId);
 
       } catch (err) {
         console.error('[BotShield]', err.message || err);
@@ -559,71 +559,47 @@ export default {
     }
 
     // ================================================================
-    // SSE Status Subscription
+    // Status Polling (Heroku kills SSE after 30s, so poll instead)
     // ================================================================
-    async function subscribeStatus(requestId) {
-      var url = API_BASE.replace('/operations', '') + '/operations/verification/subscribe-status?request_id=' + encodeURIComponent(requestId);
+    async function pollStatus(requestId) {
+      var url = API_BASE + '/verification/status?request_id=' + encodeURIComponent(requestId);
+      var attempts = 0;
+      var maxAttempts = 120; // 4 min at 2s intervals
 
-      try {
-        var response = await fetch(url, {
-          method: 'GET',
-          headers: { 'Accept': 'text/event-stream' },
-        });
-
-        if (!response.ok || !response.body) throw new Error('Stream failed');
-
-        var reader = response.body.getReader();
-        activeReader = reader;
-        var decoder = new TextDecoder();
-        var buffer = '';
-
-        while (true) {
-          var result = await reader.read();
-          if (result.done) break;
-
-          buffer += decoder.decode(result.value, { stream: true });
-          var lines = buffer.split('\\n');
-          buffer = lines.pop() || '';
-
-          for (var i = 0; i < lines.length; i++) {
-            var line = lines[i].trim();
-            if (!line) continue;
-            try {
-              var parsed;
-              if (line.startsWith('data: ')) {
-                parsed = JSON.parse(line.slice(6));
-              } else {
-                parsed = JSON.parse(line);
-              }
-              var data = parsed.data || parsed;
-
-              if (data.heartbeat) continue;
-
-              if (data.status === 'completed' || data.status === 'verified') {
-                onVerified(data);
-                reader.cancel();
-                return;
-              } else if (data.status === 'failed') {
-                setWidgetState('failed', 'Verification failed — click to retry');
-                verifying = false;
-                reader.cancel();
-                return;
-              } else if (data.status === 'expired') {
-                setWidgetState('failed', 'Verification expired — click to retry');
-                verifying = false;
-                reader.cancel();
-                return;
-              }
-            } catch (e) { /* ignore parse errors */ }
-          }
+      var interval = setInterval(async function() {
+        attempts++;
+        if (attempts > maxAttempts) {
+          clearInterval(interval);
+          setWidgetState('failed', 'Verification expired — click to retry');
+          verifying = false;
+          return;
         }
-      } catch (err) {
-        console.error('[BotShield] SSE error:', err);
-        setWidgetState('failed', 'Connection error — click to retry');
-        verifying = false;
-      } finally {
-        activeReader = null;
-      }
+
+        try {
+          var res = await fetch(url);
+          if (!res.ok) return; // retry on next tick
+
+          var json = await res.json();
+          var data = json?.data?.data || json?.data || json;
+          var status = data?.status;
+
+          if (status === 'completed' || status === 'verified') {
+            clearInterval(interval);
+            onVerified(data);
+          } else if (status === 'failed') {
+            clearInterval(interval);
+            setWidgetState('failed', 'Verification failed — click to retry');
+            verifying = false;
+          } else if (status === 'expired') {
+            clearInterval(interval);
+            setWidgetState('failed', 'Verification expired — click to retry');
+            verifying = false;
+          }
+          // else: still pending, keep polling
+        } catch (e) {
+          // network error — retry on next tick
+        }
+      }, 2000);
     }
 
     // ================================================================
