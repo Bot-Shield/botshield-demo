@@ -430,16 +430,20 @@ export default {
     // ================================================================
     var params = new URLSearchParams(window.location.search);
     var SITE_KEY = params.get('site_key') || 'pk_test_demo';
+    var SCOPE = params.get('scope') || 'checkout.complete';
     var API_BASE = 'https://api.botshield.ai/operations';
 
-    // Show which key is active
+    // Show which key + scope is active
     var keyEl = document.getElementById('keyIndicator');
+    var info = [];
     if (params.get('site_key')) {
-      keyEl.textContent = 'Using: ' + SITE_KEY.slice(0, 20) + '...';
+      info.push(SITE_KEY.slice(0, 20) + '...');
     } else {
-      keyEl.textContent = 'Using default demo key (will fail — pass ?site_key=pk_test_...)';
+      info.push('demo key (pass ?site_key=pk_test_...)');
       keyEl.style.color = '#ca8a04';
     }
+    info.push('scope: ' + SCOPE);
+    keyEl.textContent = info.join(' | ');
 
     // ================================================================
     // State
@@ -506,8 +510,11 @@ export default {
           }),
         });
 
-        if (!sessionRes.ok) throw new Error('Session failed: ' + sessionRes.status);
         var sessionData = await sessionRes.json();
+        if (!sessionRes.ok || sessionData?.data?.error) {
+          var sessionErr = sessionData?.data?.error?.message || sessionData?.error?.message || 'Session failed: ' + sessionRes.status;
+          throw new Error(sessionErr);
+        }
         var session = sessionData.data?.data || sessionData.data;
         var sessionToken = session?.anchor_grant_token || session?.session_token;
         if (!sessionToken) throw new Error('No session token returned');
@@ -521,14 +528,16 @@ export default {
           },
           body: JSON.stringify({
             return_url: window.location.href,
-            scope: 'checkout.complete',
+            scope: SCOPE,
             sdk_type: 'signal',
             mode: 'private',
           }),
         });
 
-        if (!linkRes.ok) throw new Error('Verification link failed: ' + linkRes.status);
         var linkData = await linkRes.json();
+        if (linkData?.data?.error) {
+          throw new Error(linkData.data.error.message || 'Verification link failed');
+        }
         var link = linkData.data?.data || linkData.data;
         var requestId = link?.request_id;
         var webUrl = link?.web_url;
@@ -544,7 +553,10 @@ export default {
 
       } catch (err) {
         console.error('[BotShield]', err);
-        setWidgetState('failed', 'Verification failed — click to retry');
+        var msg = err.message || 'Unknown error';
+        // Truncate long messages for widget display
+        var shortMsg = msg.length > 60 ? msg.slice(0, 57) + '...' : msg;
+        setWidgetState('failed', shortMsg + ' — click to retry');
         verifying = false;
       }
     }
