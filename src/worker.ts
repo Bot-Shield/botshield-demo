@@ -138,26 +138,10 @@ export default {
       gap: 2px;
     }
 
-    .event-artist {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .event-tour {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .event-venue {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-
-    .event-date {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
+    .event-artist { font-size: 18px; font-weight: 700; }
+    .event-tour { font-size: 14px; color: var(--text-secondary); }
+    .event-venue { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .event-date { font-size: 13px; color: var(--text-secondary); }
 
     /* Order Summary */
     .order-card {
@@ -167,11 +151,7 @@ export default {
       padding: 16px;
     }
 
-    .order-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 14px;
-    }
+    .order-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
 
     .order-row {
       display: flex;
@@ -181,13 +161,8 @@ export default {
       font-size: 14px;
     }
 
-    .order-row .label {
-      color: var(--text-secondary);
-    }
-
-    .order-row .value {
-      font-weight: 500;
-    }
+    .order-row .label { color: var(--text-secondary); }
+    .order-row .value { font-weight: 500; }
 
     .order-divider {
       border: none;
@@ -202,18 +177,79 @@ export default {
       font-weight: 700;
     }
 
-    /* BotShield Widget Area */
-    .botshield-area {
-      background: var(--card-bg-alt);
+    /* BotShield Widget (custom — SDK A flow, not the web component) */
+    .bs-widget {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 64px;
+      padding: 15px 10px;
+      border-radius: 10px;
       border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 16px;
+      background: var(--card-bg-alt);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+
+    .bs-widget:hover { border-color: #147baa; }
+    .bs-widget.verified {
+      background: rgba(5, 46, 35, 0.1);
+      border-color: var(--verified-green);
+      cursor: default;
+    }
+    .bs-widget.verifying { cursor: wait; }
+    .bs-widget.failed {
+      border-color: #ef4444;
+      background: rgba(220,38,38,0.1);
+      cursor: pointer;
+    }
+
+    .bs-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-left: 6px;
+    }
+
+    .bs-icon {
+      width: 16px;
+      height: 16px;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+    }
+
+    .bs-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .bs-brand {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      min-height: 64px;
+      gap: 1px;
     }
+
+    .bs-brand-name {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .bs-brand-links {
+      font-size: 6px;
+      color: var(--text-secondary);
+    }
+
+    .bs-brand-links a { color: inherit; text-decoration: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bs-spin { animation: spin 0.8s linear infinite; }
 
     /* Purchase Button */
     .purchase-btn {
@@ -227,21 +263,11 @@ export default {
       font-weight: 700;
       cursor: pointer;
       transition: opacity 0.2s, transform 0.1s;
-      letter-spacing: -0.2px;
     }
 
-    .purchase-btn:hover:not(:disabled) {
-      opacity: 0.92;
-    }
-
-    .purchase-btn:active:not(:disabled) {
-      transform: scale(0.985);
-    }
-
-    .purchase-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
+    .purchase-btn:hover:not(:disabled) { opacity: 0.92; }
+    .purchase-btn:active:not(:disabled) { transform: scale(0.985); }
+    .purchase-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* Toast */
     .toast {
@@ -259,10 +285,7 @@ export default {
       transition: transform 0.3s ease;
       white-space: nowrap;
     }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
 
     /* Confirmation Overlay */
     .confirmation {
@@ -277,11 +300,7 @@ export default {
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
-
-    .confirmation.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .confirmation.show { opacity: 1; pointer-events: auto; }
 
     .confirmation-card {
       background: var(--card-bg);
@@ -305,24 +324,13 @@ export default {
     }
 
     .confirmation-check svg {
-      width: 28px;
-      height: 28px;
-      stroke: white;
-      fill: none;
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 28px; height: 28px;
+      stroke: white; fill: none;
+      stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .confirmation h2 {
-      font-size: 20px;
-      margin-bottom: 6px;
-    }
-
-    .confirmation p {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
+    .confirmation h2 { font-size: 20px; margin-bottom: 6px; }
+    .confirmation p { font-size: 14px; color: var(--text-secondary); }
   </style>
 </head>
 <body>
@@ -370,9 +378,29 @@ export default {
       </div>
     </div>
 
-    <!-- BotShield Widget -->
-    <div class="botshield-area">
-      <botshield-verify site-key="pk_test_demo" theme="dark"></botshield-verify>
+    <!-- BotShield Widget (SDK A verification flow) -->
+    <div class="bs-widget" id="bsWidget" onclick="startVerification()">
+      <div class="bs-left">
+        <div class="bs-icon" id="bsIcon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.33L2.67 3.67V7.33C2.67 11.23 4.85 14.85 8 15.67C11.15 14.85 13.33 11.23 13.33 7.33V3.67L8 1.33Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="bs-label" id="bsLabel">Verify human presence</span>
+      </div>
+      <div class="bs-brand">
+        <svg width="24" height="26" viewBox="0 0 24 26" fill="none">
+          <defs><linearGradient id="bg" x1="12" y1="1" x2="12" y2="25.5" gradientUnits="userSpaceOnUse"><stop stop-color="#1a9bd5"/><stop offset="1" stop-color="#0e6b96"/></linearGradient></defs>
+          <path d="M12 1L2 5.5V12C2 18.35 6.27 24.27 12 25.5C17.73 24.27 22 18.35 22 12V5.5L12 1Z" stroke="url(#bg)" stroke-width="1.5" fill="none"/>
+          <path d="M12 4.5L5.5 7.5V12C5.5 16.1 8.3 19.85 12 20.8C15.7 19.85 18.5 16.1 18.5 12V7.5L12 4.5Z" fill="rgba(20,123,170,0.12)" stroke="url(#bg)" stroke-width="0.8"/>
+          <path d="M9 13L11 15L15 11" stroke="url(#bg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="bs-brand-name">BotShield</div>
+        <div class="bs-brand-links">
+          <a href="https://botshield.ai/privacy" target="_blank">Privacy</a> &bull;
+          <a href="https://botshield.ai/terms" target="_blank">Terms</a>
+        </div>
+      </div>
     </div>
 
     <!-- Purchase Button -->
@@ -393,41 +421,213 @@ export default {
     </div>
   </div>
 
-  <!-- BotShield SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js"></script>
-
   <script>
-    // Countdown timer
+    // ================================================================
+    // CONFIG — Replace with your site key
+    // ================================================================
+    var SITE_KEY = 'pk_test_demo';
+    var API_BASE = 'https://api.botshield.ai/operations';
+
+    // ================================================================
+    // State
+    // ================================================================
+    var verifying = false;
+    var activeReader = null;
+
+    // ================================================================
+    // Countdown timer (cosmetic)
+    // ================================================================
     (function() {
-      let total = 7 * 60 + 32;
-      const el = document.getElementById('countdown');
-      const tick = () => {
+      var total = 7 * 60 + 32;
+      var el = document.getElementById('countdown');
+      setInterval(function() {
         if (total <= 0) return;
         total--;
-        const m = Math.floor(total / 60);
-        const s = String(total % 60).padStart(2, '0');
+        var m = Math.floor(total / 60);
+        var s = String(total % 60).padStart(2, '0');
         el.textContent = m + ':' + s;
-      };
-      setInterval(tick, 1000);
+      }, 1000);
     })();
 
-    // BotShield success handler
-    document.addEventListener('botshield:success', () => {
-      const btn = document.getElementById('purchaseBtn');
-      btn.disabled = false;
+    // ================================================================
+    // Widget UI helpers
+    // ================================================================
+    var widget = document.getElementById('bsWidget');
+    var label = document.getElementById('bsLabel');
+    var icon = document.getElementById('bsIcon');
 
-      const toast = document.getElementById('toast');
+    function setWidgetState(state, text) {
+      widget.className = 'bs-widget ' + state;
+      label.textContent = text;
+      if (state === 'verifying') {
+        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="bs-spin"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8" stroke-linecap="round"/></svg>';
+      } else if (state === 'verified') {
+        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      } else if (state === 'failed') {
+        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#dc2626" stroke-width="1.5"/><path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round"/></svg>';
+      } else {
+        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.33L2.67 3.67V7.33C2.67 11.23 4.85 14.85 8 15.67C11.15 14.85 13.33 11.23 13.33 7.33V3.67L8 1.33Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      }
+    }
+
+    // ================================================================
+    // SDK A Verification Flow
+    // (same as ClientSdkPlayground: create-session → create-verification-link → SSE)
+    // ================================================================
+    async function startVerification() {
+      if (verifying) return;
+      verifying = true;
+      setWidgetState('verifying', 'Verifying...');
+
+      try {
+        // Step 1: Create session with site key
+        var sessionRes = await fetch(API_BASE + '/sdk/create-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SITE_KEY,
+          },
+          body: JSON.stringify({
+            partner_user_id: 'demo_' + crypto.randomUUID().slice(0, 8),
+            metadata: { source: 'ticketz-demo' },
+          }),
+        });
+
+        if (!sessionRes.ok) throw new Error('Session failed: ' + sessionRes.status);
+        var sessionData = await sessionRes.json();
+        var session = sessionData.data?.data || sessionData.data;
+        var sessionToken = session?.anchor_grant_token || session?.session_token;
+        if (!sessionToken) throw new Error('No session token returned');
+
+        // Step 2: Create verification link
+        var linkRes = await fetch(API_BASE + '/sdk/create-verification-link', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionToken,
+          },
+          body: JSON.stringify({
+            return_url: window.location.href,
+            scope: 'checkout.complete',
+            sdk_type: 'signal',
+            mode: 'private',
+          }),
+        });
+
+        if (!linkRes.ok) throw new Error('Verification link failed: ' + linkRes.status);
+        var linkData = await linkRes.json();
+        var link = linkData.data?.data || linkData.data;
+        var requestId = link?.request_id;
+        var webUrl = link?.web_url;
+
+        if (!webUrl || !requestId) throw new Error('No verification link returned');
+
+        // Step 3: Open verification in new tab (BotShield app for passkey)
+        window.open(webUrl, '_blank');
+        setWidgetState('verifying', 'Waiting for verification...');
+
+        // Step 4: Subscribe to status via SSE
+        subscribeStatus(requestId);
+
+      } catch (err) {
+        console.error('[BotShield]', err);
+        setWidgetState('failed', 'Verification failed — click to retry');
+        verifying = false;
+      }
+    }
+
+    // ================================================================
+    // SSE Status Subscription
+    // ================================================================
+    async function subscribeStatus(requestId) {
+      var url = API_BASE.replace('/operations', '') + '/operations/verification/subscribe-status?request_id=' + encodeURIComponent(requestId);
+
+      try {
+        var response = await fetch(url, {
+          method: 'GET',
+          headers: { 'Accept': 'text/event-stream' },
+        });
+
+        if (!response.ok || !response.body) throw new Error('Stream failed');
+
+        var reader = response.body.getReader();
+        activeReader = reader;
+        var decoder = new TextDecoder();
+        var buffer = '';
+
+        while (true) {
+          var result = await reader.read();
+          if (result.done) break;
+
+          buffer += decoder.decode(result.value, { stream: true });
+          var lines = buffer.split('\\n');
+          buffer = lines.pop() || '';
+
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line) continue;
+            try {
+              var parsed;
+              if (line.startsWith('data: ')) {
+                parsed = JSON.parse(line.slice(6));
+              } else {
+                parsed = JSON.parse(line);
+              }
+              var data = parsed.data || parsed;
+
+              if (data.heartbeat) continue;
+
+              if (data.status === 'completed' || data.status === 'verified') {
+                onVerified(data);
+                reader.cancel();
+                return;
+              } else if (data.status === 'failed') {
+                setWidgetState('failed', 'Verification failed — click to retry');
+                verifying = false;
+                reader.cancel();
+                return;
+              } else if (data.status === 'expired') {
+                setWidgetState('failed', 'Verification expired — click to retry');
+                verifying = false;
+                reader.cancel();
+                return;
+              }
+            } catch (e) { /* ignore parse errors */ }
+          }
+        }
+      } catch (err) {
+        console.error('[BotShield] SSE error:', err);
+        setWidgetState('failed', 'Connection error — click to retry');
+        verifying = false;
+      } finally {
+        activeReader = null;
+      }
+    }
+
+    // ================================================================
+    // Verified handler
+    // ================================================================
+    function onVerified(data) {
+      setWidgetState('verified', 'Human presence verified');
+      verifying = false;
+
+      // Enable purchase button
+      document.getElementById('purchaseBtn').disabled = false;
+
+      // Show toast
+      var toast = document.getElementById('toast');
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    });
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
 
+    // ================================================================
     // Purchase button
+    // ================================================================
     document.getElementById('purchaseBtn').addEventListener('click', function() {
       if (this.disabled) return;
       document.getElementById('confirmation').classList.add('show');
     });
 
-    // Dismiss confirmation
     document.getElementById('confirmation').addEventListener('click', function(e) {
       if (e.target === this) this.classList.remove('show');
     });
