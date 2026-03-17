@@ -403,6 +403,9 @@ export default {
       </div>
     </div>
 
+    <!-- Site Key Indicator -->
+    <div id="keyIndicator" style="font-size:11px; color:#6b7280; text-align:center; font-family:monospace;"></div>
+
     <!-- Purchase Button -->
     <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
   </div>
@@ -423,10 +426,20 @@ export default {
 
   <script>
     // ================================================================
-    // CONFIG — Replace with your site key
+    // CONFIG — site key from ?site_key= URL param, or fallback
     // ================================================================
-    var SITE_KEY = 'pk_test_demo';
+    var params = new URLSearchParams(window.location.search);
+    var SITE_KEY = params.get('site_key') || 'pk_test_demo';
     var API_BASE = 'https://api.botshield.ai/operations';
+
+    // Show which key is active
+    var keyEl = document.getElementById('keyIndicator');
+    if (params.get('site_key')) {
+      keyEl.textContent = 'Using: ' + SITE_KEY.slice(0, 20) + '...';
+    } else {
+      keyEl.textContent = 'Using default demo key (will fail — pass ?site_key=pk_test_...)';
+      keyEl.style.color = '#ca8a04';
+    }
 
     // ================================================================
     // State
