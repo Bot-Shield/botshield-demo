@@ -552,11 +552,8 @@ export default {
         subscribeStatus(requestId);
 
       } catch (err) {
-        console.error('[BotShield]', err);
-        var msg = err.message || 'Unknown error';
-        // Truncate long messages for widget display
-        var shortMsg = msg.length > 60 ? msg.slice(0, 57) + '...' : msg;
-        setWidgetState('failed', shortMsg + ' — click to retry');
+        console.error('[BotShield]', err.message || err);
+        setWidgetState('failed', 'Verification failed — click to retry');
         verifying = false;
       }
     }
