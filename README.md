@@ -6,22 +6,28 @@ A demo checkout page showing how to integrate the [BotShield](https://botshield.
 
 ## How It Works
 
-```
-Your site (this Worker)              BotShield (cdn.botshield.ai)
-┌─────────────────────┐              ┌─────────────────────────┐
-│                     │              │                         │
-│  <botshield-verify  │   click →    │  /challenge             │
-│    site-key="pk_…"  │              │  Bot scoring +          │
-│    theme="dark" />  │              │  behavioral fingerprint │
-│                     │  ← token     │                         │
-│  "Complete Purchase"│  (postMsg)   │  /api/verify            │
-│  button enabled     │              │  Signs JWT with         │
-│                     │              │  HMAC-SHA256            │
-└─────────┬───────────┘              └─────────────────────────┘
-          │ token
-          ▼
-Your server (optional)
-  POST /sdk/verify-token → { valid: true, claims: { ... } }
+```mermaid
+sequenceDiagram
+    participant User
+    participant Site as Your Site<br/>(this Worker)
+    participant CDN as BotShield CDN<br/>(cdn.botshield.ai)
+    participant API as BotShield API<br/>(api.botshield.ai)
+    participant Server as Your Server<br/>(optional)
+
+    User->>Site: Loads checkout page
+    Site-->>User: Renders &lt;botshield-verify&gt; widget
+
+    User->>CDN: Clicks widget → opens /challenge
+    CDN->>CDN: Edge bot scoring +<br/>behavioral fingerprint
+    CDN->>CDN: Signs JWT (HMAC-SHA256)
+    CDN-->>Site: Token via postMessage
+
+    Site-->>User: "Complete Purchase" button enabled
+
+    User->>Server: Submits form with token
+    Server->>API: POST /sdk/verify-token
+    API-->>Server: { valid: true, claims: { ... } }
+    Server-->>User: Purchase confirmed
 ```
 
 No secrets on your site. The `pk_*` site key is public. Token signing happens on BotShield's infrastructure. Your server validates tokens via the [BotShield API](https://docs.botshield.ai).
