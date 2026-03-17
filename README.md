@@ -9,24 +9,24 @@ A demo checkout page showing how to integrate the [BotShield](https://botshield.
 ```mermaid
 sequenceDiagram
     participant User
-    participant Site as Your Site<br/>(this Worker)
-    participant CDN as BotShield CDN<br/>(cdn.botshield.ai)
-    participant API as BotShield API<br/>(api.botshield.ai)
-    participant Server as Your Server<br/>(optional)
+    participant Site as Your Site
+    participant CDN as BotShield CDN
+    participant API as BotShield API
+    participant Server as Your Server
 
     User->>Site: Loads checkout page
-    Site-->>User: Renders &lt;botshield-verify&gt; widget
+    Site-->>User: Renders botshield-verify widget
 
-    User->>CDN: Clicks widget → opens /challenge
-    CDN->>CDN: Edge bot scoring +<br/>behavioral fingerprint
-    CDN->>CDN: Signs JWT (HMAC-SHA256)
+    User->>CDN: Clicks widget, opens /challenge
+    CDN->>CDN: Edge bot scoring + fingerprint
+    CDN->>CDN: Signs JWT with HMAC-SHA256
     CDN-->>Site: Token via postMessage
 
-    Site-->>User: "Complete Purchase" button enabled
+    Site-->>User: Complete Purchase button enabled
 
     User->>Server: Submits form with token
     Server->>API: POST /sdk/verify-token
-    API-->>Server: { valid: true, claims: { ... } }
+    API-->>Server: valid true, claims
     Server-->>User: Purchase confirmed
 ```
 
@@ -52,6 +52,8 @@ Edit `src/worker.ts` and replace the site key:
 
 Get a site key from the [BotShield Console](https://console.botshield.ai) under **Settings → Site Keys**.
 
+> **Important:** Your deployment domain must be added as a **trusted origin** on your site key. In the BotShield Console, go to **Settings → Site Keys**, select your key, and add your domain (e.g. `https://your-domain.com`) to the **Allowed Origins** list. Requests from unregistered origins will be rejected.
+
 ### 3. Run locally
 
 ```bash
@@ -75,6 +77,8 @@ To use a custom domain, update `wrangler.jsonc`:
   ]
 }
 ```
+
+After deploying, add `https://your-domain.com` to your site key's **Allowed Origins** in the [BotShield Console](https://console.botshield.ai) — otherwise the widget will fail origin validation.
 
 ## Customization
 
