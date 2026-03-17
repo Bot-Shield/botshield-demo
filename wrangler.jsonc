@@ -1,0 +1,12 @@
+{
+  "name": "botshield-demo",
+  "main": "src/worker.ts",
+  "compatibility_date": "2024-12-30",
+  "account_id": "9e8a7774180038be08d52d95adbc82c5",
+  "routes": [
+    {
+      "pattern": "demo.botshield.ai",
+      "custom_domain": true
+    }
+  ]
+}
