@@ -4,298 +4,270 @@ export default {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Ticketz - Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --page-bg: #000000;
-      --card-bg: #1a1a1a;
-      --card-bg-alt: #0e0e0e;
-      --card-border: #2a2a2a;
-      --text-primary: #ffffff;
-      --text-secondary: #9ca3af;
-      --ticketz-purple: #7c3aed;
-      --ticketz-purple-dark: #6d28d9;
-      --timer-accent: #10b981;
-      --verified-green: #16a34a;
-      --radius: 12px;
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
     }
 
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: var(--page-bg);
-      color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 0;
-    }
-
+    /* ── Root container: full viewport, flex column, centered ── */
     .page {
       width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      padding: 16px;
+      height: 100%;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      align-items: center;
+      gap: 22px;
+      padding: 16px;
+      padding-top: env(safe-area-inset-top, 16px);
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* Ticketz Header */
+    /* ── Spacer: pushes content down from top ── */
+    .top-spacer {
+      flex-shrink: 0;
+      height: 34px;
+    }
+
+    /* ── Header: Ticketz brand centered ── */
     .header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 0;
+      justify-content: center;
+      gap: 9.5px;
+      flex-shrink: 0;
     }
 
     .header-logo {
-      width: 36px;
-      height: 36px;
-      background: var(--ticketz-purple);
-      border-radius: 8px;
+      width: 31px;
+      height: 31px;
+      border-radius: 50%;
+      background: #7c3aed;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .header-logo svg {
-      width: 20px;
-      height: 20px;
-      fill: white;
-    }
+    .header-logo svg { width: 16px; height: 16px; fill: white; }
 
     .header-brand {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--ticketz-purple);
-      letter-spacing: -0.5px;
+      font-size: 19px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 28.7px;
     }
 
-    /* Countdown Timer */
+    /* ── Content section: timer + event + order grouped ── */
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* ── Timer bar: orange accent ── */
     .timer-bar {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 12px 16px;
+      background: rgba(255, 156, 102, 0.15);
+      border: 1px solid rgba(255, 156, 102, 0.6);
+      border-radius: 12px;
+      padding: 17px 19px;
       display: flex;
       align-items: center;
       gap: 10px;
+      width: 100%;
+      height: 58px;
     }
 
-    .timer-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--timer-accent);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    .timer-icon { width: 24px; height: 24px; flex-shrink: 0; }
 
     .timer-text {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 400;
+      color: #c9c9c9;
+      line-height: 18px;
+      padding-left: 12px;
+    }
+
+    .timer-countdown {
       font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .timer-text span {
-      color: var(--timer-accent);
       font-weight: 600;
+      color: #ffffff;
+      line-height: 20px;
       font-variant-numeric: tabular-nums;
+      text-align: right;
     }
 
-    /* Event Card */
+    /* ── Event card ── */
     .event-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 16px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px;
       display: flex;
-      gap: 14px;
-      align-items: center;
+      gap: 39px;
+      align-items: flex-start;
+      width: 100%;
     }
 
     .event-art {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 74px;
       border-radius: 8px;
       flex-shrink: 0;
-      object-fit: cover;
     }
 
     .event-details {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
     }
 
-    .event-artist { font-size: 18px; font-weight: 700; }
-    .event-tour { font-size: 14px; color: var(--text-secondary); }
-    .event-venue { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-    .event-date { font-size: 13px; color: var(--text-secondary); }
+    .event-artist {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 28px;
+      color: #ffffff;
+    }
 
-    /* Order Summary */
+    .event-tour {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #ffffff;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #959595;
+    }
+
+    /* ── Order summary ── */
     .order-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 16px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      width: 100%;
+      position: relative;
+      padding: 25px 28px;
     }
-
-    .order-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
 
     .order-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
+      align-items: baseline;
       font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #999999;
     }
 
-    .order-row .label { color: var(--text-secondary); }
-    .order-row .value { font-weight: 500; }
+    .order-row + .order-row { margin-top: 17px; }
+
+    .order-row .qty {
+      margin-right: 24px;
+    }
 
     .order-divider {
       border: none;
-      border-top: 1px solid var(--card-border);
-      margin: 10px 0;
+      border-top: 1px solid #2a2a2a;
+      margin: 26px 0 19px 0;
     }
 
-    .order-total .label,
-    .order-total .value {
-      color: var(--text-primary);
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    /* BotShield Widget (custom — SDK A flow, not the web component) */
-    .bs-widget {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      height: 64px;
-      padding: 15px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      background: var(--card-bg-alt);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      user-select: none;
-    }
-
-    .bs-widget:hover { border-color: #147baa; }
-    .bs-widget.verified {
-      background: rgba(5, 46, 35, 0.1);
-      border-color: var(--verified-green);
-      cursor: default;
-    }
-    .bs-widget.verifying { cursor: wait; }
-    .bs-widget.failed {
-      border-color: #ef4444;
-      background: rgba(220,38,38,0.1);
-      cursor: pointer;
-    }
-
-    .bs-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding-left: 6px;
-    }
-
-    .bs-icon {
-      width: 16px;
-      height: 16px;
-      color: #e5e7eb;
-      display: flex;
-      align-items: center;
-    }
-
-    .bs-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: #e5e7eb;
-      white-space: nowrap;
-    }
-
-    .bs-brand {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1px;
-    }
-
-    .bs-brand-name {
-      font-size: 9.5px;
+    .order-total {
+      font-size: 18px;
       font-weight: 600;
-      color: #e5e7eb;
+      line-height: 28px;
+      color: #ffffff;
     }
 
-    .bs-brand-links {
-      font-size: 6px;
-      color: var(--text-secondary);
+    .order-total span { color: #ffffff; }
+
+    /* ── BotShield widget ── */
+    botshield-verify {
+      display: block;
+      width: 100%;
     }
 
-    .bs-brand-links a { color: inherit; text-decoration: none; }
+    /* ── Actions: purchase button ── */
+    .actions {
+      width: 100%;
+      flex-shrink: 0;
+    }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .bs-spin { animation: spin 0.8s linear infinite; }
-
-    /* Purchase Button */
     .purchase-btn {
       width: 100%;
-      padding: 16px 24px;
-      border: none;
-      border-radius: var(--radius);
-      background: linear-gradient(135deg, var(--ticketz-purple), var(--ticketz-purple-dark));
-      color: white;
+      padding: 10px 16px;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      background: #7f56d9;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 600;
+      line-height: 24px;
       cursor: pointer;
       transition: opacity 0.2s, transform 0.1s;
+      box-shadow:
+        0px 1px 2px 0px rgba(10, 13, 18, 0.05),
+        inset 0px -2px 0px 0px rgba(10, 13, 18, 0.05),
+        inset 0px 0px 0px 1px rgba(10, 13, 18, 0.18);
     }
 
     .purchase-btn:hover:not(:disabled) { opacity: 0.92; }
     .purchase-btn:active:not(:disabled) { transform: scale(0.985); }
-    .purchase-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .purchase-btn:disabled { opacity: 0.30; cursor: not-allowed; }
 
-    /* Toast */
+    /* ── Toast ── */
     .toast {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
-      background: var(--verified-green);
+      background: #16a34a;
       color: white;
       padding: 12px 24px;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
-      z-index: 1000;
+      z-index: 10000;
       transition: transform 0.3s ease;
       white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* Confirmation Overlay */
+    /* ── Confirmation overlay ── */
     .confirmation {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 2000;
+      z-index: 20000;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -303,8 +275,8 @@ export default {
     .confirmation.show { opacity: 1; pointer-events: auto; }
 
     .confirmation-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       border-radius: 16px;
       padding: 32px;
       text-align: center;
@@ -313,10 +285,9 @@ export default {
     }
 
     .confirmation-check {
-      width: 56px;
-      height: 56px;
+      width: 56px; height: 56px;
       border-radius: 50%;
-      background: var(--verified-green);
+      background: #16a34a;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -330,11 +301,14 @@ export default {
     }
 
     .confirmation h2 { font-size: 20px; margin-bottom: 6px; }
-    .confirmation p { font-size: 14px; color: var(--text-secondary); }
+    .confirmation p { font-size: 14px; color: #9ca3af; }
   </style>
 </head>
 <body>
   <div class="page">
+    <!-- Top spacer (safe area) -->
+    <div class="top-spacer"></div>
+
     <!-- Header -->
     <div class="header">
       <div class="header-logo">
@@ -343,77 +317,64 @@ export default {
       <div class="header-brand">Ticketz</div>
     </div>
 
-    <!-- Countdown Timer -->
-    <div class="timer-bar">
-      <div class="timer-dot"></div>
-      <div class="timer-text">Complete purchase within <span id="countdown">7:32</span></div>
-    </div>
+    <!-- Content -->
+    <div class="content">
+      <!-- Timer -->
+      <div class="timer-bar">
+        <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="timer-text">Complete purchase within</div>
+        <div class="timer-countdown" id="countdown">7:32</div>
+      </div>
 
-    <!-- Event Card -->
-    <div class="event-card">
-      <img class="event-art" src="https://placehold.co/80x80/1a1a1a/ffffff?text=AF" alt="Arcade Fire" width="80" height="80">
-      <div class="event-details">
-        <div class="event-artist">Arcade Fire</div>
-        <div class="event-tour">World Tour 2025</div>
-        <div class="event-venue">Madison Square Garden</div>
-        <div class="event-date">Sat, Aug 16 &bull; 8:00pm</div>
-      </div>
-    </div>
-
-    <!-- Order Summary -->
-    <div class="order-card">
-      <div class="order-title">Order Summary</div>
-      <div class="order-row">
-        <span class="label">GA Floor x2</span>
-        <span class="value">$195.00</span>
-      </div>
-      <div class="order-row">
-        <span class="label">Service Fee</span>
-        <span class="value">$38.90</span>
-      </div>
-      <hr class="order-divider">
-      <div class="order-row order-total">
-        <span class="label">Total</span>
-        <span class="value">$428.50</span>
-      </div>
-    </div>
-
-    <!-- BotShield Widget (SDK A verification flow) -->
-    <div class="bs-widget" id="bsWidget" onclick="startVerification()">
-      <div class="bs-left">
-        <div class="bs-icon" id="bsIcon">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1.33L2.67 3.67V7.33C2.67 11.23 4.85 14.85 8 15.67C11.15 14.85 13.33 11.23 13.33 7.33V3.67L8 1.33Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+      <!-- Event -->
+      <div class="event-card">
+        <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;">AF</div>
+        <div class="event-details">
+          <div class="event-artist">Arcade Fire</div>
+          <div class="event-tour">World Tour 2025</div>
+          <div class="event-meta">
+            <span>Madison Square Garden</span>
+            <span>Sat, Aug 16 &bull; 8:00pm</span>
+          </div>
         </div>
-        <span class="bs-label" id="bsLabel">Verify human presence</span>
       </div>
-      <div class="bs-brand">
-        <svg width="24" height="26" viewBox="0 0 24 26" fill="none">
-          <defs><linearGradient id="bg" x1="12" y1="1" x2="12" y2="25.5" gradientUnits="userSpaceOnUse"><stop stop-color="#1a9bd5"/><stop offset="1" stop-color="#0e6b96"/></linearGradient></defs>
-          <path d="M12 1L2 5.5V12C2 18.35 6.27 24.27 12 25.5C17.73 24.27 22 18.35 22 12V5.5L12 1Z" stroke="url(#bg)" stroke-width="1.5" fill="none"/>
-          <path d="M12 4.5L5.5 7.5V12C5.5 16.1 8.3 19.85 12 20.8C15.7 19.85 18.5 16.1 18.5 12V7.5L12 4.5Z" fill="rgba(20,123,170,0.12)" stroke="url(#bg)" stroke-width="0.8"/>
-          <path d="M9 13L11 15L15 11" stroke="url(#bg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <div class="bs-brand-name">BotShield</div>
-        <div class="bs-brand-links">
-          <a href="https://botshield.ai/privacy" target="_blank">Privacy</a> &bull;
-          <a href="https://botshield.ai/terms" target="_blank">Terms</a>
+
+      <!-- Order -->
+      <div class="order-card">
+        <div class="order-row">
+          <span>GA Floor</span>
+          <div><span class="qty">x2</span><span>$195.00</span></div>
+        </div>
+        <div class="order-row">
+          <span>Service Fee</span>
+          <span>$38.90</span>
+        </div>
+        <hr class="order-divider">
+        <div class="order-row order-total">
+          <span>Total</span>
+          <span>$428.50</span>
         </div>
       </div>
     </div>
 
-    <!-- Site Key Indicator -->
-    <div id="keyIndicator" style="font-size:11px; color:#6b7280; text-align:center; font-family:monospace;"></div>
+    <!-- BotShield Verify -->
+    <botshield-verify
+      id="bsVerify"
+      theme="dark"
+      scan-mode="modal"
+      signals="true"
+    ></botshield-verify>
 
-    <!-- Purchase Button -->
-    <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
+    <!-- Purchase -->
+    <div class="actions">
+      <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
+    </div>
   </div>
 
   <!-- Toast -->
   <div class="toast" id="toast">Human verified — you're good to go!</div>
 
-  <!-- Confirmation Overlay -->
+  <!-- Confirmation -->
   <div class="confirmation" id="confirmation">
     <div class="confirmation-card">
       <div class="confirmation-check">
@@ -424,203 +385,50 @@ export default {
     </div>
   </div>
 
+  <!-- SDK -->
+  <script src="https://cdn.botshield.ai/sdk.js"></script>
+
   <script>
-    // ================================================================
-    // CONFIG — site key from ?site_key= URL param, or fallback
-    // ================================================================
     var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_test_demo';
-    var SCOPE = params.get('scope') || 'checkout.complete';
-    var API_BASE = 'https://api.botshield.ai/operations';
+    var SITE_KEY = params.get('site_key') || 'pk_test_405c955ab77e440ba0494ef45dc7b244';
+    var SCOPE = params.get('scope') || 'checkout';
+    var MODE = params.get('mode') || 'private';
 
-    // Show which key + scope is active
-    var keyEl = document.getElementById('keyIndicator');
-    var info = [];
-    if (params.get('site_key')) {
-      info.push(SITE_KEY.slice(0, 20) + '...');
-    } else {
-      info.push('demo key (pass ?site_key=pk_test_...)');
-      keyEl.style.color = '#ca8a04';
-    }
-    info.push('scope: ' + SCOPE);
-    keyEl.textContent = info.join(' | ');
+    var bsVerify = document.getElementById('bsVerify');
+    bsVerify.setAttribute('site-key', SITE_KEY);
+    bsVerify.setAttribute('scope', SCOPE);
+    bsVerify.setAttribute('mode', MODE);
 
-    // ================================================================
-    // State
-    // ================================================================
-    var verifying = false;
-    var activeReader = null;
-
-    // ================================================================
-    // Countdown timer (cosmetic)
-    // ================================================================
+    // Countdown (cosmetic)
     (function() {
       var total = 7 * 60 + 32;
       var el = document.getElementById('countdown');
       setInterval(function() {
         if (total <= 0) return;
         total--;
-        var m = Math.floor(total / 60);
-        var s = String(total % 60).padStart(2, '0');
-        el.textContent = m + ':' + s;
+        el.textContent = Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
       }, 1000);
     })();
 
-    // ================================================================
-    // Widget UI helpers
-    // ================================================================
-    var widget = document.getElementById('bsWidget');
-    var label = document.getElementById('bsLabel');
-    var icon = document.getElementById('bsIcon');
-
-    function setWidgetState(state, text) {
-      widget.className = 'bs-widget ' + state;
-      label.textContent = text;
-      if (state === 'verifying') {
-        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="bs-spin"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8" stroke-linecap="round"/></svg>';
-      } else if (state === 'verified') {
-        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      } else if (state === 'failed') {
-        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#dc2626" stroke-width="1.5"/><path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round"/></svg>';
-      } else {
-        icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.33L2.67 3.67V7.33C2.67 11.23 4.85 14.85 8 15.67C11.15 14.85 13.33 11.23 13.33 7.33V3.67L8 1.33Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      }
-    }
-
-    // ================================================================
-    // SDK A Verification Flow
-    // (same as ClientSdkPlayground: create-session → create-verification-link → SSE)
-    // ================================================================
-    async function startVerification() {
-      if (verifying) return;
-      verifying = true;
-      setWidgetState('verifying', 'Verifying...');
-
-      try {
-        // Step 1: Create session with site key
-        var sessionRes = await fetch(API_BASE + '/sdk/create-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + SITE_KEY,
-          },
-          body: JSON.stringify({
-            partner_user_id: 'demo_' + crypto.randomUUID().slice(0, 8),
-            metadata: { source: 'ticketz-demo' },
-          }),
-        });
-
-        var sessionData = await sessionRes.json();
-        if (!sessionRes.ok || sessionData?.data?.error) {
-          var sessionErr = sessionData?.data?.error?.message || sessionData?.error?.message || 'Session failed: ' + sessionRes.status;
-          throw new Error(sessionErr);
-        }
-        var session = sessionData.data?.data || sessionData.data;
-        var sessionToken = session?.anchor_grant_token || session?.session_token;
-        if (!sessionToken) throw new Error('No session token returned');
-
-        // Step 2: Create verification link
-        var linkRes = await fetch(API_BASE + '/sdk/create-verification-link', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + sessionToken,
-          },
-          body: JSON.stringify({
-            return_url: window.location.href,
-            scope: SCOPE,
-            sdk_type: 'signal',
-            mode: 'private',
-          }),
-        });
-
-        var linkData = await linkRes.json();
-        if (linkData?.data?.error) {
-          throw new Error(linkData.data.error.message || 'Verification link failed');
-        }
-        var link = linkData.data?.data || linkData.data;
-        var requestId = link?.request_id;
-        var webUrl = link?.web_url;
-
-        if (!webUrl || !requestId) throw new Error('No verification link returned');
-
-        // Step 3: Open verification in new tab (BotShield app for passkey)
-        window.open(webUrl, '_blank');
-        setWidgetState('verifying', 'Waiting for verification...');
-
-        // Step 4: Poll for completion (Heroku kills SSE after 30s)
-        pollStatus(requestId);
-
-      } catch (err) {
-        console.error('[BotShield]', err.message || err);
-        setWidgetState('failed', 'Verification failed — click to retry');
-        verifying = false;
-      }
-    }
-
-    // ================================================================
-    // Status Polling (Heroku kills SSE after 30s, so poll instead)
-    // ================================================================
-    async function pollStatus(requestId) {
-      var url = API_BASE + '/verification/status?request_id=' + encodeURIComponent(requestId);
-      var attempts = 0;
-      var maxAttempts = 120; // 4 min at 2s intervals
-
-      var interval = setInterval(async function() {
-        attempts++;
-        if (attempts > maxAttempts) {
-          clearInterval(interval);
-          setWidgetState('failed', 'Verification expired — click to retry');
-          verifying = false;
-          return;
-        }
-
-        try {
-          var res = await fetch(url);
-          if (!res.ok) return; // retry on next tick
-
-          var json = await res.json();
-          var data = json?.data?.data || json?.data || json;
-          var status = data?.status;
-
-          if (status === 'completed' || status === 'verified') {
-            clearInterval(interval);
-            onVerified(data);
-          } else if (status === 'failed') {
-            clearInterval(interval);
-            setWidgetState('failed', 'Verification failed — click to retry');
-            verifying = false;
-          } else if (status === 'expired') {
-            clearInterval(interval);
-            setWidgetState('failed', 'Verification expired — click to retry');
-            verifying = false;
-          }
-          // else: still pending, keep polling
-        } catch (e) {
-          // network error — retry on next tick
-        }
-      }, 2000);
-    }
-
-    // ================================================================
-    // Verified handler
-    // ================================================================
-    function onVerified(data) {
-      setWidgetState('verified', 'Human presence verified');
-      verifying = false;
-
-      // Enable purchase button
+    // BotShield events
+    bsVerify.addEventListener('botshield:success', function(e) {
+      console.log('[Ticketz] BotShield verified:', e.detail);
       document.getElementById('purchaseBtn').disabled = false;
-
-      // Show toast
       var toast = document.getElementById('toast');
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3000);
-    }
+    });
 
-    // ================================================================
-    // Purchase button
-    // ================================================================
+    bsVerify.addEventListener('botshield:failure', function(e) {
+      console.error('[Ticketz] BotShield verification failed:', e.detail);
+    });
+
+    bsVerify.addEventListener('botshield:expired', function(e) {
+      console.warn('[Ticketz] BotShield token expired:', e.detail);
+      document.getElementById('purchaseBtn').disabled = true;
+    });
+
+    // Purchase
     document.getElementById('purchaseBtn').addEventListener('click', function() {
       if (this.disabled) return;
       document.getElementById('confirmation').classList.add('show');
