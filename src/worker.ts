@@ -390,7 +390,7 @@ export default {
 
   <script>
     var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_test_405c955ab77e440ba0494ef45dc7b244';
+    var SITE_KEY = params.get('site_key') || 'pk_live_d57d5bc7dbb829c6bb0eb74fa7c8ea4e';
     var SCOPE = params.get('scope') || 'checkout';
     var MODE = params.get('mode') || 'private';
 
