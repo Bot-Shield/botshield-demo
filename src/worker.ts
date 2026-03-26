@@ -391,7 +391,7 @@ export default {
   <script>
     var params = new URLSearchParams(window.location.search);
     var SITE_KEY = params.get('site_key') || 'pk_live_d57d5bc7dbb829c6bb0eb74fa7c8ea4e';
-    var SCOPE = params.get('scope') || 'checkout';
+    var SCOPE = params.get('scope') || 'ticket_purchase';
     var MODE = params.get('mode') || 'private';
 
     var bsVerify = document.getElementById('bsVerify');
@@ -410,9 +410,12 @@ export default {
       }, 1000);
     })();
 
-    // BotShield events
+    // BotShield events — track verified token for server-side check
+    var verifiedToken = null;
+
     bsVerify.addEventListener('botshield:success', function(e) {
       console.log('[Ticketz] BotShield verified:', e.detail);
+      verifiedToken = e.detail && e.detail.token ? e.detail.token : null;
       document.getElementById('purchaseBtn').disabled = false;
       var toast = document.getElementById('toast');
       toast.classList.add('show');
@@ -421,16 +424,23 @@ export default {
 
     bsVerify.addEventListener('botshield:failure', function(e) {
       console.error('[Ticketz] BotShield verification failed:', e.detail);
+      verifiedToken = null;
+      document.getElementById('purchaseBtn').disabled = true;
     });
 
     bsVerify.addEventListener('botshield:expired', function(e) {
       console.warn('[Ticketz] BotShield token expired:', e.detail);
+      verifiedToken = null;
       document.getElementById('purchaseBtn').disabled = true;
     });
 
-    // Purchase
+    // Purchase — only allow if we have a valid verification token
     document.getElementById('purchaseBtn').addEventListener('click', function() {
-      if (this.disabled) return;
+      if (!verifiedToken) {
+        console.warn('[Ticketz] Purchase blocked — no verified token');
+        this.disabled = true;
+        return;
+      }
       document.getElementById('confirmation').classList.add('show');
     });
 
