@@ -331,10 +331,10 @@ export default {
         <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;">AF</div>
         <div class="event-details">
           <div class="event-artist">Arcade Fire</div>
-          <div class="event-tour">World Tour 2025</div>
+          <div class="event-tour">World Tour 2026</div>
           <div class="event-meta">
             <span>Madison Square Garden</span>
-            <span>Sat, Aug 16 &bull; 8:00pm</span>
+            <span>Sat, Apr 12 &bull; 8:00pm</span>
           </div>
         </div>
       </div>
