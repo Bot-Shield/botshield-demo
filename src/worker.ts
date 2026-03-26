@@ -331,10 +331,10 @@ export default {
         <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;">AF</div>
         <div class="event-details">
           <div class="event-artist">Arcade Fire</div>
-          <div class="event-tour">World Tour 2026</div>
+          <div class="event-tour" id="eventTour">World Tour</div>
           <div class="event-meta">
             <span>Madison Square Garden</span>
-            <span>Sat, Apr 12 &bull; 8:00pm</span>
+            <span id="eventDate"></span>
           </div>
         </div>
       </div>
@@ -389,6 +389,21 @@ export default {
   <script src="https://cdn.botshield.ai/sdk.js"></script>
 
   <script>
+    // Dynamic event date — next Saturday ~2 weeks out
+    (function() {
+      var now = new Date();
+      var target = new Date(now);
+      target.setDate(target.getDate() + 14);
+      // Roll forward to Saturday (6)
+      var day = target.getDay();
+      var diff = (6 - day + 7) % 7;
+      if (diff === 0 && day !== 6) diff = 7;
+      target.setDate(target.getDate() + diff);
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('eventDate').textContent = 'Sat, ' + months[target.getMonth()] + ' ' + target.getDate() + ' \\u2022 8:00pm';
+      document.getElementById('eventTour').textContent = 'World Tour ' + target.getFullYear();
+    })();
+
     var params = new URLSearchParams(window.location.search);
     var SITE_KEY = params.get('site_key') || 'pk_live_d57d5bc7dbb829c6bb0eb74fa7c8ea4e';
     var SCOPE = params.get('scope') || 'ticket_purchase';
