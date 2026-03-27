@@ -208,7 +208,8 @@ export default {
 
     /* ── BotShield widget ── */
     botshield-verify {
-      display: block;
+      display: flex;
+      justify-content: center;
       width: 100%;
     }
 
@@ -386,7 +387,7 @@ export default {
   </div>
 
   <!-- SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=2"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
