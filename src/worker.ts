@@ -242,6 +242,43 @@ export default {
     .purchase-btn:active:not(:disabled) { transform: scale(0.985); }
     .purchase-btn:disabled { opacity: 0.30; cursor: not-allowed; }
 
+    /* ── Census "Powered by" attribution footer (host-page, below Complete
+       Purchase). Pixel-matched to Figma OsQQtkzL52OOOGVnWNwDFX node 1984:6645:
+       Census wordmark + green check, then "Privacy | Terms" (Inter Medium,
+       14.4px, white) centered below. ── */
+    .census-branding {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 16px;
+      width: 100%;
+    }
+    .census-branding .census-logo {
+      height: 44px;
+      width: auto;
+      max-width: 100%;
+      display: block;
+    }
+    .census-branding .census-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14.4px;
+      font-weight: 500;
+      line-height: 31px;
+      color: #ffffff;
+    }
+    .census-branding .census-links a {
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .census-branding .census-links a:hover { text-decoration: underline; }
+    .census-branding .census-sep { color: #ffffff; }
+
     /* ── Toast ── */
     .toast {
       position: fixed;
@@ -369,6 +406,16 @@ export default {
     <!-- Purchase -->
     <div class="actions">
       <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
+
+      <!-- Census "Powered by" attribution (SDK-served logo) -->
+      <div class="census-branding">
+        <img class="census-logo" src="https://cdn.botshield.ai/assets/census-logo.svg" alt="Powered by Census" width="225" height="50" />
+        <div class="census-links">
+          <a href="https://botshield.ai/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a>
+          <span class="census-sep" aria-hidden="true">|</span>
+          <a href="https://botshield.ai/terms" target="_blank" rel="noopener noreferrer">Terms</a>
+        </div>
+      </div>
     </div>
   </div>
 
