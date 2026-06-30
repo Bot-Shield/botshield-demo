@@ -363,7 +363,7 @@ export default {
   </div>
 
   <!-- SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=11"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=12"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
