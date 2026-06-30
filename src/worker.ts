@@ -213,86 +213,10 @@ export default {
       width: 100%;
     }
 
-    /* ── Actions: purchase button ── */
-    .actions {
-      width: 100%;
-      flex-shrink: 0;
-    }
-
-    .purchase-btn {
-      width: 100%;
-      padding: 10px 16px;
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      background: #7f56d9;
-      color: #ffffff;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 24px;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      box-shadow:
-        0px 1px 2px 0px rgba(10, 13, 18, 0.05),
-        inset 0px -2px 0px 0px rgba(10, 13, 18, 0.05),
-        inset 0px 0px 0px 1px rgba(10, 13, 18, 0.18);
-    }
-
-    .purchase-btn:hover:not(:disabled) { opacity: 0.92; }
-    .purchase-btn:active:not(:disabled) { transform: scale(0.985); }
-    .purchase-btn:disabled { opacity: 0.30; cursor: not-allowed; }
-
-    /* ── Footer below Complete Purchase: Census attribution + StayVerified
-       MultiPass button, SIDE BY SIDE, vertically centered to each other, the
-       whole group horizontally centered. 30px gap (per Figma #140). ── */
-    .census-footer {
-      display: flex;
-      flex-direction: row;
-      align-items: center;        /* branding + button vertically centered */
-      justify-content: center;    /* group horizontally centered */
-      gap: 30px;                  /* exactly 30px between branding and button */
-      margin-top: 16px;
-      width: 100%;
-      flex-wrap: wrap;            /* graceful on very narrow screens */
-    }
-
-    /* Census lockup — wordmark + check, then "Privacy | Terms" below. Sized to
-       the Figma footer lockup: ~86.16 x 31.26 px (node 1984:6645, uniformly
-       scaled). Wordmark width 86.16 -> height ~19.2; links sized so the total
-       block is ~31px tall. */
-    .census-branding {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1px;
-      width: 86.16px;
-    }
-    .census-branding .census-logo {
-      width: 86.16px;
-      height: auto;               /* ~19.2px from the 224.088x50 viewBox */
-      display: block;
-    }
-    .census-branding .census-links {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      font-family: 'Inter', sans-serif;
-      font-size: 9px;
-      font-weight: 500;
-      line-height: 11px;
-      color: #ffffff;
-    }
-    .census-branding .census-links a {
-      color: #ffffff;
-      text-decoration: none;
-    }
-    .census-branding .census-links a:hover { text-decoration: underline; }
-    .census-branding .census-sep { color: #ffffff; }
-
-    /* StayVerified SDK element sits inline in the row at its native size. */
-    botshield-stayverified { display: inline-flex; align-items: center; }
+    /* The verify button, checkout button, and footer (Census attribution +
+       MultiPass CTA) are all rendered inside <botshield-verify>. The demo only
+       relabels the checkout button (checkout-label) and could restyle it via
+       the component's --bs-checkout-* custom properties. */
 
     /* ── Toast ── */
     .toast {
@@ -410,34 +334,17 @@ export default {
       </div>
     </div>
 
-    <!-- BotShield Verify -->
+    <!-- BotShield Verify — ONE component renders the verify button, the
+         checkout button (verified-gated, component-owned), and the footer
+         (Census attribution + MultiPass CTA). The demo only restyles/relabels
+         the checkout button and listens for botshield:checkout. -->
     <botshield-verify
       id="bsVerify"
       theme="dark"
       scan-mode="modal"
       signals="true"
+      checkout-label="Complete Purchase"
     ></botshield-verify>
-
-    <!-- Purchase -->
-    <div class="actions">
-      <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
-
-      <!-- Footer: Census attribution + StayVerified MultiPass button, side by side -->
-      <div class="census-footer">
-        <!-- Census attribution (SDK-served logo) -->
-        <div class="census-branding">
-          <img class="census-logo" src="https://cdn.botshield.ai/assets/census-logo.svg" alt="Powered by Census" width="225" height="50" />
-          <div class="census-links">
-            <a href="https://botshield.ai/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a>
-            <span class="census-sep" aria-hidden="true">|</span>
-            <a href="https://botshield.ai/terms" target="_blank" rel="noopener noreferrer">Terms</a>
-          </div>
-        </div>
-
-        <!-- StayVerified MultiPass — standalone SDK custom element -->
-        <botshield-stayverified id="bsStayVerified"></botshield-stayverified>
-      </div>
-    </div>
   </div>
 
   <!-- Toast -->
@@ -455,7 +362,7 @@ export default {
   </div>
 
   <!-- SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=5"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=6"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
@@ -483,16 +390,6 @@ export default {
     bsVerify.setAttribute('scope', SCOPE);
     bsVerify.setAttribute('mode', MODE);
 
-    // StayVerified MultiPass CTA (footer) — same SDK element, gated on scope.
-    var bsStayVerified = document.getElementById('bsStayVerified');
-    if (bsStayVerified) {
-      bsStayVerified.setAttribute('site-key', SITE_KEY);
-      bsStayVerified.setAttribute('scope', SCOPE);
-      bsStayVerified.addEventListener('botshield:stayverified', function(e) {
-        console.log('[demo] stayverified clicked', e.detail);
-      });
-    }
-
     // Countdown (cosmetic)
     (function() {
       var total = 7 * 60 + 32;
@@ -504,13 +401,12 @@ export default {
       }, 1000);
     })();
 
-    // BotShield events — track verified token for server-side check
-    var verifiedToken = null;
-
+    // BotShield events. The component owns the checkout button's verified-gating
+    // + tamper-proofing, so the demo no longer tracks the token or toggles a
+    // button — it just reacts to the verification result (cosmetic toast) and
+    // runs the purchase when the component emits botshield:checkout.
     bsVerify.addEventListener('botshield:success', function(e) {
       console.log('[Ticketz] BotShield verified:', e.detail);
-      verifiedToken = e.detail && e.detail.token ? e.detail.token : null;
-      document.getElementById('purchaseBtn').disabled = false;
       var toast = document.getElementById('toast');
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3000);
@@ -518,24 +414,23 @@ export default {
 
     bsVerify.addEventListener('botshield:failure', function(e) {
       console.error('[Ticketz] BotShield verification failed:', e.detail);
-      verifiedToken = null;
-      document.getElementById('purchaseBtn').disabled = true;
     });
 
     bsVerify.addEventListener('botshield:expired', function(e) {
       console.warn('[Ticketz] BotShield token expired:', e.detail);
-      verifiedToken = null;
-      document.getElementById('purchaseBtn').disabled = true;
     });
 
-    // Purchase — only allow if we have a valid verification token
-    document.getElementById('purchaseBtn').addEventListener('click', function() {
-      if (!verifiedToken) {
-        console.warn('[Ticketz] Purchase blocked — no verified token');
-        this.disabled = true;
-        return;
-      }
+    // Checkout — fired by the component ONLY when its internal server-verified
+    // state is resolved (the component enforces the gate; the demo just runs the
+    // purchase). Show the order confirmation.
+    bsVerify.addEventListener('botshield:checkout', function(e) {
+      console.log('[Ticketz] Checkout (verified):', e.detail);
       document.getElementById('confirmation').classList.add('show');
+    });
+
+    // MultiPass "Works with / Add to BotShield" CTA (footer, inside the component).
+    bsVerify.addEventListener('botshield:stayverified', function(e) {
+      console.log('[Ticketz] stayverified clicked:', e.detail);
     });
 
     document.getElementById('confirmation').addEventListener('click', function(e) {
