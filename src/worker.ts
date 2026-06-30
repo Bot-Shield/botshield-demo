@@ -242,34 +242,46 @@ export default {
     .purchase-btn:active:not(:disabled) { transform: scale(0.985); }
     .purchase-btn:disabled { opacity: 0.30; cursor: not-allowed; }
 
-    /* ── Census "Powered by" attribution footer (host-page, below Complete
-       Purchase). Pixel-matched to Figma OsQQtkzL52OOOGVnWNwDFX node 1984:6645:
-       Census wordmark + green check, then "Privacy | Terms" (Inter Medium,
-       14.4px, white) centered below. ── */
+    /* ── Footer below Complete Purchase: Census attribution + StayVerified
+       MultiPass button, SIDE BY SIDE, vertically centered to each other, the
+       whole group horizontally centered. 30px gap (per Figma #140). ── */
+    .census-footer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;        /* branding + button vertically centered */
+      justify-content: center;    /* group horizontally centered */
+      gap: 30px;                  /* exactly 30px between branding and button */
+      margin-top: 16px;
+      width: 100%;
+      flex-wrap: wrap;            /* graceful on very narrow screens */
+    }
+
+    /* Census lockup — wordmark + check, then "Privacy | Terms" below. Sized to
+       the Figma footer lockup: ~86.16 x 31.26 px (node 1984:6645, uniformly
+       scaled). Wordmark width 86.16 -> height ~19.2; links sized so the total
+       block is ~31px tall. */
     .census-branding {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      margin-top: 16px;
-      width: 100%;
+      gap: 1px;
+      width: 86.16px;
     }
     .census-branding .census-logo {
-      height: 44px;
-      width: auto;
-      max-width: 100%;
+      width: 86.16px;
+      height: auto;               /* ~19.2px from the 224.088x50 viewBox */
       display: block;
     }
     .census-branding .census-links {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 4px;
       font-family: 'Inter', sans-serif;
-      font-size: 14.4px;
+      font-size: 9px;
       font-weight: 500;
-      line-height: 31px;
+      line-height: 11px;
       color: #ffffff;
     }
     .census-branding .census-links a {
@@ -278,6 +290,9 @@ export default {
     }
     .census-branding .census-links a:hover { text-decoration: underline; }
     .census-branding .census-sep { color: #ffffff; }
+
+    /* StayVerified SDK element sits inline in the row at its native size. */
+    botshield-stayverified { display: inline-flex; align-items: center; }
 
     /* ── Toast ── */
     .toast {
@@ -407,14 +422,20 @@ export default {
     <div class="actions">
       <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
 
-      <!-- Census "Powered by" attribution (SDK-served logo) -->
-      <div class="census-branding">
-        <img class="census-logo" src="https://cdn.botshield.ai/assets/census-logo.svg" alt="Powered by Census" width="225" height="50" />
-        <div class="census-links">
-          <a href="https://botshield.ai/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a>
-          <span class="census-sep" aria-hidden="true">|</span>
-          <a href="https://botshield.ai/terms" target="_blank" rel="noopener noreferrer">Terms</a>
+      <!-- Footer: Census attribution + StayVerified MultiPass button, side by side -->
+      <div class="census-footer">
+        <!-- Census attribution (SDK-served logo) -->
+        <div class="census-branding">
+          <img class="census-logo" src="https://cdn.botshield.ai/assets/census-logo.svg" alt="Powered by Census" width="225" height="50" />
+          <div class="census-links">
+            <a href="https://botshield.ai/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a>
+            <span class="census-sep" aria-hidden="true">|</span>
+            <a href="https://botshield.ai/terms" target="_blank" rel="noopener noreferrer">Terms</a>
+          </div>
         </div>
+
+        <!-- StayVerified MultiPass — standalone SDK custom element -->
+        <botshield-stayverified id="bsStayVerified"></botshield-stayverified>
       </div>
     </div>
   </div>
@@ -434,7 +455,7 @@ export default {
   </div>
 
   <!-- SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=3"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=5"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
@@ -461,6 +482,16 @@ export default {
     bsVerify.setAttribute('site-key', SITE_KEY);
     bsVerify.setAttribute('scope', SCOPE);
     bsVerify.setAttribute('mode', MODE);
+
+    // StayVerified MultiPass CTA (footer) — same SDK element, gated on scope.
+    var bsStayVerified = document.getElementById('bsStayVerified');
+    if (bsStayVerified) {
+      bsStayVerified.setAttribute('site-key', SITE_KEY);
+      bsStayVerified.setAttribute('scope', SCOPE);
+      bsStayVerified.addEventListener('botshield:stayverified', function(e) {
+        console.log('[demo] stayverified clicked', e.detail);
+      });
+    }
 
     // Countdown (cosmetic)
     (function() {
