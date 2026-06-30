@@ -207,40 +207,17 @@ export default {
     .order-total span { color: #ffffff; }
 
     /* ── BotShield widget ── */
+    /* display:block (NOT flex) — the component stacks its rows internally; a
+       flex host would lay its shadow children out in a row. */
     botshield-verify {
-      display: flex;
-      justify-content: center;
+      display: block;
       width: 100%;
     }
 
-    /* ── Actions: purchase button ── */
-    .actions {
-      width: 100%;
-      flex-shrink: 0;
-    }
-
-    .purchase-btn {
-      width: 100%;
-      padding: 10px 16px;
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      background: #7f56d9;
-      color: #ffffff;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 24px;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      box-shadow:
-        0px 1px 2px 0px rgba(10, 13, 18, 0.05),
-        inset 0px -2px 0px 0px rgba(10, 13, 18, 0.05),
-        inset 0px 0px 0px 1px rgba(10, 13, 18, 0.18);
-    }
-
-    .purchase-btn:hover:not(:disabled) { opacity: 0.92; }
-    .purchase-btn:active:not(:disabled) { transform: scale(0.985); }
-    .purchase-btn:disabled { opacity: 0.30; cursor: not-allowed; }
+    /* The verify button, checkout button, and footer (Census attribution +
+       MultiPass CTA) are all rendered inside <botshield-verify>. The demo only
+       relabels the checkout button (checkout-label) and could restyle it via
+       the component's --bs-checkout-* custom properties. */
 
     /* ── Toast ── */
     .toast {
@@ -358,18 +335,17 @@ export default {
       </div>
     </div>
 
-    <!-- BotShield Verify -->
+    <!-- BotShield Verify — ONE component renders the verify button, the
+         checkout button (verified-gated, component-owned), and the footer
+         (Census attribution + MultiPass CTA). The demo only restyles/relabels
+         the checkout button and listens for botshield:checkout. -->
     <botshield-verify
       id="bsVerify"
       theme="dark"
       scan-mode="modal"
       signals="true"
+      checkout-label="Complete Purchase"
     ></botshield-verify>
-
-    <!-- Purchase -->
-    <div class="actions">
-      <button class="purchase-btn" id="purchaseBtn" disabled>Complete Purchase</button>
-    </div>
   </div>
 
   <!-- Toast -->
@@ -387,7 +363,7 @@ export default {
   </div>
 
   <!-- SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=3"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=11"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
@@ -426,13 +402,12 @@ export default {
       }, 1000);
     })();
 
-    // BotShield events — track verified token for server-side check
-    var verifiedToken = null;
-
+    // BotShield events. The component owns the checkout button's verified-gating
+    // + tamper-proofing, so the demo no longer tracks the token or toggles a
+    // button — it just reacts to the verification result (cosmetic toast) and
+    // runs the purchase when the component emits botshield:checkout.
     bsVerify.addEventListener('botshield:success', function(e) {
       console.log('[Ticketz] BotShield verified:', e.detail);
-      verifiedToken = e.detail && e.detail.token ? e.detail.token : null;
-      document.getElementById('purchaseBtn').disabled = false;
       var toast = document.getElementById('toast');
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3000);
@@ -440,24 +415,23 @@ export default {
 
     bsVerify.addEventListener('botshield:failure', function(e) {
       console.error('[Ticketz] BotShield verification failed:', e.detail);
-      verifiedToken = null;
-      document.getElementById('purchaseBtn').disabled = true;
     });
 
     bsVerify.addEventListener('botshield:expired', function(e) {
       console.warn('[Ticketz] BotShield token expired:', e.detail);
-      verifiedToken = null;
-      document.getElementById('purchaseBtn').disabled = true;
     });
 
-    // Purchase — only allow if we have a valid verification token
-    document.getElementById('purchaseBtn').addEventListener('click', function() {
-      if (!verifiedToken) {
-        console.warn('[Ticketz] Purchase blocked — no verified token');
-        this.disabled = true;
-        return;
-      }
+    // Checkout — fired by the component ONLY when its internal server-verified
+    // state is resolved (the component enforces the gate; the demo just runs the
+    // purchase). Show the order confirmation.
+    bsVerify.addEventListener('botshield:checkout', function(e) {
+      console.log('[Ticketz] Checkout (verified):', e.detail);
       document.getElementById('confirmation').classList.add('show');
+    });
+
+    // MultiPass "Works with / Add to BotShield" CTA (footer, inside the component).
+    bsVerify.addEventListener('botshield:stayverified', function(e) {
+      console.log('[Ticketz] stayverified clicked:', e.detail);
     });
 
     document.getElementById('confirmation').addEventListener('click', function(e) {
