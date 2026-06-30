@@ -207,9 +207,10 @@ export default {
     .order-total span { color: #ffffff; }
 
     /* ── BotShield widget ── */
+    /* display:block (NOT flex) — the component stacks its rows internally; a
+       flex host would lay its shadow children out in a row. */
     botshield-verify {
-      display: flex;
-      justify-content: center;
+      display: block;
       width: 100%;
     }
 
