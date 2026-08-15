@@ -280,6 +280,50 @@ export default {
 
     .confirmation h2 { font-size: 20px; margin-bottom: 6px; }
     .confirmation p { font-size: 14px; color: #9ca3af; }
+
+    /* ── Demo controls (top-right): Reset + partner-ref chip ──
+       Demo chrome, not part of the Ticketz page design — quiet by intent. */
+    .demo-controls {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 12px);
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      z-index: 30000;
+    }
+
+    .demo-reset {
+      background: rgba(26, 26, 26, 0.9);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #9ca3af;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .demo-reset:hover { color: #ffffff; border-color: #3a3a3a; }
+
+    .demo-ref {
+      display: none;
+      background: rgba(26, 26, 26, 0.9);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #61656c;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 6px 8px;
+      cursor: pointer;
+    }
+
+    .demo-ref.show { display: block; }
+    .demo-ref:active { color: #9ca3af; }
   </style>
 </head>
 <body>
@@ -348,6 +392,14 @@ export default {
     ></botshield-verify>
   </div>
 
+  <!-- Demo controls: reset the widget state; the partner ref survives so the
+       second run demos the MultiPass instant path. Chip appears after the
+       first successful verification; tap copies the ref. -->
+  <div class="demo-controls">
+    <button type="button" class="demo-reset" id="demoReset">Reset</button>
+    <button type="button" class="demo-ref" id="demoRef" title="partner_user_ref — tap to copy"></button>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast">Human verified — you're good to go!</div>
 
@@ -391,6 +443,41 @@ export default {
     bsVerify.setAttribute('scope', SCOPE);
     bsVerify.setAttribute('mode', MODE);
 
+    // ── Partner user ref (MultiPass instant path) ─────────────────────
+    // A real partner sends their own logged-in user id here. The demo mints
+    // a stable stand-in once and keeps it in localStorage: the FIRST
+    // verification links it to the BotShield identity server-side
+    // (partner_user_linkages, link-on-verify default), so every later
+    // evaluate with the same ref resolves the user and returns the instant
+    // pass — the MultiPass Active pill, no QR. ?fresh=1 mints a new ref
+    // (detaches this demo identity) to run the full QR flow again.
+    var REF_KEY = 'tkz_demo_user_ref';
+    var VERIFIED_KEY = 'tkz_demo_verified_once';
+    var userRef = localStorage.getItem(REF_KEY);
+    if (!userRef || params.get('fresh')) {
+      userRef = 'tkz_' + Array.from(crypto.getRandomValues(new Uint8Array(6)))
+        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      localStorage.setItem(REF_KEY, userRef);
+      localStorage.removeItem(VERIFIED_KEY);
+    }
+    bsVerify.setAttribute('platform-user-ref', userRef);
+
+    // Ref chip — visible once a verification has happened on this browser.
+    var refChip = document.getElementById('demoRef');
+    refChip.textContent = userRef;
+    if (localStorage.getItem(VERIFIED_KEY)) refChip.classList.add('show');
+    refChip.addEventListener('click', function() {
+      navigator.clipboard && navigator.clipboard.writeText(userRef);
+    });
+
+    // Reset — back to the idle widget for another pass. The ref survives on
+    // purpose: the point of the second run is the MultiPass instant path.
+    document.getElementById('demoReset').addEventListener('click', function() {
+      bsVerify.reset();
+      document.getElementById('confirmation').classList.remove('show');
+      document.getElementById('toast').classList.remove('show');
+    });
+
     // Countdown (cosmetic)
     (function() {
       var total = 7 * 60 + 32;
@@ -411,6 +498,9 @@ export default {
       var toast = document.getElementById('toast');
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3000);
+      // First success on this browser: surface the partner ref chip.
+      localStorage.setItem(VERIFIED_KEY, '1');
+      refChip.classList.add('show');
     });
 
     bsVerify.addEventListener('botshield:failure', function(e) {
