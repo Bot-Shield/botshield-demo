@@ -382,7 +382,7 @@ export default {
     })();
 
     var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_live_d57d5bc7dbb829c6bb0eb74fa7c8ea4e';
+    var SITE_KEY = params.get('site_key') || 'pk_live_c71c420add027025b9e42c1ba9ff00ce';
     var SCOPE = params.get('scope') || 'ticket_purchase';
     var MODE = params.get('mode') || 'private';
 
