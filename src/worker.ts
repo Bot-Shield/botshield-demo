@@ -414,8 +414,11 @@ export default {
     </div>
   </div>
 
-  <!-- SDK -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=12"></script>
+  <!-- SDK — cdn-staging until the prod Supabase cutover is seeded: the demo's
+       site keys live in the staging DB, so cdn (→ Heroku prod → fresh prod DB)
+       rejects them with "Invalid site key". Flip back to cdn.botshield.ai at
+       cutover. -->
+  <script src="https://cdn-staging.botshield.ai/sdk.js?v=13"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
