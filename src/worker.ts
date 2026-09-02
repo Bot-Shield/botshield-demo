@@ -215,7 +215,7 @@ export default {
     }
 
     /* The verify button, checkout button, and footer (Census attribution +
-       MultiPass CTA) are all rendered inside <botshield-verify>. The demo only
+       BotShield ID CTA) are all rendered inside <botshield-verify>. The demo only
        relabels the checkout button (checkout-label) and could restyle it via
        the component's --bs-checkout-* custom properties. */
 
@@ -381,7 +381,7 @@ export default {
 
     <!-- BotShield Verify — ONE component renders the verify button, the
          checkout button (verified-gated, component-owned), and the footer
-         (Census attribution + MultiPass CTA). The demo only restyles/relabels
+         (Census attribution + BotShield ID CTA). The demo only restyles/relabels
          the checkout button and listens for botshield:checkout. -->
     <botshield-verify
       id="bsVerify"
@@ -414,10 +414,15 @@ export default {
     </div>
   </div>
 
-  <!-- SDK — cdn-staging until the prod Supabase cutover is seeded: the demo's
-       site keys live in the staging DB, so cdn (→ Heroku prod → fresh prod DB)
-       rejects them with "Invalid site key". Flip back to cdn.botshield.ai at
-       cutover. -->
+  <!-- SDK host = which backend the demo runs against. cdn-staging → the embed
+       routes to wg-staging.botshield.ai (a Cloudflare TUNNEL to a laptop WG —
+       NOT a hosted server); cdn → wg.botshield.ai (Heroku prod).
+       Prod is READY for this demo as of 2026-09-02: the prod DB carries a
+       seeded Ticketz partner (pk_live_e398598c7f5af741b540abffd49ae74e,
+       "Demo (Ticketz) — seeded 2026-08-15") with an active production
+       ticket_purchase gate. Flip to cdn.botshield.ai + that key for a
+       laptop-independent, prod-backed demo (the scanning phone must then run
+       the prod app build). -->
   <script src="https://cdn-staging.botshield.ai/sdk.js?v=13"></script>
 
   <script>
@@ -446,14 +451,16 @@ export default {
     bsVerify.setAttribute('scope', SCOPE);
     bsVerify.setAttribute('mode', MODE);
 
-    // ── Partner user ref (MultiPass instant path) ─────────────────────
+    // ── Partner user ref (BotShield ID continuity — the instant path) ──
     // A real partner sends their own logged-in user id here. The demo mints
     // a stable stand-in once and keeps it in localStorage: the FIRST
     // verification links it to the BotShield identity server-side
     // (partner_user_linkages, link-on-verify default), so every later
     // evaluate with the same ref resolves the user and returns the instant
-    // pass — the MultiPass Active pill, no QR. ?fresh=1 mints a new ref
-    // (detaches this demo identity) to run the full QR flow again.
+    // pass — result_state 'human_verified', the "Human Verified" pill, no QR.
+    // (Two-state contract: the retired reason/"MultiPass Active" state no
+    // longer crosses the wire — both runs read "Human Verified"; the tell is
+    // the missing QR.) ?fresh=1 mints a new ref to run the full QR flow again.
     var REF_KEY = 'tkz_demo_user_ref';
     var VERIFIED_KEY = 'tkz_demo_verified_once';
     var userRef = localStorage.getItem(REF_KEY);
@@ -474,7 +481,8 @@ export default {
     });
 
     // Reset — back to the idle widget for another pass. The ref survives on
-    // purpose: the point of the second run is the MultiPass instant path.
+    // purpose: the point of the second run is the instant path (BotShield ID
+    // continuity — verified with no QR).
     document.getElementById('demoReset').addEventListener('click', function() {
       bsVerify.reset();
       document.getElementById('confirmation').classList.remove('show');
@@ -510,9 +518,9 @@ export default {
       console.error('[Ticketz] BotShield verification failed:', e.detail);
     });
 
-    bsVerify.addEventListener('botshield:expired', function(e) {
-      console.warn('[Ticketz] BotShield token expired:', e.detail);
-    });
+    // (Dead listener removed: the component never dispatches 'botshield:expired'
+    // as a DOM event — expiry resets the widget and calls the `onexpired`
+    // callback attribute instead.)
 
     // Checkout — fired by the component ONLY when its internal server-verified
     // state is resolved (the component enforces the gate; the demo just runs the
@@ -522,10 +530,8 @@ export default {
       document.getElementById('confirmation').classList.add('show');
     });
 
-    // MultiPass "Works with / Add to BotShield" CTA (footer, inside the component).
-    bsVerify.addEventListener('botshield:stayverified', function(e) {
-      console.log('[Ticketz] stayverified clicked:', e.detail);
-    });
+    // (Dead listener removed: 'botshield:stayverified' is never dispatched —
+    // the footer "Stay Verified" lockup inside the component is static branding.)
 
     document.getElementById('confirmation').addEventListener('click', function(e) {
       if (e.target === this) this.classList.remove('show');

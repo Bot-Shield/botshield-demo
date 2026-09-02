@@ -15,22 +15,27 @@ sequenceDiagram
     participant Server as Your Server
 
     User->>Site: Loads checkout page
-    Site-->>User: Renders botshield-verify widget
+    Site-->>User: Renders botshield-verify widget (Verify human with BotShield)
 
-    User->>CDN: Clicks widget, opens /challenge
-    CDN->>CDN: Edge bot scoring + fingerprint
-    CDN->>CDN: Signs JWT with HMAC-SHA256
-    CDN-->>Site: Token via postMessage
+    User->>CDN: Clicks Verify
+    CDN->>API: POST /signal/evaluate (site key, gate, partner user ref)
+    API-->>CDN: { verdict, result_state }
+    alt result_state = human_verified (returning user, current BotShield ID)
+        CDN-->>Site: verified — no ceremony
+    else verdict = require_presence
+        CDN-->>User: QR / deep link → BotShield app → Face ID
+        API->>API: verification/complete → ES256 attestation (JWKS)
+        CDN-->>Site: botshield:success { token }
+    end
 
     Site-->>User: Complete Purchase button enabled
 
-    User->>Server: Submits form with token
-    Server->>API: POST /sdk/verify-token
-    API-->>Server: valid true, claims
+    User->>Server: Submits order with token
+    Server->>API: verify against JWKS (or POST /sdk/verify-token)
     Server-->>User: Purchase confirmed
 ```
 
-No secrets on your site. The `pk_*` site key is public. Token signing happens on BotShield's infrastructure. Your server validates tokens via the [BotShield API](https://docs.botshield.ai).
+No secrets on your site. The `pk_*` site key is public. The attestation is an **ES256 JWT** signed on BotShield's infrastructure and verifiable against BotShield's public **JWKS** (`https://api.botshield.ai/.well-known/jwks.json`) — your server can validate it locally, or call the [BotShield API](https://docs.botshield.ai). Your site never learns *who* the person is — only that a real human is present (**Census two-result-state contract**: `human_verified` | `unavailable`).
 
 ## Quick Start
 
@@ -86,16 +91,18 @@ This is a single-file Worker (`src/worker.ts`) that returns HTML. Customize it h
 
 - **Branding** — change colors, logo, product details
 - **Theme** — set `theme="light"`, `theme="dark"`, or `theme="auto"` on the widget
-- **Button gating** — the "Complete Purchase" button is disabled until verification succeeds:
+- **Button gating** — the widget owns a verified-gated checkout button (`checkout-label`) and fires `botshield:checkout` only from its resolved state; or gate your own button on `botshield:success`:
 
 ```javascript
 document.addEventListener('botshield:success', (e) => {
-  const token = e.detail.token; // signed JWT
+  const { token, request_id, via } = e.detail; // token = ES256 attestation JWT
   buyButton.disabled = false;
 });
 ```
 
-- **Server-side validation** — send the token to your backend and call:
+- **Returning users (BotShield ID continuity)** — pass your own user id as `platform-user-ref`. The first verification links it to the person's BotShield ID (`link-on-verify`, default on); on later visits `/signal/evaluate` returns `result_state: "human_verified"` directly and the widget resolves with no QR and no Face ID.
+
+- **Server-side validation** — the attestation is an ES256 JWT (`kid` in the header). Verify it locally against BotShield's JWKS — `https://api.botshield.ai/.well-known/jwks.json` — with any standard JWT library, or send it to BotShield:
 
 ```bash
 curl -X POST https://api.botshield.ai/operations/sdk/verify-token \
@@ -103,19 +110,7 @@ curl -X POST https://api.botshield.ai/operations/sdk/verify-token \
   -d '{"token": "eyJhbG..."}'
 ```
 
-Response:
-```json
-{
-  "valid": true,
-  "claims": {
-    "botshield_user_id": "abc-123",
-    "verified": true,
-    "auth_mode": "private",
-    "organization_id": "org_...",
-    "expires_at": 1710700000
-  }
-}
-```
+The claims carry `verified: true`, the `request_id`, the organization, and expiry (attestations are short-lived and single-use per request) — and **no identity**: BotShield never returns who the person is.
 
 ## Widget Reference
 
@@ -126,19 +121,22 @@ Response:
 <!-- Place the widget -->
 <botshield-verify
   site-key="pk_test_..."
+  scope="ticket_purchase"
   theme="dark"
+  platform-user-ref="your-user-id"
+  link-on-verify="true"
+  checkout-label="Complete Purchase"
   onsuccess="handleVerified"
   onfailure="handleFailed"
 ></botshield-verify>
 
 <script>
   function handleVerified(detail) {
-    console.log('Token:', detail.token);
-    console.log('Score:', detail.score);
+    console.log('Token:', detail.token, 'via:', detail.via);
   }
 
   function handleFailed(detail) {
-    console.log('Reason:', detail.reason);
+    console.log('Failed:', detail.reason);
   }
 </script>
 ```
@@ -146,10 +144,14 @@ Response:
 | Attribute | Values | Default | Description |
 |-----------|--------|---------|-------------|
 | `site-key` | `pk_test_*`, `pk_live_*` | — | Your BotShield site key (required) |
+| `scope` | gate name | — | The **gate** this action moment runs (create gates in the Console under BotShield Census) |
 | `theme` | `light`, `dark`, `auto` | `auto` | Widget color scheme |
-| `mode` | `session`, `always` | `session` | Verification frequency |
-| `onsuccess` | function name | — | Called with `{ token, score }` on verification |
-| `onfailure` | function name | — | Called with `{ reason, score }` on failure |
+| `mode` | `private`, `linked-account` | `private` | Anonymous verification vs. link a known account |
+| `platform-user-ref` | your user id | — | Enables BotShield ID continuity for returning users (sent to BotShield as `partner_user_ref`; hashed at rest) |
+| `link-on-verify` | `true`, `false` | `true` | Write the user↔BotShield ID linkage after a successful verification |
+| `scan-mode` | `modal` | `modal` | On desktop, the QR hand-off renders as an on-page modal |
+| `checkout-label` | text | — | Label for the widget-owned, verified-gated checkout button |
+| `onsuccess` / `onfailure` | function name | — | Callbacks mirroring the events below |
 
 ## Events
 
@@ -157,9 +159,11 @@ The widget dispatches Custom Events that bubble through the DOM:
 
 | Event | Detail | When |
 |-------|--------|------|
-| `botshield:success` | `{ token, score }` | User verified |
-| `botshield:failure` | `{ reason, score }` | Verification failed or bot detected |
-| `botshield:challenge` | `{ reason, verification_url }` | Active verification needed (high-risk score) |
+| `botshield:multipass-status` | `{ event_id, request_id, verdict, result_state }` | The pre-check answer from `/signal/evaluate`. **Gate on `result_state`** (`human_verified` \| `unavailable`); `verdict` (`pass` \| `require_presence`) is only the widget's flow signal. *(Event name kept for compatibility.)* |
+| `botshield:success` | `{ token, request_id, via }` | A real human is verified — `token` is the ES256 attestation |
+| `botshield:failure` | `{ reason }` | Verification failed or was declined |
+| `botshield:challenge` | `{ request_id, web_url, deep_link }` | A verification ceremony was started (QR / deep link) |
+| `botshield:checkout` | `{ request_id }` | The widget-owned checkout button was clicked from a verified state |
 | `botshield:reset` | `{}` | Widget reset to idle |
 
 ## Links
