@@ -519,7 +519,7 @@ export default {
     });
 
     // (Dead listener removed: the component never dispatches 'botshield:expired'
-    // as a DOM event — expiry resets the widget and calls the `onexpired`
+    // as a DOM event — expiry resets the widget and calls the 'onexpired'
     // callback attribute instead.)
 
     // Checkout — fired by the component ONLY when its internal server-verified
