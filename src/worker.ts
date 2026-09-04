@@ -424,7 +424,7 @@ export default {
        ticket_purchase gate. Flip to cdn.botshield.ai + that key for a
        laptop-independent, prod-backed demo (the scanning phone must then run
        the prod app build). -->
-  <script src="https://cdn-staging.botshield.ai/sdk.js?v=14"></script>
+  <script src="https://cdn-staging.botshield.ai/sdk.js?v=15"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
