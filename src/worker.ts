@@ -389,11 +389,12 @@ export default {
       scan-mode="modal"
       signals="true"
       checkout-label="Complete Purchase"
+      betas="inline-passkey"
     ></botshield-verify>
   </div>
 
   <!-- Demo controls: reset the widget state; the partner ref survives so the
-       second run demos the MultiPass instant path. Chip appears after the
+       second run demos the BotShield ID instant path. Chip appears after the
        first successful verification; tap copies the ref. -->
   <div class="demo-controls">
     <button type="button" class="demo-reset" id="demoReset">Reset</button>
@@ -423,7 +424,7 @@ export default {
        ticket_purchase gate. Flip to cdn.botshield.ai + that key for a
        laptop-independent, prod-backed demo (the scanning phone must then run
        the prod app build). -->
-  <script src="https://cdn-staging.botshield.ai/sdk.js?v=13"></script>
+  <script src="https://cdn-staging.botshield.ai/sdk.js?v=14"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
