@@ -397,6 +397,7 @@ export default {
        second run demos the BotShield ID instant path. Chip appears after the
        first successful verification; tap copies the ref. -->
   <div class="demo-controls">
+    <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
     <button type="button" class="demo-reset" id="demoReset">Reset</button>
     <button type="button" class="demo-ref" id="demoRef" title="partner_user_ref — tap to copy"></button>
   </div>
@@ -485,6 +486,24 @@ export default {
     // purpose: the point of the second run is the instant path (BotShield ID
     // continuity — verified with no QR).
     document.getElementById('demoReset').addEventListener('click', function() {
+      bsVerify.reset();
+      document.getElementById('confirmation').classList.remove('show');
+      document.getElementById('toast').classList.remove('show');
+    });
+
+    // New visitor — forget the partner ref (and the verified flag) so the next
+    // Verify is a FIRST visit again: pre-check → ceremony (passkey / QR). Use
+    // this to re-run the full flow on the show floor; Reset alone re-runs the
+    // instant path because the ref (and its BotShield ID linkage) survives.
+    document.getElementById('demoNewVisitor').addEventListener('click', function() {
+      localStorage.removeItem(REF_KEY);
+      localStorage.removeItem(VERIFIED_KEY);
+      userRef = 'tkz_' + Array.from(crypto.getRandomValues(new Uint8Array(6)))
+        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      localStorage.setItem(REF_KEY, userRef);
+      bsVerify.setAttribute('platform-user-ref', userRef);
+      refChip.textContent = userRef;
+      refChip.classList.remove('show');
       bsVerify.reset();
       document.getElementById('confirmation').classList.remove('show');
       document.getElementById('toast').classList.remove('show');
