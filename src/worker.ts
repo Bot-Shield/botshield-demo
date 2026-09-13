@@ -416,16 +416,14 @@ export default {
     </div>
   </div>
 
-  <!-- SDK host = which backend the demo runs against. cdn-staging → the embed
-       routes to wg-staging.botshield.ai (a Cloudflare TUNNEL to a laptop WG —
-       NOT a hosted server); cdn → wg.botshield.ai (Heroku prod).
-       Prod is READY for this demo as of 2026-09-02: the prod DB carries a
-       seeded Ticketz partner (pk_live_e398598c7f5af741b540abffd49ae74e,
-       "Demo (Ticketz) — seeded 2026-08-15") with an active production
-       ticket_purchase gate. Flip to cdn.botshield.ai + that key for a
-       laptop-independent, prod-backed demo (the scanning phone must then run
-       the prod app build). -->
-  <script src="https://cdn-staging.botshield.ai/sdk.js?v=15"></script>
+  <!-- SDK host = which backend the demo runs against. The embed calls the
+       API on the host it was loaded from: cdn → wg.botshield.ai (Heroku prod),
+       cdn-staging → wg-staging.botshield.ai (a Cloudflare TUNNEL to a laptop).
+       PRODUCTION since 2026-09-13: prod DB carries the Ticketz partner with the
+       seeded "Demo (Ticketz)" site key below and an active production
+       ticket_purchase gate. The scanning phone must run the prod app build.
+       To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
+  <script src="https://cdn.botshield.ai/sdk.js?v=16"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
@@ -444,7 +442,7 @@ export default {
     })();
 
     var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_live_c71c420add027025b9e42c1ba9ff00ce';
+    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
     var SCOPE = params.get('scope') || 'ticket_purchase';
     var MODE = params.get('mode') || 'private';
 
