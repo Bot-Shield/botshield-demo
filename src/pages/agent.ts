@@ -170,7 +170,7 @@ export const agentHtml = `<!DOCTYPE html>
     // Tiny markdown for agent replies: **bold**, inline code, "- " bullets. Escaped first.
     function mdLite(t) {
       var e = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      e = e.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\x60([^\x60]+)\x60/g, '<code>$1</code>');
+      e = e.replace(/\\*\\*([^*]+)\\*\\*/g, '<b>$1</b>').replace(/\\x60([^\\x60]+)\\x60/g, '<code>$1</code>');
       e = e.replace(/^- (.*)$/gm, '\u2022 $1');
       return e;
     }
