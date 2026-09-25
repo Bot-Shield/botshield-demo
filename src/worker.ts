@@ -77,18 +77,23 @@ async function agentChat(env: Env, messages: ChatMessage[], bindToken: string | 
   let data: any = {};
   try { data = JSON.parse(text); } catch { return json({ error: 'Bad reply from the model.' }, 502); }
 
-  // Flatten the content blocks: text → reply; mcp_tool_use / mcp_tool_result → timeline events.
+  // Keep the turn in ORDER: the agent talks, calls a tool, talks again. Each
+  // content block becomes a timeline event; tool results are read for the two
+  // states the demo cares about (approval_sent → "confirm in BotShield",
+  // confirmed → the order) so the page can render real cards, not JSON.
   const events: Array<Record<string, unknown>> = [];
   const parts: string[] = [];
   for (const block of data.content ?? []) {
-    if (block.type === 'text') parts.push(block.text);
+    if (block.type === 'text' && block.text?.trim()) { parts.push(block.text); events.push({ type: 'text', text: block.text }); }
     else if (block.type === 'mcp_tool_use') events.push({ type: 'tool', name: block.name, args: JSON.stringify(block.input ?? {}).slice(0, 220) });
     else if (block.type === 'mcp_tool_result') {
       const body = Array.isArray(block.content) ? block.content.map((c: any) => c?.text ?? '').join(' ') : String(block.content ?? '');
-      const last = events[events.length - 1];
-      if (last && last.type === 'tool' && !last.result) { last.result = body.slice(0, 600); last.summary = summarizeToolResult(body); }
-      // A proposed checkout waiting on the phone reads as an "ask" for the timeline.
-      if (/propos|pending|waiting|approve|confirm/i.test(body) && /human|phone|BotShield|card/i.test(body)) events.push({ type: 'ask', text: body.slice(0, 300) });
+      const last = [...events].reverse().find((e) => e.type === 'tool' && !e.result);
+      if (last) { last.result = body.slice(0, 600); last.summary = summarizeToolResult(body); last.error = !!block.is_error; }
+      let j: any = null; try { j = JSON.parse(body); } catch { /* not JSON */ }
+      if (j?.status === 'approval_sent') events.push({ type: 'ask', request_id: j.approval_request_id ?? null, text: 'Confirm in BotShield on your phone — the purchase is waiting for you.' });
+      else if (j?.status === 'confirmed' && j?.order_id) events.push({ type: 'order', order_id: j.order_id, event: j.event ?? null, seats: j.seats ?? null, total: j.total ?? null, approved_by: j.attested?.approved_by_opaque_id ?? null, ceremony_id: j.attested?.ceremony_id ?? null });
+      else if (j?.status === 'pending' || j?.status === 'awaiting_approval') events.push({ type: 'ask', request_id: j.approval_request_id ?? j.request_id ?? null, text: 'Still waiting on you — confirm in BotShield on your phone.' });
     }
   }
   return json({ reply: parts.join('\n').trim(), events, usage: data.usage ?? null, stop: data.stop_reason ?? null });
