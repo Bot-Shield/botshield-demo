@@ -37,6 +37,10 @@ export const agentHtml = `<!DOCTYPE html>
     .msg.user { align-self: flex-end; background: #7c3aed; color: #fff; border-bottom-right-radius: 4px; }
     .msg.agent { align-self: flex-start; background: #17171a; border: 1px solid #222; border-bottom-left-radius: 4px; }
     .msg.agent b { color: #fff; } .msg.agent code { font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: #c9d1ff; }
+    .msg.agent .trow { margin: 6px 0; padding: 8px 10px; border-radius: 10px; background: #101013; border: 1px solid #23232a; white-space: normal; }
+    .msg.agent .tname { font-weight: 600; color: #fff; margin-bottom: 3px; }
+    .msg.agent .tcell { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: #d4d4d4; }
+    .msg.agent .tcell span { color: #7a7a7a; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; }
     .msg.sys { align-self: center; background: transparent; color: #8a8a8a; font-size: 12.5px; text-align: center; max-width: 100%; }
     .msg.tool { align-self: flex-start; font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: #9aa0ad; background: #101216; border: 1px dashed #2a2f3a; padding: 8px 11px; white-space: normal; }
     .msg.tool summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; }
@@ -168,9 +172,25 @@ export const agentHtml = `<!DOCTYPE html>
     });
 
     // Tiny markdown for agent replies: **bold**, inline code, "- " bullets. Escaped first.
+    // A markdown table (if the model still writes one) → stacked rows: first
+    // cell bold, the rest as "label value" lines. Reads on a phone; a pipe grid does not.
+    function tableToRows(block) {
+      var lines = block.split('\\n').filter(function(l) { return /^\\s*\\|/.test(l); });
+      if (lines.length < 2) return block;
+      var cells = function(l) { return l.replace(/^\\s*\\|/, '').replace(/\\|\\s*$/, '').split('|').map(function(c) { return c.trim(); }); };
+      var head = cells(lines[0]);
+      var rows = lines.slice(1).filter(function(l) { return !/^\\s*\\|?\\s*:?-{2,}/.test(l); }).map(cells);
+      return rows.map(function(r) {
+        var first = '<div class="trow"><div class="tname">' + r[0] + '</div>';
+        var rest = r.slice(1).map(function(c, i) { return '<div class="tcell"><span>' + (head[i + 1] || '') + '</span>' + c + '</div>'; }).join('');
+        return first + rest + '</div>';
+      }).join('');
+    }
     function mdLite(t) {
       var e = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       e = e.replace(/\\*\\*([^*]+)\\*\\*/g, '<b>$1</b>').replace(/\\x60([^\\x60]+)\\x60/g, '<code>$1</code>');
+      e = e.replace(/^#{1,3} (.*)$/gm, '<b>$1</b>');
+      e = e.replace(/(?:^\\s*\\|.*(?:\\n|$))+/gm, function(block) { return tableToRows(block.replace(/\\n$/, '')); });
       e = e.replace(/^- (.*)$/gm, '\u2022 $1');
       return e;
     }
