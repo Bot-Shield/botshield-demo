@@ -283,6 +283,13 @@ export default {
 
     /* ── Demo controls (top-right): Reset + partner-ref chip ──
        Demo chrome, not part of the Ticketz page design — quiet by intent. */
+    .age-badge {
+      display: inline-block; margin-left: 8px; padding: 2px 7px; border-radius: 6px;
+      font-size: 11px; font-weight: 700; letter-spacing: .04em; vertical-align: 2px;
+      color: #ffb547; border: 1px solid rgba(255, 181, 71, 0.5); background: rgba(255, 181, 71, 0.10);
+    }
+    .age-note { margin-top: 8px; font-size: 12px; line-height: 1.45; color: #9a9a9a; }
+    .age-note em { color: #c9c9c9; font-style: normal; }
     .demo-controls {
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 12px);
@@ -350,14 +357,15 @@ export default {
 
       <!-- Event -->
       <div class="event-card">
-        <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;">AF</div>
+        <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;" id="eventArt">AF</div>
         <div class="event-details">
-          <div class="event-artist">Arcade Fire</div>
+          <div class="event-artist"><span id="eventArtist">Arcade Fire</span><span class="age-badge" id="ageBadge" hidden>21+</span></div>
           <div class="event-tour" id="eventTour">World Tour</div>
           <div class="event-meta">
-            <span>Madison Square Garden</span>
+            <span id="eventVenue">Madison Square Garden</span>
             <span id="eventDate"></span>
           </div>
+          <div class="age-note" id="ageNote" hidden>Age-restricted event. Ticketz checks you're over 21 without seeing your ID — BotShield returns only <em>verified</em> or <em>unavailable</em>, never a birthdate.</div>
         </div>
       </div>
 
@@ -399,6 +407,7 @@ export default {
   <div class="demo-controls">
     <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
     <button type="button" class="demo-reset" id="demoReset">Reset</button>
+    <button type="button" class="demo-reset" id="demoAge" title="Switch between the all-ages checkout (Human Gate) and the 21+ event (Age Gate)"></button>
     <button type="button" class="demo-ref" id="demoRef" title="partner_user_ref — tap to copy"></button>
   </div>
 
@@ -443,7 +452,30 @@ export default {
 
     var params = new URLSearchParams(window.location.search);
     var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
-    var SCOPE = params.get('scope') || 'ticket_purchase';
+    // ?event=21 → the age-restricted event: same widget, the Ticketz
+    // Age Gate scope (gate_type 'age', threshold 21 — configured in the
+    // Console, not here). Everything else on the page is unchanged: the
+    // gate type comes from the scope, the widget adapts its copy, and the
+    // result the page sees is verified / unavailable — never an age.
+    var AGE_EVENT = params.get('event') === '21';
+    var SCOPE = params.get('scope') || (AGE_EVENT ? 'enter_site_age_check' : 'ticket_purchase');
+    if (AGE_EVENT) {
+      document.getElementById('eventArtist').textContent = 'Late Night Set';
+      document.getElementById('eventArt').textContent = 'LN';
+      document.getElementById('eventTour').textContent = 'After Hours \u2022 21+';
+      document.getElementById('eventVenue').textContent = 'The Basement, Brooklyn';
+      document.getElementById('ageBadge').hidden = false;
+      document.getElementById('ageNote').hidden = false;
+      document.title = 'Ticketz - Checkout (21+)';
+    }
+    var demoAge = document.getElementById('demoAge');
+    demoAge.textContent = AGE_EVENT ? 'All-ages event' : '21+ event';
+    demoAge.addEventListener('click', function() {
+      var next = new URL(window.location.href);
+      if (AGE_EVENT) next.searchParams.delete('event'); else next.searchParams.set('event', '21');
+      next.searchParams.delete('scope');
+      window.location.href = next.toString();
+    });
     var MODE = params.get('mode') || 'private';
 
     var bsVerify = document.getElementById('bsVerify');
@@ -522,9 +554,32 @@ export default {
     // + tamper-proofing, so the demo no longer tracks the token or toggles a
     // button — it just reacts to the verification result (cosmetic toast) and
     // runs the purchase when the component emits botshield:checkout.
+    // Display only: a real integration confirms the token on its server
+    // (POST /sdk/verify-token). The demo peeks at the JWT payload to pick the
+    // toast line — age_verdict is 'verified' or 'unavailable', never an age.
+    function ageVerdictOf(detail) {
+      try {
+        var tok = detail && (detail.token || detail.verification_token || detail.signed_token);
+        if (!tok || tok.split('.').length < 3) return null;
+        var b = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        var claims = JSON.parse(atob(b + '='.repeat((4 - b.length % 4) % 4)));
+        return claims.age_verdict || (claims.botshield && claims.botshield.age_verdict) || null;
+      } catch (err) { return null; }
+    }
+
     bsVerify.addEventListener('botshield:success', function(e) {
       console.log('[Ticketz] BotShield verified:', e.detail);
       var toast = document.getElementById('toast');
+      if (AGE_EVENT) {
+        var v = ageVerdictOf(e.detail);
+        toast.textContent = v === 'verified'
+          ? 'Over 21 \u2014 verified. Enjoy the show.'
+          : v === 'unavailable'
+            ? 'Human verified \u2014 age check unavailable on this device. Finish on your phone.'
+            : 'Human verified.';
+      } else {
+        toast.textContent = "Human verified \u2014 you're good to go!";
+      }
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3000);
       // First success on this browser: surface the partner ref chip.
