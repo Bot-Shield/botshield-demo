@@ -1,0 +1,559 @@
+// Ticketz — Human Gate at checkout (all-ages). Inline passkey beta on desktop,
+// QR / phone hand-off otherwise. Served at /ticketz; framed by the Demos shell.
+export const ticketzHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Ticketz - Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ── Root container: full viewport, flex column, centered ── */
+    .page {
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      padding: 16px;
+      padding-top: env(safe-area-inset-top, 16px);
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Spacer: pushes content down from top ── */
+    .top-spacer {
+      flex-shrink: 0;
+      height: 34px;
+    }
+
+    /* ── Header: Ticketz brand centered ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9.5px;
+      flex-shrink: 0;
+    }
+
+    .header-logo {
+      width: 31px;
+      height: 31px;
+      border-radius: 50%;
+      background: #7c3aed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-logo svg { width: 16px; height: 16px; fill: white; }
+
+    .header-brand {
+      font-size: 19px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 28.7px;
+    }
+
+    /* ── Content section: timer + event + order grouped ── */
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* ── Timer bar: orange accent ── */
+    .timer-bar {
+      background: rgba(255, 156, 102, 0.15);
+      border: 1px solid rgba(255, 156, 102, 0.6);
+      border-radius: 12px;
+      padding: 17px 19px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      height: 58px;
+    }
+
+    .timer-icon { width: 24px; height: 24px; flex-shrink: 0; }
+
+    .timer-text {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 400;
+      color: #c9c9c9;
+      line-height: 18px;
+      padding-left: 12px;
+    }
+
+    .timer-countdown {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 20px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    /* ── Event card ── */
+    .event-card {
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      gap: 39px;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .event-art {
+      width: 72px;
+      height: 74px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .event-details {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-artist {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 28px;
+      color: #ffffff;
+    }
+
+    .event-tour {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #ffffff;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #959595;
+    }
+
+    /* ── Order summary ── */
+    .order-card {
+      background: #1a1a1a;
+      border-radius: 8px;
+      width: 100%;
+      position: relative;
+      padding: 25px 28px;
+    }
+
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #999999;
+    }
+
+    .order-row + .order-row { margin-top: 17px; }
+
+    .order-row .qty {
+      margin-right: 24px;
+    }
+
+    .order-divider {
+      border: none;
+      border-top: 1px solid #2a2a2a;
+      margin: 26px 0 19px 0;
+    }
+
+    .order-total {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 28px;
+      color: #ffffff;
+    }
+
+    .order-total span { color: #ffffff; }
+
+    /* ── BotShield widget ── */
+    /* display:block (NOT flex) — the component stacks its rows internally; a
+       flex host would lay its shadow children out in a row. */
+    botshield-verify {
+      display: block;
+      width: 100%;
+    }
+
+    /* The verify button, checkout button, and footer (Census attribution +
+       BotShield ID CTA) are all rendered inside <botshield-verify>. The demo only
+       relabels the checkout button (checkout-label) and could restyle it via
+       the component's --bs-checkout-* custom properties. */
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #16a34a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 10000;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Confirmation overlay ── */
+    .confirmation {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .confirmation.show { opacity: 1; pointer-events: auto; }
+
+    .confirmation-card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+    }
+
+    .confirmation-check {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: #16a34a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .confirmation-check svg {
+      width: 28px; height: 28px;
+      stroke: white; fill: none;
+      stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .confirmation h2 { font-size: 20px; margin-bottom: 6px; }
+    .confirmation p { font-size: 14px; color: #9ca3af; }
+
+    /* ── Demo controls (top-right): Reset + partner-ref chip ──
+       Demo chrome, not part of the Ticketz page design — quiet by intent. */
+    .demo-controls {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 12px);
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      z-index: 30000;
+    }
+
+    .demo-reset {
+      background: rgba(26, 26, 26, 0.9);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #9ca3af;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .demo-reset:hover { color: #ffffff; border-color: #3a3a3a; }
+
+    .demo-ref {
+      display: none;
+      background: rgba(26, 26, 26, 0.9);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #61656c;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 6px 8px;
+      cursor: pointer;
+    }
+
+    .demo-ref.show { display: block; }
+    .demo-ref:active { color: #9ca3af; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Top spacer (safe area) -->
+    <div class="top-spacer"></div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M2 9a2 2 0 012-2h16a2 2 0 012 2v1a3 3 0 000 6v1a2 2 0 01-2 2H4a2 2 0 01-2-2v-1a3 3 0 000-6V9z"/></svg>
+      </div>
+      <div class="header-brand">Ticketz</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Timer -->
+      <div class="timer-bar">
+        <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="timer-text">Complete purchase within</div>
+        <div class="timer-countdown" id="countdown">7:32</div>
+      </div>
+
+      <!-- Event -->
+      <div class="event-card">
+        <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;">AF</div>
+        <div class="event-details">
+          <div class="event-artist">Arcade Fire</div>
+          <div class="event-tour" id="eventTour">World Tour</div>
+          <div class="event-meta">
+            <span>Madison Square Garden</span>
+            <span id="eventDate"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order -->
+      <div class="order-card">
+        <div class="order-row">
+          <span>GA Floor</span>
+          <div><span class="qty">x2</span><span>$195.00</span></div>
+        </div>
+        <div class="order-row">
+          <span>Service Fee</span>
+          <span>$38.90</span>
+        </div>
+        <hr class="order-divider">
+        <div class="order-row order-total">
+          <span>Total</span>
+          <span>$428.50</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BotShield Verify — ONE component renders the verify button, the
+         checkout button (verified-gated, component-owned), and the footer
+         (Census attribution + BotShield ID CTA). The demo only restyles/relabels
+         the checkout button and listens for botshield:checkout. -->
+    <botshield-verify
+      id="bsVerify"
+      theme="dark"
+      scan-mode="modal"
+      signals="true"
+      checkout-label="Complete Purchase"
+      betas="inline-passkey"
+    ></botshield-verify>
+  </div>
+
+  <!-- Demo controls: reset the widget state; the partner ref survives so the
+       second run demos the BotShield ID instant path. Chip appears after the
+       first successful verification; tap copies the ref. -->
+  <div class="demo-controls">
+    <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
+    <button type="button" class="demo-reset" id="demoReset">Reset</button>
+    <button type="button" class="demo-ref" id="demoRef" title="partner_user_ref — tap to copy"></button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Human verified — you're good to go!</div>
+
+  <!-- Confirmation -->
+  <div class="confirmation" id="confirmation">
+    <div class="confirmation-card">
+      <div class="confirmation-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2>Purchase Complete!</h2>
+      <p>Your tickets have been sent to your email. Enjoy the show!</p>
+    </div>
+  </div>
+
+  <!-- SDK host = which backend the demo runs against. The embed calls the
+       API on the host it was loaded from: cdn → wg.botshield.ai (Heroku prod),
+       cdn-staging → wg-staging.botshield.ai (a Cloudflare TUNNEL to a laptop).
+       PRODUCTION since 2026-09-13: prod DB carries the Ticketz partner with the
+       seeded "Demo (Ticketz)" site key below and an active production
+       ticket_purchase gate. The scanning phone must run the prod app build.
+       To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
+  <script src="https://cdn.botshield.ai/sdk.js?v=16"></script>
+
+  <script>
+    // Dynamic event date — next Saturday ~2 weeks out
+    (function() {
+      var now = new Date();
+      var target = new Date(now);
+      target.setDate(target.getDate() + 14);
+      // Roll forward to Saturday (6)
+      var day = target.getDay();
+      var diff = (6 - day + 7) % 7;
+      if (diff === 0 && day !== 6) diff = 7;
+      target.setDate(target.getDate() + diff);
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('eventDate').textContent = 'Sat, ' + months[target.getMonth()] + ' ' + target.getDate() + ' \\u2022 8:00pm';
+      document.getElementById('eventTour').textContent = 'World Tour ' + target.getFullYear();
+    })();
+
+    var params = new URLSearchParams(window.location.search);
+    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+    var SCOPE = params.get('scope') || 'ticket_purchase';
+    var MODE = params.get('mode') || 'private';
+
+    var bsVerify = document.getElementById('bsVerify');
+    bsVerify.setAttribute('site-key', SITE_KEY);
+    bsVerify.setAttribute('scope', SCOPE);
+    bsVerify.setAttribute('mode', MODE);
+
+    // ── Partner user ref (BotShield ID continuity — the instant path) ──
+    // A real partner sends their own logged-in user id here. The demo mints
+    // a stable stand-in once and keeps it in localStorage: the FIRST
+    // verification links it to the BotShield identity server-side
+    // (partner_user_linkages, link-on-verify default), so every later
+    // evaluate with the same ref resolves the user and returns the instant
+    // pass — result_state 'human_verified', the "Human Verified" pill, no QR.
+    // (Two-state contract: the retired reason/"MultiPass Active" state no
+    // longer crosses the wire — both runs read "Human Verified"; the tell is
+    // the missing QR.) ?fresh=1 mints a new ref to run the full QR flow again.
+    var REF_KEY = 'tkz_demo_user_ref';
+    var VERIFIED_KEY = 'tkz_demo_verified_once';
+    var userRef = localStorage.getItem(REF_KEY);
+    if (!userRef || params.get('fresh')) {
+      userRef = 'tkz_' + Array.from(crypto.getRandomValues(new Uint8Array(6)))
+        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      localStorage.setItem(REF_KEY, userRef);
+      localStorage.removeItem(VERIFIED_KEY);
+    }
+    bsVerify.setAttribute('platform-user-ref', userRef);
+
+    // Ref chip — visible once a verification has happened on this browser.
+    var refChip = document.getElementById('demoRef');
+    refChip.textContent = userRef;
+    if (localStorage.getItem(VERIFIED_KEY)) refChip.classList.add('show');
+    refChip.addEventListener('click', function() {
+      navigator.clipboard && navigator.clipboard.writeText(userRef);
+    });
+
+    // Reset — back to the idle widget for another pass. The ref survives on
+    // purpose: the point of the second run is the instant path (BotShield ID
+    // continuity — verified with no QR).
+    document.getElementById('demoReset').addEventListener('click', function() {
+      bsVerify.reset();
+      document.getElementById('confirmation').classList.remove('show');
+      document.getElementById('toast').classList.remove('show');
+    });
+
+    // New visitor — forget the partner ref (and the verified flag) so the next
+    // Verify is a FIRST visit again: pre-check → ceremony (passkey / QR). Use
+    // this to re-run the full flow on the show floor; Reset alone re-runs the
+    // instant path because the ref (and its BotShield ID linkage) survives.
+    document.getElementById('demoNewVisitor').addEventListener('click', function() {
+      localStorage.removeItem(REF_KEY);
+      localStorage.removeItem(VERIFIED_KEY);
+      userRef = 'tkz_' + Array.from(crypto.getRandomValues(new Uint8Array(6)))
+        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      localStorage.setItem(REF_KEY, userRef);
+      bsVerify.setAttribute('platform-user-ref', userRef);
+      refChip.textContent = userRef;
+      refChip.classList.remove('show');
+      bsVerify.reset();
+      document.getElementById('confirmation').classList.remove('show');
+      document.getElementById('toast').classList.remove('show');
+    });
+
+    // Countdown (cosmetic)
+    (function() {
+      var total = 7 * 60 + 32;
+      var el = document.getElementById('countdown');
+      setInterval(function() {
+        if (total <= 0) return;
+        total--;
+        el.textContent = Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
+      }, 1000);
+    })();
+
+    // BotShield events. The component owns the checkout button's verified-gating
+    // + tamper-proofing, so the demo no longer tracks the token or toggles a
+    // button — it just reacts to the verification result (cosmetic toast) and
+    // runs the purchase when the component emits botshield:checkout.
+    bsVerify.addEventListener('botshield:success', function(e) {
+      console.log('[Ticketz] BotShield verified:', e.detail);
+      var toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+      // First success on this browser: surface the partner ref chip.
+      localStorage.setItem(VERIFIED_KEY, '1');
+      refChip.classList.add('show');
+    });
+
+    bsVerify.addEventListener('botshield:failure', function(e) {
+      console.error('[Ticketz] BotShield verification failed:', e.detail);
+    });
+
+    // (Dead listener removed: the component never dispatches 'botshield:expired'
+    // as a DOM event — expiry resets the widget and calls the 'onexpired'
+    // callback attribute instead.)
+
+    // Checkout — fired by the component ONLY when its internal server-verified
+    // state is resolved (the component enforces the gate; the demo just runs the
+    // purchase). Show the order confirmation.
+    bsVerify.addEventListener('botshield:checkout', function(e) {
+      console.log('[Ticketz] Checkout (verified):', e.detail);
+      document.getElementById('confirmation').classList.add('show');
+    });
+
+    // (Dead listener removed: 'botshield:stayverified' is never dispatched —
+    // the footer "Stay Verified" lockup inside the component is static branding.)
+
+    document.getElementById('confirmation').addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('show');
+    });
+  </script>
+</body>
+</html>`;
