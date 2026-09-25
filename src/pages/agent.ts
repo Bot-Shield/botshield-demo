@@ -45,6 +45,13 @@ export const agentHtml = `<!DOCTYPE html>
     .compose button:disabled { opacity: .45; cursor: not-allowed; }
     .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 10px; }
     .chip { background: #131316; border: 1px solid #262626; border-radius: 999px; color: #c9c9c9; font-family: inherit; font-size: 12.5px; padding: 6px 11px; cursor: pointer; }
+    .link { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #1a1a1a; background: #0b0d12; font-size: 13px; }
+    .link .l { color: #c9c9c9; }
+    .link .l b { color: #fff; font-weight: 600; }
+    .link.bound .l b { color: #00d492; }
+    .link button { background: #147baa; color: #fff; border: 0; border-radius: 9px; font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
+    .link button.ghost { background: transparent; border: 1px solid #2a2a2a; color: #c9c9c9; }
+    .code { font-family: 'Roboto Mono', monospace; font-size: 22px; letter-spacing: .22em; color: #fff; background: #151517; border: 1px solid #2a2a2a; border-radius: 9px; padding: 4px 10px 4px 14px; }
     .foot { font-size: 11.5px; color: #5b5b5b; text-align: center; padding: 10px 8px 0; line-height: 1.5; max-width: 560px; }
     .foot b { color: #8a8a8a; font-weight: 600; }
   </style>
@@ -61,6 +68,10 @@ export const agentHtml = `<!DOCTYPE html>
 
     <div class="chat">
       <div class="status" id="status"><span class="dot"></span><span id="statusText">Connecting&hellip;</span></div>
+      <div class="link" id="link">
+        <span class="l" id="linkText"><b>Link your BotShield ID</b> &mdash; so a purchase can be sent to <i>your</i> phone.</span>
+        <button type="button" id="linkBtn">Link</button>
+      </div>
       <div class="log" id="log">
         <div class="msg agent">Hi, I&rsquo;m the Ticketz agent. I can find shows and buy tickets for you &mdash; but I never spend without you. When it&rsquo;s time to pay, the request goes to your phone and <b>you</b> confirm with BotShield.</div>
       </div>
@@ -85,6 +96,56 @@ export const agentHtml = `<!DOCTYPE html>
     var statusText = document.getElementById('statusText');
     var history = [];
     var live = false;
+    var LINK_KEY = 'tkz_agent_bind_jwt';
+    var bindToken = sessionStorage.getItem(LINK_KEY) || null;
+    var linkEl = document.getElementById('link');
+    var linkText = document.getElementById('linkText');
+    var linkBtn = document.getElementById('linkBtn');
+    var linkPolling = false;
+
+    function renderLink() {
+      if (bindToken) {
+        linkEl.classList.add('bound');
+        linkText.innerHTML = '<b>BotShield ID linked.</b> Purchases go to your phone for approval.';
+        linkBtn.textContent = 'Unlink'; linkBtn.className = 'ghost';
+      } else {
+        linkEl.classList.remove('bound');
+        linkText.innerHTML = '<b>Link your BotShield ID</b> \u2014 so a purchase can be sent to <i>your</i> phone.';
+        linkBtn.textContent = 'Link'; linkBtn.className = '';
+      }
+    }
+    renderLink();
+
+    // The Link ceremony: a 6-character code, entered in the BotShield app
+    // (Agents Ask → Link), answered with a bind JWT the gateway trusts.
+    async function startLink() {
+      if (linkPolling) return;
+      linkPolling = true;
+      linkBtn.disabled = true;
+      try {
+        var r = await fetch('/api/agent/link/start', { method: 'POST' });
+        var j = await r.json();
+        if (!r.ok || !j.code) { add('sys', 'Could not start the link: ' + (j.error || r.status)); return; }
+        linkText.innerHTML = 'In the BotShield app, open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span>';
+        linkBtn.textContent = 'Waiting\u2026';
+        for (var i = 0; i < 18; i++) { // ~6 min of 20s long-polls
+          var s = await fetch('/api/agent/link/status?code=' + encodeURIComponent(j.code));
+          var sj = await s.json();
+          if (sj.status === 'bound' && sj.token) {
+            bindToken = sj.token; sessionStorage.setItem(LINK_KEY, bindToken);
+            add('sys', 'Linked. Purchases will be proposed to your phone.');
+            return;
+          }
+          if (sj.status === 'expired' || sj.status === 'denied') { add('sys', 'Link ' + sj.status + ' \u2014 try again.'); return; }
+        }
+        add('sys', 'Link timed out \u2014 try again.');
+      } catch (e) { add('sys', 'Link failed \u2014 try again.'); }
+      finally { linkPolling = false; linkBtn.disabled = false; renderLink(); }
+    }
+    linkBtn.addEventListener('click', function() {
+      if (bindToken) { bindToken = null; sessionStorage.removeItem(LINK_KEY); renderLink(); add('sys', 'Unlinked.'); }
+      else startLink();
+    });
 
     function add(kind, text) {
       var d = document.createElement('div');
@@ -115,7 +176,9 @@ export const agentHtml = `<!DOCTYPE html>
       send.disabled = true;
       var pending = add('agent', '\\u2026');
       try {
-        var r = await fetch('/api/agent/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: history }) });
+        var headers = { 'Content-Type': 'application/json' };
+        if (bindToken) headers['Authorization'] = 'Bearer ' + bindToken;
+        var r = await fetch('/api/agent/chat', { method: 'POST', headers: headers, body: JSON.stringify({ messages: history }) });
         var j = await r.json();
         if (!r.ok) { pending.className = 'msg sys'; pending.textContent = j.error || 'The agent could not answer.'; return; }
         pending.remove();
