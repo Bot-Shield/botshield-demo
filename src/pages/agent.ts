@@ -15,6 +15,7 @@ export const agentHtml = `<!DOCTYPE html>
   <meta name="theme-color" content="#000000">
   <meta name="robots" content="noindex">
   <title>Ticketz - Agent</title>
+  <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>

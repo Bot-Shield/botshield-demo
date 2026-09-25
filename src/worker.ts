@@ -16,6 +16,7 @@ import { ticketzHtml } from './pages/ticketz';
 import { vapezHtml } from './pages/vapez';
 import { agentHtml } from './pages/agent';
 import { shellHtml } from './shell';
+import { FAVICON_ICO_B64 } from './favicon';
 
 interface Env {
   AGENT_GATEWAY_URL?: string;  // https://gateway-demo.botshield.ai — MCP at /mcp, Link ceremony at /oauth/link/*
@@ -106,6 +107,10 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
+    if (path === '/favicon.ico') {
+      const bytes = Uint8Array.from(atob(FAVICON_ICO_B64), (c) => c.charCodeAt(0));
+      return new Response(bytes, { headers: { 'Content-Type': 'image/x-icon', 'Cache-Control': 'public, max-age=86400' } });
+    }
     if (path === '/') return html(shellHtml());
     if (path === '/ticketz') return html(ticketzHtml);
     if (path === '/vapez') return html(vapezHtml);

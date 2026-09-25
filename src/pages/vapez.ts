@@ -14,6 +14,7 @@ export const vapezHtml = `<!DOCTYPE html>
   <meta name="theme-color" content="#000000">
   <meta name="robots" content="noindex">
   <title>Vapez - Enter</title>
+  <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -84,6 +85,7 @@ export const vapezHtml = `<!DOCTYPE html>
           theme="dark"
           scan-mode="modal"
           signals="true"
+          age-threshold="18"
           checkout-label="Enter site"
         ></botshield-verify>
         <p class="wall-note">What Vapez receives: <em>verified</em> or <em>unavailable</em>. On a phone without an age assertion the check is <em>unavailable</em> &mdash; the door stays closed, and you are told why.</p>
@@ -109,7 +111,7 @@ export const vapezHtml = `<!DOCTYPE html>
   </div>
   <div class="toast" id="toast"></div>
 
-  <script src="https://cdn.botshield.ai/sdk.js?v=16"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=17"></script>
   <script>
     var params = new URLSearchParams(window.location.search);
     // Same prod partner + key as Ticketz: the Vepez gate lives on that org.
@@ -156,7 +158,10 @@ export const vapezHtml = `<!DOCTYPE html>
       if (v === 'unavailable') say('Human verified \\u2014 but no age assertion on this device. The door stays closed; finish on a phone that has one.');
       else say('Over 18 \\u2014 verified. Tap Enter site.');
     });
-    bsVerify.addEventListener('botshield:failure', function(e) { console.error('[Vapez] verification failed:', e.detail); });
+    bsVerify.addEventListener('botshield:failure', function(e) {
+      console.error('[Vapez] verification failed:', e.detail);
+      if (e.detail && e.detail.reason === 'age_unavailable') say('Human verified \u2014 but no age assertion on this device. The door stays closed.');
+    });
 
     // The component only emits checkout when its server-verified state is
     // resolved — that is the door opening.
