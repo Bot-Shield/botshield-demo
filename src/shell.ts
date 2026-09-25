@@ -18,7 +18,7 @@ export interface DemoEntry {
 
 export const DEMOS: DemoEntry[] = [
   { key: 'ticketz', group: 'Ticketz', label: 'BotShield Gate', hint: 'Human Gate at checkout', path: '/ticketz' },
-  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent', badge: 'Live' },
+  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent' },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez' },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: 'https://salesforce-demo.botshield.ai/coralcloud/s/' },
 ];
@@ -41,6 +41,7 @@ export function shellHtml(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0b0c0e">
   <title>BotShield Demos</title>
+  <link rel="icon" href="/favicon.ico">
   <meta name="description" content="Live demos of BotShield: Human Gate at checkout, Age Gate at the door, Agents Ask for AI agents, and the Salesforce Agentforce integration.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -75,8 +76,10 @@ export function shellHtml(): string {
     .crumb b { color: var(--ink); font-weight: 500; }
     .crumb .sep { color: #33373f; }
     .crumb .right { margin-left: auto; text-transform: none; letter-spacing: 0; font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--muted); }
-    .frame { flex: 1; min-height: 0; background: #000; }
-    .frame iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
+    /* Desktop: the demo runs in a phone-sized frame, centred — the same
+       composition as the app's web rail. Phone: it IS the screen. */
+    .frame { flex: 1; min-height: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 28px 24px; }
+    .frame iframe { width: 430px; max-width: 100%; height: 100%; max-height: 900px; border: 1px solid #23262c; border-radius: 26px; display: block; background: #000; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
 
     @media (max-width: 767px) {
       .app { grid-template-columns: 1fr; }
@@ -87,6 +90,8 @@ export function shellHtml(): string {
       .top .title { font-size: 15px; font-weight: 600; }
       .top .title small { display: block; font-size: 11.5px; font-weight: 400; color: var(--faint); }
       .crumb { display: none; }
+      .frame { padding: 0; }
+      .frame iframe { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; }
       .rail .close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 14px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: #14161b; color: var(--ink); display: flex; align-items: center; justify-content: center; }
     }
     @media (min-width: 768px) { .rail .close { display: none; } }

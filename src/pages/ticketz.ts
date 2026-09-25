@@ -8,6 +8,7 @@ export const ticketzHtml = `<!DOCTYPE html>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Ticketz - Checkout</title>
+  <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -423,7 +424,7 @@ export const ticketzHtml = `<!DOCTYPE html>
        seeded "Demo (Ticketz)" site key below and an active production
        ticket_purchase gate. The scanning phone must run the prod app build.
        To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=16"></script>
+  <script src="https://cdn.botshield.ai/sdk.js?v=17"></script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
