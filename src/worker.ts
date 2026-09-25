@@ -289,6 +289,7 @@ export default {
       color: #ffb547; border: 1px solid rgba(255, 181, 71, 0.5); background: rgba(255, 181, 71, 0.10);
     }
     .age-note { margin-top: 8px; font-size: 12px; line-height: 1.45; color: #9a9a9a; }
+    .age-badge[hidden], .age-note[hidden] { display: none; }
     .age-note em { color: #c9c9c9; font-style: normal; }
     .demo-controls {
       position: fixed;
