@@ -45,8 +45,19 @@ export const agentHtml = `<!DOCTYPE html>
     .msg.tool details[open] summary::before { content: '\\25BE'; }
     .msg.tool .tname { color: #c9d1ff; }
     .msg.tool pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; color: #8a90a0; max-height: 220px; overflow: auto; font: inherit; }
-    .msg.ask { align-self: flex-start; background: rgba(0, 212, 146, 0.08); border: 1px solid rgba(0, 212, 146, 0.35); color: #d7fff1; }
-    .msg.ask b { color: #00d492; }
+    .msg.ask { align-self: flex-start; background: rgba(20, 123, 170, 0.10); border: 1px solid rgba(20, 123, 170, 0.5); color: #e6f4fb; display: flex; gap: 10px; align-items: flex-start; }
+    .msg.ask b { color: #5cc3ee; display: block; margin-bottom: 2px; }
+    .msg.ask .ph { flex-shrink: 0; width: 26px; height: 26px; border-radius: 8px; background: #147baa; display: flex; align-items: center; justify-content: center; }
+    .msg.order { align-self: flex-start; background: rgba(0, 212, 146, 0.08); border: 1px solid rgba(0, 212, 146, 0.4); color: #d7fff1; width: 86%; }
+    .msg.order b { color: #00d492; display: block; margin-bottom: 6px; }
+    .msg.order .row { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; padding: 3px 0; border-top: 1px solid rgba(0,212,146,.12); }
+    .msg.order .row span:last-child { color: #fff; font-weight: 600; text-align: right; }
+    .msg.order .att { margin-top: 8px; font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: #7fd9b9; word-break: break-all; }
+    .msg.typing { align-self: flex-start; background: #17171a; border: 1px solid #222; border-bottom-left-radius: 4px; padding: 12px 14px; display: flex; gap: 5px; align-items: center; }
+    .msg.typing i { width: 7px; height: 7px; border-radius: 50%; background: #8a8a8a; animation: bsdot 1.2s infinite ease-in-out; }
+    .msg.typing i:nth-child(2) { animation-delay: .18s; } .msg.typing i:nth-child(3) { animation-delay: .36s; }
+    @keyframes bsdot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+    .msg.typing small { margin-left: 8px; font-size: 12px; color: #7a7a7a; }
     .compose { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #1a1a1a; }
     .compose input { flex: 1; min-width: 0; background: #151517; border: 1px solid #262626; border-radius: 11px; color: #fff; font-family: inherit; font-size: 15px; padding: 11px 13px; outline: none; }
     .compose input:focus { border-color: #7c3aed; }
@@ -182,6 +193,21 @@ export const agentHtml = `<!DOCTYPE html>
       log.appendChild(d);
       return d;
     }
+    function addAsk(ev) {
+      var d = document.createElement('div');
+      d.className = 'msg ask';
+      d.innerHTML = '<span class="ph"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span><span><b>Confirm in BotShield</b>' + (ev.text || '') + (ev.request_id ? '<br><span style="font-family:Roboto Mono,monospace;font-size:10.5px;color:#7aa9bf">' + ev.request_id + '</span>' : '') + '</span>';
+      log.appendChild(d); log.scrollTop = log.scrollHeight;
+    }
+    function addOrder(ev) {
+      var d = document.createElement('div');
+      d.className = 'msg order';
+      var rows = [['Order', ev.order_id], ['Event', ev.event], ['Seats', ev.seats], ['Total', ev.total]].filter(function(r) { return r[1] != null; });
+      d.innerHTML = '<b>Order confirmed \\u2014 approved by you</b>' + rows.map(function(r) { return '<div class="row"><span>' + r[0] + '</span><span></span></div>'; }).join('') + (ev.approved_by ? '<div class="att">approved_by ' + ev.approved_by + (ev.ceremony_id ? ' \\u00b7 ceremony ' + ev.ceremony_id : '') + '</div>' : '');
+      var spans = d.querySelectorAll('.row span:last-child');
+      rows.forEach(function(r, i) { spans[i].textContent = String(r[1]); });
+      log.appendChild(d); log.scrollTop = log.scrollHeight;
+    }
     function add(kind, text) {
       var d = document.createElement('div');
       d.className = 'msg ' + kind;
@@ -209,23 +235,32 @@ export const agentHtml = `<!DOCTYPE html>
       turns.push({ role: 'user', content: q });
       input.value = '';
       send.disabled = true;
-      var pending = add('agent', '\\u2026');
+      var pending = document.createElement('div');
+      pending.className = 'msg typing';
+      pending.innerHTML = '<i></i><i></i><i></i><small>Ticketz agent is working\\u2026</small>';
+      log.appendChild(pending); log.scrollTop = log.scrollHeight;
+      var tick = setTimeout(function() { pending.querySelector('small').textContent = 'Talking to Ticketz\\u2026'; }, 6000);
+      var tick2 = setTimeout(function() { pending.querySelector('small').textContent = 'Waiting on a tool (this can take a bit)\\u2026'; }, 16000);
       try {
         var headers = { 'Content-Type': 'application/json' };
         if (bindToken) headers['Authorization'] = 'Bearer ' + bindToken;
         var r = await fetch('/api/agent/chat', { method: 'POST', headers: headers, body: JSON.stringify({ messages: turns }) });
         var j = await r.json();
-        if (!r.ok) { pending.className = 'msg sys'; pending.textContent = j.error || 'The agent could not answer.'; return; }
-        pending.remove();
+        if (!r.ok) { clearTimeout(tick); clearTimeout(tick2); pending.className = 'msg sys'; pending.innerHTML = ''; pending.textContent = j.error || 'The agent could not answer.'; return; }
+        clearTimeout(tick); clearTimeout(tick2); pending.remove();
+        var spoke = false;
         (j.events || []).forEach(function(ev) {
-          if (ev.type === 'tool') addTool(ev);
-          else if (ev.type === 'ask') add('ask', '<b>Waiting on you.</b> ' + ev.text);
+          if (ev.type === 'text') { add('agent', ev.text); spoke = true; }
+          else if (ev.type === 'tool') addTool(ev);
+          else if (ev.type === 'ask') addAsk(ev);
+          else if (ev.type === 'order') addOrder(ev);
         });
-        add('agent', j.reply || '(no reply)');
+        if (!spoke) add('agent', j.reply || '(no reply)');
         turns.push({ role: 'assistant', content: j.reply || '' });
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
-        pending.className = 'msg sys'; pending.textContent = 'Network error \\u2014 try again.';
+        clearTimeout(tick); clearTimeout(tick2);
+        pending.className = 'msg sys'; pending.innerHTML = ''; pending.textContent = 'Network error \\u2014 try again.';
       } finally {
         send.disabled = !live;
         input.focus();
