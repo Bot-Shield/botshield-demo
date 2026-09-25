@@ -175,7 +175,7 @@ export const agentHtml = `<!DOCTYPE html>
       var sum = document.createElement('summary');
       sum.innerHTML = '<span class="tname"></span><span class="tsum"></span>';
       sum.querySelector('.tname').textContent = ev.name + '(' + (ev.args && ev.args !== '{}' ? '\\u2026' : '') + ')';
-      sum.querySelector('.tsum').textContent = ev.result ? '\\u2192 ' + summarize(ev.name, ev.result) : '';
+      sum.querySelector('.tsum').textContent = ev.result ? '\\u2192 ' + (ev.summary || summarize(ev.name, ev.result)) : '';
       var pre = document.createElement('pre');
       pre.textContent = (ev.args && ev.args !== '{}' ? 'args ' + ev.args + '\\n' : '') + (ev.result || '');
       det.appendChild(sum); det.appendChild(pre); d.appendChild(det);

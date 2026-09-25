@@ -86,12 +86,27 @@ async function agentChat(env: Env, messages: ChatMessage[], bindToken: string | 
     else if (block.type === 'mcp_tool_result') {
       const body = Array.isArray(block.content) ? block.content.map((c: any) => c?.text ?? '').join(' ') : String(block.content ?? '');
       const last = events[events.length - 1];
-      if (last && last.type === 'tool' && !last.result) last.result = body.slice(0, 220);
+      if (last && last.type === 'tool' && !last.result) { last.result = body.slice(0, 600); last.summary = summarizeToolResult(body); }
       // A proposed checkout waiting on the phone reads as an "ask" for the timeline.
       if (/propos|pending|waiting|approve|confirm/i.test(body) && /human|phone|BotShield|card/i.test(body)) events.push({ type: 'ask', text: body.slice(0, 300) });
     }
   }
   return json({ reply: parts.join('\n').trim(), events, usage: data.usage ?? null, stop: data.stop_reason ?? null });
+}
+
+/** One line for the chat timeline, computed from the FULL tool result before truncation. */
+function summarizeToolResult(body: string): string {
+  try {
+    const j = JSON.parse(body);
+    if (Array.isArray(j?.events)) return `${j.events.length} events`;
+    if (Array.isArray(j?.tickets)) return `${j.tickets.length} tickets`;
+    if (j?.status && j?.request_id) return `${j.status} · ${j.request_id}`;
+    if (j?.status) return String(j.status);
+    if (j?.total) return `total ${j.total}`;
+    if (j?.error) return `error: ${String(j.error).slice(0, 60)}`;
+  } catch { /* not JSON */ }
+  const t = body.replace(/\s+/g, ' ').trim();
+  return t.length > 60 ? `${t.slice(0, 57)}…` : t;
 }
 
 /** Link ceremony passthrough: the page never talks to the gateway directly. */
