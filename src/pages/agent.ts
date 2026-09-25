@@ -92,7 +92,7 @@ export const agentHtml = `<!DOCTYPE html>
     var log = document.getElementById('log');
     var input = document.getElementById('input');
     var send = document.getElementById('send');
-    var status = document.getElementById('status');
+    var statusEl = document.getElementById('status'); // not `status`: window.status is a string property
     var statusText = document.getElementById('statusText');
     var history = [];
     var live = false;
@@ -157,7 +157,7 @@ export const agentHtml = `<!DOCTYPE html>
     }
     function setLive(on, text) {
       live = on;
-      status.className = 'status ' + (on ? 'live' : 'off');
+      statusEl.className = 'status ' + (on ? 'live' : 'off');
       statusText.textContent = text;
       send.disabled = !on;
     }
