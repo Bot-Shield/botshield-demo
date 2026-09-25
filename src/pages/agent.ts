@@ -48,10 +48,19 @@ export const agentHtml = `<!DOCTYPE html>
     .msg.tool summary::before { content: '\\25B8'; color: #5b6070; font-size: 10px; }
     .msg.tool details[open] summary::before { content: '\\25BE'; }
     .msg.tool .tname { color: #c9d1ff; }
+    .msg.tool .tcount { color: #7c8aa5; font-size: 10.5px; margin-left: 2px; }
     .msg.tool pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; color: #8a90a0; max-height: 220px; overflow: auto; font: inherit; }
     .msg.ask { align-self: flex-start; background: rgba(20, 123, 170, 0.10); border: 1px solid rgba(20, 123, 170, 0.5); color: #e6f4fb; display: flex; gap: 10px; align-items: flex-start; }
     .msg.ask b { color: #5cc3ee; display: block; margin-bottom: 2px; }
     .msg.ask .ph { flex-shrink: 0; width: 26px; height: 26px; border-radius: 8px; background: #147baa; display: flex; align-items: center; justify-content: center; }
+    .msg.ask .wait { display: block; margin-top: 6px; font-size: 12px; color: #9cc9de; }
+    .msg.ask .wait i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #5cc3ee; margin-right: 3px; animation: bsdot 1.2s infinite ease-in-out; }
+    .msg.ask .wait i:nth-child(2) { animation-delay: .18s; } .msg.ask .wait i:nth-child(3) { animation-delay: .36s; }
+    .msg.ask .links { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .msg.ask .links a { font-size: 12px; color: #fff; background: #147baa; border-radius: 8px; padding: 5px 9px; text-decoration: none; }
+    .msg.ask .links a.ghost { background: transparent; border: 1px solid #2a3f4b; color: #b9dcea; }
+    .msg.ask.done .wait, .msg.ask.done .links { display: none; }
+    .msg.closed { align-self: flex-start; background: rgba(255, 90, 90, 0.08); border: 1px solid rgba(255, 90, 90, 0.35); color: #ffd9d9; }
     .msg.order { align-self: flex-start; background: rgba(0, 212, 146, 0.08); border: 1px solid rgba(0, 212, 146, 0.4); color: #d7fff1; width: 86%; }
     .msg.order b { color: #00d492; display: block; margin-bottom: 6px; }
     .msg.order .row { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; padding: 3px 0; border-top: 1px solid rgba(0,212,146,.12); }
@@ -200,11 +209,22 @@ export const agentHtml = `<!DOCTYPE html>
       return (result.length > 60 ? result.slice(0, 57) + '\\u2026' : result).replace(/\\s+/g, ' ');
     }
     function addTool(ev) {
+      // Same tool, same outcome, back to back (the model retrying a pending
+      // checkout) → one line with a counter, not a column of identical boxes.
+      var sig = ev.name + '|' + (ev.summary || '');
+      var lastEl = log.lastElementChild;
+      if (lastEl && lastEl.classList.contains('tool') && lastEl.getAttribute('data-sig') === sig) {
+        var n = (Number(lastEl.getAttribute('data-n')) || 1) + 1;
+        lastEl.setAttribute('data-n', String(n));
+        var c = lastEl.querySelector('.tcount'); if (c) c.textContent = '\\u00d7' + n;
+        return lastEl;
+      }
       var d = document.createElement('div');
       d.className = 'msg tool';
+      d.setAttribute('data-sig', sig); d.setAttribute('data-n', '1');
       var det = document.createElement('details');
       var sum = document.createElement('summary');
-      sum.innerHTML = '<span class="tname"></span><span class="tsum"></span>';
+      sum.innerHTML = '<span class="tname"></span><span class="tsum"></span><span class="tcount"></span>';
       sum.querySelector('.tname').textContent = ev.name + '(' + (ev.args && ev.args !== '{}' ? '\\u2026' : '') + ')';
       sum.querySelector('.tsum').textContent = ev.result ? '\\u2192 ' + (ev.summary || summarize(ev.name, ev.result)) : '';
       var pre = document.createElement('pre');
@@ -213,11 +233,42 @@ export const agentHtml = `<!DOCTYPE html>
       log.appendChild(d);
       return d;
     }
+    var askCard = null;
     function addAsk(ev) {
+      if (askCard && askCard.getAttribute('data-req') === (ev.request_id || '')) return askCard;
       var d = document.createElement('div');
       d.className = 'msg ask';
-      d.innerHTML = '<span class="ph"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span><span><b>Confirm in BotShield</b>' + (ev.text || '') + (ev.request_id ? '<br><span style="font-family:Roboto Mono,monospace;font-size:10.5px;color:#7aa9bf">' + ev.request_id + '</span>' : '') + '</span>';
+      d.setAttribute('data-req', ev.request_id || '');
+      d.innerHTML = '<span class="ph"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>'
+        + '<span><b>Confirm in BotShield on your phone</b>' + (ev.text || '')
+        + '<span class="wait"><i></i><i></i><i></i><span class="wtxt">Waiting for you \\u2014 take your time, the card is good for 10 minutes.</span></span>'
+        + '<span class="links"><a href="https://app.botshield.ai/app/agents-ask" target="_blank" rel="noopener">Open BotShield</a><a class="ghost" href="https://app.botshield.ai" target="_blank" rel="noopener">New here? Sign up</a></span>'
+        + '</span>';
       log.appendChild(d); log.scrollTop = log.scrollHeight;
+      askCard = d;
+      return d;
+    }
+    function addClosed(ev) {
+      var d = document.createElement('div'); d.className = 'msg closed';
+      d.textContent = 'Purchase ' + (ev.status || 'closed') + (ev.text ? ' \\u2014 ' + ev.text : '') + '. Nothing was charged.';
+      log.appendChild(d); log.scrollTop = log.scrollHeight;
+    }
+    // The page owns the wait: while a checkout is pending, re-ask the agent
+    // every ~20s (each check itself waits on the server) until the card is
+    // confirmed, declined or expired — up to the card's 10-minute TTL.
+    var waitTimer = null, waitStarted = 0, waitChecks = 0;
+    function stopWaiting() { if (waitTimer) clearTimeout(waitTimer); waitTimer = null; if (askCard) askCard.classList.add('done'); }
+    function scheduleCheck(reqId) {
+      if (waitTimer) return;
+      if (!waitStarted) waitStarted = Date.now();
+      var left = Math.max(0, 10 * 60 * 1000 - (Date.now() - waitStarted));
+      if (left <= 0) { stopWaiting(); add('sys', 'The approval card expired. Ask me again to send a new one.'); return; }
+      waitTimer = setTimeout(function() {
+        waitTimer = null; waitChecks++;
+        var w = askCard && askCard.querySelector('.wtxt');
+        if (w) w.textContent = 'Still waiting \\u2014 checked ' + waitChecks + '\\u00d7 \\u00b7 ' + Math.ceil(left / 60000) + ' min left on the card.';
+        ask('Check approval ' + reqId + ' again. If approved, finish the purchase; if still pending, say only "still pending"; if declined or expired, say so.', true);
+      }, 20000);
     }
     function addOrder(ev) {
       var d = document.createElement('div');
@@ -249,14 +300,15 @@ export const agentHtml = `<!DOCTYPE html>
       else { setLive(false, 'Not connected'); add('sys', (h && h.reason) || 'The Ticketz agent is not connected to a gateway yet.'); }
     }).catch(function() { setLive(false, 'Not connected'); add('sys', 'The Ticketz agent is not connected to a gateway yet.'); });
 
-    async function ask(q) {
+    async function ask(q, hidden) {
       if (!q || !live) return;
-      add('user', q);
+      if (!hidden) { add('user', q); stopWaiting(); waitStarted = 0; waitChecks = 0; }
       turns.push({ role: 'user', content: q });
       input.value = '';
       send.disabled = true;
       var pending = document.createElement('div');
       pending.className = 'msg typing';
+      if (hidden) pending.style.display = 'none';
       pending.innerHTML = '<i></i><i></i><i></i><small>Ticketz agent is working\\u2026</small>';
       log.appendChild(pending); log.scrollTop = log.scrollHeight;
       var tick = setTimeout(function() { pending.querySelector('small').textContent = 'Talking to Ticketz\\u2026'; }, 6000);
@@ -269,14 +321,17 @@ export const agentHtml = `<!DOCTYPE html>
         if (!r.ok) { clearTimeout(tick); clearTimeout(tick2); pending.className = 'msg sys'; pending.innerHTML = ''; pending.textContent = j.error || 'The agent could not answer.'; return; }
         clearTimeout(tick); clearTimeout(tick2); pending.remove();
         var spoke = false;
+        var stillPending = hidden && j.awaiting && !(j.events || []).some(function(ev) { return ev.type === 'order' || ev.type === 'closed'; });
         (j.events || []).forEach(function(ev) {
-          if (ev.type === 'text') { add('agent', ev.text); spoke = true; }
-          else if (ev.type === 'tool') addTool(ev);
+          if (ev.type === 'text') { if (!stillPending) { add('agent', ev.text); spoke = true; } }
+          else if (ev.type === 'tool') { if (!stillPending) addTool(ev); }
           else if (ev.type === 'ask') addAsk(ev);
-          else if (ev.type === 'order') addOrder(ev);
+          else if (ev.type === 'order') { stopWaiting(); addOrder(ev); }
+          else if (ev.type === 'closed') { stopWaiting(); addClosed(ev); }
         });
-        if (!spoke) add('agent', j.reply || '(no reply)');
+        if (!spoke && !stillPending) add('agent', j.reply || '(no reply)');
         turns.push({ role: 'assistant', content: j.reply || '' });
+        if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting); }
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
         clearTimeout(tick); clearTimeout(tick2);
