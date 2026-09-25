@@ -31,13 +31,20 @@ export const agentHtml = `<!DOCTYPE html>
     .status .dot { width: 7px; height: 7px; border-radius: 50%; background: #3a3a3a; }
     .status.live .dot { background: #00d492; box-shadow: 0 0 0 3px rgba(0, 212, 146, 0.18); }
     .status.off .dot { background: #ffb547; }
-    .log { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+    .log { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+    .log > * { flex-shrink: 0; }
     .msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
     .msg.user { align-self: flex-end; background: #7c3aed; color: #fff; border-bottom-right-radius: 4px; }
     .msg.agent { align-self: flex-start; background: #17171a; border: 1px solid #222; border-bottom-left-radius: 4px; }
     .msg.agent b { color: #fff; } .msg.agent code { font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: #c9d1ff; }
     .msg.sys { align-self: center; background: transparent; color: #8a8a8a; font-size: 12.5px; text-align: center; max-width: 100%; }
-    .msg.tool { align-self: flex-start; font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: #9aa0ad; background: #101216; border: 1px dashed #2a2f3a; }
+    .msg.tool { align-self: flex-start; font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: #9aa0ad; background: #101216; border: 1px dashed #2a2f3a; padding: 8px 11px; white-space: normal; }
+    .msg.tool summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; }
+    .msg.tool summary::-webkit-details-marker { display: none; }
+    .msg.tool summary::before { content: '\\25B8'; color: #5b6070; font-size: 10px; }
+    .msg.tool details[open] summary::before { content: '\\25BE'; }
+    .msg.tool .tname { color: #c9d1ff; }
+    .msg.tool pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; color: #8a90a0; max-height: 220px; overflow: auto; font: inherit; }
     .msg.ask { align-self: flex-start; background: rgba(0, 212, 146, 0.08); border: 1px solid rgba(0, 212, 146, 0.35); color: #d7fff1; }
     .msg.ask b { color: #00d492; }
     .compose { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #1a1a1a; }
@@ -156,6 +163,25 @@ export const agentHtml = `<!DOCTYPE html>
       e = e.replace(/^- (.*)$/gm, '\u2022 $1');
       return e;
     }
+    function summarize(name, result) {
+      if (!result) return '';
+      try { var j = JSON.parse(result); if (Array.isArray(j.events)) return j.events.length + ' events'; if (j.status) return String(j.status); if (j.total) return 'total ' + j.total; } catch (e) {}
+      return (result.length > 60 ? result.slice(0, 57) + '\\u2026' : result).replace(/\\s+/g, ' ');
+    }
+    function addTool(ev) {
+      var d = document.createElement('div');
+      d.className = 'msg tool';
+      var det = document.createElement('details');
+      var sum = document.createElement('summary');
+      sum.innerHTML = '<span class="tname"></span><span class="tsum"></span>';
+      sum.querySelector('.tname').textContent = ev.name + '(' + (ev.args && ev.args !== '{}' ? '\\u2026' : '') + ')';
+      sum.querySelector('.tsum').textContent = ev.result ? '\\u2192 ' + summarize(ev.name, ev.result) : '';
+      var pre = document.createElement('pre');
+      pre.textContent = (ev.args && ev.args !== '{}' ? 'args ' + ev.args + '\\n' : '') + (ev.result || '');
+      det.appendChild(sum); det.appendChild(pre); d.appendChild(det);
+      log.appendChild(d);
+      return d;
+    }
     function add(kind, text) {
       var d = document.createElement('div');
       d.className = 'msg ' + kind;
@@ -192,11 +218,12 @@ export const agentHtml = `<!DOCTYPE html>
         if (!r.ok) { pending.className = 'msg sys'; pending.textContent = j.error || 'The agent could not answer.'; return; }
         pending.remove();
         (j.events || []).forEach(function(ev) {
-          if (ev.type === 'tool') add('tool', ev.name + '(' + (ev.args || '') + ')' + (ev.result ? ' \\u2192 ' + ev.result : ''));
+          if (ev.type === 'tool') addTool(ev);
           else if (ev.type === 'ask') add('ask', '<b>Waiting on you.</b> ' + ev.text);
         });
         add('agent', j.reply || '(no reply)');
         turns.push({ role: 'assistant', content: j.reply || '' });
+        setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
         pending.className = 'msg sys'; pending.textContent = 'Network error \\u2014 try again.';
       } finally {
