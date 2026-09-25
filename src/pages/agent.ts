@@ -94,7 +94,7 @@ export const agentHtml = `<!DOCTYPE html>
     var send = document.getElementById('send');
     var statusEl = document.getElementById('status'); // not 'status': window.status is a string property
     var statusText = document.getElementById('statusText');
-    var history = [];
+    var turns = []; // not 'history': window.history
     var live = false;
     var LINK_KEY = 'tkz_agent_bind_jwt';
     var bindToken = sessionStorage.getItem(LINK_KEY) || null;
@@ -171,14 +171,14 @@ export const agentHtml = `<!DOCTYPE html>
     async function ask(q) {
       if (!q || !live) return;
       add('user', q);
-      history.push({ role: 'user', content: q });
+      turns.push({ role: 'user', content: q });
       input.value = '';
       send.disabled = true;
       var pending = add('agent', '\\u2026');
       try {
         var headers = { 'Content-Type': 'application/json' };
         if (bindToken) headers['Authorization'] = 'Bearer ' + bindToken;
-        var r = await fetch('/api/agent/chat', { method: 'POST', headers: headers, body: JSON.stringify({ messages: history }) });
+        var r = await fetch('/api/agent/chat', { method: 'POST', headers: headers, body: JSON.stringify({ messages: turns }) });
         var j = await r.json();
         if (!r.ok) { pending.className = 'msg sys'; pending.textContent = j.error || 'The agent could not answer.'; return; }
         pending.remove();
@@ -187,7 +187,7 @@ export const agentHtml = `<!DOCTYPE html>
           else if (ev.type === 'ask') add('ask', '<b>Waiting on you.</b> ' + ev.text);
         });
         add('agent', j.reply || '(no reply)');
-        history.push({ role: 'assistant', content: j.reply || '' });
+        turns.push({ role: 'assistant', content: j.reply || '' });
       } catch (e) {
         pending.className = 'msg sys'; pending.textContent = 'Network error \\u2014 try again.';
       } finally {
