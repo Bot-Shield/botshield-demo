@@ -148,7 +148,7 @@ export const agentHtml = `<!DOCTYPE html>
       else startLink();
     });
 
-    // Tiny markdown for agent replies: **bold**, `code`, "- " bullets. Escaped first.
+    // Tiny markdown for agent replies: **bold**, inline code, "- " bullets. Escaped first.
     function mdLite(t) {
       var e = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       e = e.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\x60([^\x60]+)\x60/g, '<code>$1</code>');
