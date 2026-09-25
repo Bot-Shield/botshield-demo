@@ -1,624 +1,92 @@
-export default {
-  async fetch(): Promise<Response> {
-    const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Ticketz - Checkout</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+// demo.botshield.ai — BotShield Demos.
+//
+//   /            the Demos shell (rail + framed demo; #key selects one)
+//   /ticketz     Ticketz · BotShield Gate at checkout (Human Gate, inline passkey beta)
+//   /agent       Ticketz · Agents Ask (chat with the Ticketz agent; purchases wait for the human)
+//   /vapez       Vapez · Age Gate at the door (enter_site_age_check, 18+)
+//   /salesforce  → Coral Cloud on salesforce-demo.botshield.ai
+//   /api/agent/* the chat page's only backend: health + a proxy to the BotShield
+//                agentgateway (AGENT_GATEWAY_URL + AGENT_GATEWAY_TOKEN). Unset → 503,
+//                and the page says the agent is not connected. No fake replies.
+//
+// Every demo page runs against PRODUCTION (cdn.botshield.ai + the prod Ticketz
+// site key); the gates are the ones in the Ticketz org's Console.
+import { ticketzHtml } from './pages/ticketz';
+import { vapezHtml } from './pages/vapez';
+import { agentHtml } from './pages/agent';
+import { shellHtml } from './shell';
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: #000000;
-      color: #ffffff;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -webkit-text-size-adjust: 100%;
-    }
+interface Env {
+  AGENT_GATEWAY_URL?: string;   // e.g. https://gateway.botshield.ai (the LLM route host)
+  AGENT_GATEWAY_TOKEN?: string; // secret — bearer the gateway expects from this demo
+  AGENT_MODEL?: string;         // e.g. anthropic/claude-opus-5
+}
 
-    /* ── Root container: full viewport, flex column, centered ── */
-    .page {
-      width: 100%;
-      height: 100%;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
-      padding: 16px;
-      padding-top: env(safe-area-inset-top, 16px);
-      padding-bottom: env(safe-area-inset-bottom, 16px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+const SALESFORCE_DEMO = 'https://salesforce-demo.botshield.ai/coralcloud/s/';
 
-    /* ── Spacer: pushes content down from top ── */
-    .top-spacer {
-      flex-shrink: 0;
-      height: 34px;
-    }
-
-    /* ── Header: Ticketz brand centered ── */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9.5px;
-      flex-shrink: 0;
-    }
-
-    .header-logo {
-      width: 31px;
-      height: 31px;
-      border-radius: 50%;
-      background: #7c3aed;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-logo svg { width: 16px; height: 16px; fill: white; }
-
-    .header-brand {
-      font-size: 19px;
-      font-weight: 600;
-      color: #ffffff;
-      line-height: 28.7px;
-    }
-
-    /* ── Content section: timer + event + order grouped ── */
-    .content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
-      width: 100%;
-      flex-shrink: 0;
-    }
-
-    /* ── Timer bar: orange accent ── */
-    .timer-bar {
-      background: rgba(255, 156, 102, 0.15);
-      border: 1px solid rgba(255, 156, 102, 0.6);
-      border-radius: 12px;
-      padding: 17px 19px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      height: 58px;
-    }
-
-    .timer-icon { width: 24px; height: 24px; flex-shrink: 0; }
-
-    .timer-text {
-      flex: 1;
-      font-size: 12px;
-      font-weight: 400;
-      color: #c9c9c9;
-      line-height: 18px;
-      padding-left: 12px;
-    }
-
-    .timer-countdown {
-      font-size: 14px;
-      font-weight: 600;
-      color: #ffffff;
-      line-height: 20px;
-      font-variant-numeric: tabular-nums;
-      text-align: right;
-    }
-
-    /* ── Event card ── */
-    .event-card {
-      background: #1a1a1a;
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      gap: 39px;
-      align-items: flex-start;
-      width: 100%;
-    }
-
-    .event-art {
-      width: 72px;
-      height: 74px;
-      border-radius: 8px;
-      flex-shrink: 0;
-    }
-
-    .event-details {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .event-artist {
-      font-size: 18px;
-      font-weight: 600;
-      line-height: 28px;
-      color: #ffffff;
-    }
-
-    .event-tour {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 20px;
-      color: #ffffff;
-    }
-
-    .event-meta {
-      display: flex;
-      flex-direction: column;
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 18px;
-      color: #959595;
-    }
-
-    /* ── Order summary ── */
-    .order-card {
-      background: #1a1a1a;
-      border-radius: 8px;
-      width: 100%;
-      position: relative;
-      padding: 25px 28px;
-    }
-
-    .order-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 20px;
-      color: #999999;
-    }
-
-    .order-row + .order-row { margin-top: 17px; }
-
-    .order-row .qty {
-      margin-right: 24px;
-    }
-
-    .order-divider {
-      border: none;
-      border-top: 1px solid #2a2a2a;
-      margin: 26px 0 19px 0;
-    }
-
-    .order-total {
-      font-size: 18px;
-      font-weight: 600;
-      line-height: 28px;
-      color: #ffffff;
-    }
-
-    .order-total span { color: #ffffff; }
-
-    /* ── BotShield widget ── */
-    /* display:block (NOT flex) — the component stacks its rows internally; a
-       flex host would lay its shadow children out in a row. */
-    botshield-verify {
-      display: block;
-      width: 100%;
-    }
-
-    /* The verify button, checkout button, and footer (Census attribution +
-       BotShield ID CTA) are all rendered inside <botshield-verify>. The demo only
-       relabels the checkout button (checkout-label) and could restyle it via
-       the component's --bs-checkout-* custom properties. */
-
-    /* ── Toast ── */
-    .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      background: #16a34a;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      z-index: 10000;
-      transition: transform 0.3s ease;
-      white-space: nowrap;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* ── Confirmation overlay ── */
-    .confirmation {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .confirmation.show { opacity: 1; pointer-events: auto; }
-
-    .confirmation-card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      max-width: 340px;
-      width: 90%;
-    }
-
-    .confirmation-check {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      background: #16a34a;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .confirmation-check svg {
-      width: 28px; height: 28px;
-      stroke: white; fill: none;
-      stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    .confirmation h2 { font-size: 20px; margin-bottom: 6px; }
-    .confirmation p { font-size: 14px; color: #9ca3af; }
-
-    /* ── Demo controls (top-right): Reset + partner-ref chip ──
-       Demo chrome, not part of the Ticketz page design — quiet by intent. */
-    .age-badge {
-      display: inline-block; margin-left: 8px; padding: 2px 7px; border-radius: 6px;
-      font-size: 11px; font-weight: 700; letter-spacing: .04em; vertical-align: 2px;
-      color: #ffb547; border: 1px solid rgba(255, 181, 71, 0.5); background: rgba(255, 181, 71, 0.10);
-    }
-    .age-note { margin-top: 8px; font-size: 12px; line-height: 1.45; color: #9a9a9a; }
-    .age-badge[hidden], .age-note[hidden] { display: none; }
-    .age-note em { color: #c9c9c9; font-style: normal; }
-    .demo-controls {
-      position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 12px);
-      right: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      z-index: 30000;
-    }
-
-    .demo-reset {
-      background: rgba(26, 26, 26, 0.9);
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
-      color: #9ca3af;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 1;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-
-    .demo-reset:hover { color: #ffffff; border-color: #3a3a3a; }
-
-    .demo-ref {
-      display: none;
-      background: rgba(26, 26, 26, 0.9);
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
-      color: #61656c;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 10px;
-      line-height: 1;
-      padding: 6px 8px;
-      cursor: pointer;
-    }
-
-    .demo-ref.show { display: block; }
-    .demo-ref:active { color: #9ca3af; }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <!-- Top spacer (safe area) -->
-    <div class="top-spacer"></div>
-
-    <!-- Header -->
-    <div class="header">
-      <div class="header-logo">
-        <svg viewBox="0 0 24 24"><path d="M2 9a2 2 0 012-2h16a2 2 0 012 2v1a3 3 0 000 6v1a2 2 0 01-2 2H4a2 2 0 01-2-2v-1a3 3 0 000-6V9z"/></svg>
-      </div>
-      <div class="header-brand">Ticketz</div>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-      <!-- Timer -->
-      <div class="timer-bar">
-        <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <div class="timer-text">Complete purchase within</div>
-        <div class="timer-countdown" id="countdown">7:32</div>
-      </div>
-
-      <!-- Event -->
-      <div class="event-card">
-        <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;" id="eventArt">AF</div>
-        <div class="event-details">
-          <div class="event-artist"><span id="eventArtist">Arcade Fire</span><span class="age-badge" id="ageBadge" hidden>21+</span></div>
-          <div class="event-tour" id="eventTour">World Tour</div>
-          <div class="event-meta">
-            <span id="eventVenue">Madison Square Garden</span>
-            <span id="eventDate"></span>
-          </div>
-          <div class="age-note" id="ageNote" hidden>Age-restricted event. Ticketz checks you're over 21 without seeing your ID — BotShield returns only <em>verified</em> or <em>unavailable</em>, never a birthdate.</div>
-        </div>
-      </div>
-
-      <!-- Order -->
-      <div class="order-card">
-        <div class="order-row">
-          <span>GA Floor</span>
-          <div><span class="qty">x2</span><span>$195.00</span></div>
-        </div>
-        <div class="order-row">
-          <span>Service Fee</span>
-          <span>$38.90</span>
-        </div>
-        <hr class="order-divider">
-        <div class="order-row order-total">
-          <span>Total</span>
-          <span>$428.50</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- BotShield Verify — ONE component renders the verify button, the
-         checkout button (verified-gated, component-owned), and the footer
-         (Census attribution + BotShield ID CTA). The demo only restyles/relabels
-         the checkout button and listens for botshield:checkout. -->
-    <botshield-verify
-      id="bsVerify"
-      theme="dark"
-      scan-mode="modal"
-      signals="true"
-      checkout-label="Complete Purchase"
-      betas="inline-passkey"
-    ></botshield-verify>
-  </div>
-
-  <!-- Demo controls: reset the widget state; the partner ref survives so the
-       second run demos the BotShield ID instant path. Chip appears after the
-       first successful verification; tap copies the ref. -->
-  <div class="demo-controls">
-    <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
-    <button type="button" class="demo-reset" id="demoReset">Reset</button>
-    <button type="button" class="demo-reset" id="demoAge" title="Switch between the all-ages checkout (Human Gate) and the 21+ event (Age Gate)"></button>
-    <button type="button" class="demo-ref" id="demoRef" title="partner_user_ref — tap to copy"></button>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast">Human verified — you're good to go!</div>
-
-  <!-- Confirmation -->
-  <div class="confirmation" id="confirmation">
-    <div class="confirmation-card">
-      <div class="confirmation-check">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      </div>
-      <h2>Purchase Complete!</h2>
-      <p>Your tickets have been sent to your email. Enjoy the show!</p>
-    </div>
-  </div>
-
-  <!-- SDK host = which backend the demo runs against. The embed calls the
-       API on the host it was loaded from: cdn → wg.botshield.ai (Heroku prod),
-       cdn-staging → wg-staging.botshield.ai (a Cloudflare TUNNEL to a laptop).
-       PRODUCTION since 2026-09-13: prod DB carries the Ticketz partner with the
-       seeded "Demo (Ticketz)" site key below and an active production
-       ticket_purchase gate. The scanning phone must run the prod app build.
-       To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=16"></script>
-
-  <script>
-    // Dynamic event date — next Saturday ~2 weeks out
-    (function() {
-      var now = new Date();
-      var target = new Date(now);
-      target.setDate(target.getDate() + 14);
-      // Roll forward to Saturday (6)
-      var day = target.getDay();
-      var diff = (6 - day + 7) % 7;
-      if (diff === 0 && day !== 6) diff = 7;
-      target.setDate(target.getDate() + diff);
-      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      document.getElementById('eventDate').textContent = 'Sat, ' + months[target.getMonth()] + ' ' + target.getDate() + ' \\u2022 8:00pm';
-      document.getElementById('eventTour').textContent = 'World Tour ' + target.getFullYear();
-    })();
-
-    var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
-    // ?event=21 → the age-restricted event: same widget, the Ticketz
-    // Age Gate scope (gate_type 'age', threshold 21 — configured in the
-    // Console, not here). Everything else on the page is unchanged: the
-    // gate type comes from the scope, the widget adapts its copy, and the
-    // result the page sees is verified / unavailable — never an age.
-    var AGE_EVENT = params.get('event') === '21';
-    var SCOPE = params.get('scope') || (AGE_EVENT ? 'enter_site_age_check' : 'ticket_purchase');
-    if (AGE_EVENT) {
-      document.getElementById('eventArtist').textContent = 'Late Night Set';
-      document.getElementById('eventArt').textContent = 'LN';
-      document.getElementById('eventTour').textContent = 'After Hours \u2022 21+';
-      document.getElementById('eventVenue').textContent = 'The Basement, Brooklyn';
-      document.getElementById('ageBadge').hidden = false;
-      document.getElementById('ageNote').hidden = false;
-      document.title = 'Ticketz - Checkout (21+)';
-    }
-    var demoAge = document.getElementById('demoAge');
-    demoAge.textContent = AGE_EVENT ? 'All-ages event' : '21+ event';
-    demoAge.addEventListener('click', function() {
-      var next = new URL(window.location.href);
-      if (AGE_EVENT) next.searchParams.delete('event'); else next.searchParams.set('event', '21');
-      next.searchParams.delete('scope');
-      window.location.href = next.toString();
-    });
-    var MODE = params.get('mode') || 'private';
-
-    var bsVerify = document.getElementById('bsVerify');
-    bsVerify.setAttribute('site-key', SITE_KEY);
-    bsVerify.setAttribute('scope', SCOPE);
-    bsVerify.setAttribute('mode', MODE);
-
-    // ── Partner user ref (BotShield ID continuity — the instant path) ──
-    // A real partner sends their own logged-in user id here. The demo mints
-    // a stable stand-in once and keeps it in localStorage: the FIRST
-    // verification links it to the BotShield identity server-side
-    // (partner_user_linkages, link-on-verify default), so every later
-    // evaluate with the same ref resolves the user and returns the instant
-    // pass — result_state 'human_verified', the "Human Verified" pill, no QR.
-    // (Two-state contract: the retired reason/"MultiPass Active" state no
-    // longer crosses the wire — both runs read "Human Verified"; the tell is
-    // the missing QR.) ?fresh=1 mints a new ref to run the full QR flow again.
-    var REF_KEY = 'tkz_demo_user_ref';
-    var VERIFIED_KEY = 'tkz_demo_verified_once';
-    var userRef = localStorage.getItem(REF_KEY);
-    if (!userRef || params.get('fresh')) {
-      userRef = 'tkz_' + Array.from(crypto.getRandomValues(new Uint8Array(6)))
-        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-      localStorage.setItem(REF_KEY, userRef);
-      localStorage.removeItem(VERIFIED_KEY);
-    }
-    bsVerify.setAttribute('platform-user-ref', userRef);
-
-    // Ref chip — visible once a verification has happened on this browser.
-    var refChip = document.getElementById('demoRef');
-    refChip.textContent = userRef;
-    if (localStorage.getItem(VERIFIED_KEY)) refChip.classList.add('show');
-    refChip.addEventListener('click', function() {
-      navigator.clipboard && navigator.clipboard.writeText(userRef);
-    });
-
-    // Reset — back to the idle widget for another pass. The ref survives on
-    // purpose: the point of the second run is the instant path (BotShield ID
-    // continuity — verified with no QR).
-    document.getElementById('demoReset').addEventListener('click', function() {
-      bsVerify.reset();
-      document.getElementById('confirmation').classList.remove('show');
-      document.getElementById('toast').classList.remove('show');
-    });
-
-    // New visitor — forget the partner ref (and the verified flag) so the next
-    // Verify is a FIRST visit again: pre-check → ceremony (passkey / QR). Use
-    // this to re-run the full flow on the show floor; Reset alone re-runs the
-    // instant path because the ref (and its BotShield ID linkage) survives.
-    document.getElementById('demoNewVisitor').addEventListener('click', function() {
-      localStorage.removeItem(REF_KEY);
-      localStorage.removeItem(VERIFIED_KEY);
-      userRef = 'tkz_' + Array.from(crypto.getRandomValues(new Uint8Array(6)))
-        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-      localStorage.setItem(REF_KEY, userRef);
-      bsVerify.setAttribute('platform-user-ref', userRef);
-      refChip.textContent = userRef;
-      refChip.classList.remove('show');
-      bsVerify.reset();
-      document.getElementById('confirmation').classList.remove('show');
-      document.getElementById('toast').classList.remove('show');
-    });
-
-    // Countdown (cosmetic)
-    (function() {
-      var total = 7 * 60 + 32;
-      var el = document.getElementById('countdown');
-      setInterval(function() {
-        if (total <= 0) return;
-        total--;
-        el.textContent = Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
-      }, 1000);
-    })();
-
-    // BotShield events. The component owns the checkout button's verified-gating
-    // + tamper-proofing, so the demo no longer tracks the token or toggles a
-    // button — it just reacts to the verification result (cosmetic toast) and
-    // runs the purchase when the component emits botshield:checkout.
-    // Display only: a real integration confirms the token on its server
-    // (POST /sdk/verify-token). The demo peeks at the JWT payload to pick the
-    // toast line — age_verdict is 'verified' or 'unavailable', never an age.
-    function ageVerdictOf(detail) {
-      try {
-        var tok = detail && (detail.token || detail.verification_token || detail.signed_token);
-        if (!tok || tok.split('.').length < 3) return null;
-        var b = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        var claims = JSON.parse(atob(b + '='.repeat((4 - b.length % 4) % 4)));
-        return claims.age_verdict || (claims.botshield && claims.botshield.age_verdict) || null;
-      } catch (err) { return null; }
-    }
-
-    bsVerify.addEventListener('botshield:success', function(e) {
-      console.log('[Ticketz] BotShield verified:', e.detail);
-      var toast = document.getElementById('toast');
-      if (AGE_EVENT) {
-        var v = ageVerdictOf(e.detail);
-        toast.textContent = v === 'verified'
-          ? 'Over 21 \u2014 verified. Enjoy the show.'
-          : v === 'unavailable'
-            ? 'Human verified \u2014 age check unavailable on this device. Finish on your phone.'
-            : 'Human verified.';
-      } else {
-        toast.textContent = "Human verified \u2014 you're good to go!";
-      }
-      toast.classList.add('show');
-      setTimeout(function() { toast.classList.remove('show'); }, 3000);
-      // First success on this browser: surface the partner ref chip.
-      localStorage.setItem(VERIFIED_KEY, '1');
-      refChip.classList.add('show');
-    });
-
-    bsVerify.addEventListener('botshield:failure', function(e) {
-      console.error('[Ticketz] BotShield verification failed:', e.detail);
-    });
-
-    // (Dead listener removed: the component never dispatches 'botshield:expired'
-    // as a DOM event — expiry resets the widget and calls the 'onexpired'
-    // callback attribute instead.)
-
-    // Checkout — fired by the component ONLY when its internal server-verified
-    // state is resolved (the component enforces the gate; the demo just runs the
-    // purchase). Show the order confirmation.
-    bsVerify.addEventListener('botshield:checkout', function(e) {
-      console.log('[Ticketz] Checkout (verified):', e.detail);
-      document.getElementById('confirmation').classList.add('show');
-    });
-
-    // (Dead listener removed: 'botshield:stayverified' is never dispatched —
-    // the footer "Stay Verified" lockup inside the component is static branding.)
-
-    document.getElementById('confirmation').addEventListener('click', function(e) {
-      if (e.target === this) this.classList.remove('show');
-    });
-  </script>
-</body>
-</html>`;
-
-    return new Response(html, {
-      headers: {
-        'Content-Type': 'text/html;charset=UTF-8',
-        'Cache-Control': 'public, max-age=300',
-      },
-    });
+const html = (body: string) => new Response(body, {
+  headers: {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-cache',
+    'X-Content-Type-Options': 'nosniff',
+    // Demo pages are framed by the shell on this origin only.
+    'Content-Security-Policy': "frame-ancestors 'self'",
   },
-} satisfies ExportedHandler;
+});
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+
+interface ChatMessage { role: 'user' | 'assistant'; content: string }
+
+/** Chat proxy: OpenAI-compatible completion through the agentgateway's LLM route (tools live behind the gateway). */
+async function agentChat(env: Env, messages: ChatMessage[]): Promise<Response> {
+  if (!env.AGENT_GATEWAY_URL || !env.AGENT_GATEWAY_TOKEN) {
+    return json({ error: 'The Ticketz agent is not connected to a gateway yet.' }, 503);
+  }
+  const clean = messages.filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string').slice(-20)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }));
+  if (!clean.length) return json({ error: 'Nothing to send.' }, 400);
+  const system = 'You are the Ticketz agent: you help people find shows and buy tickets on Ticketz. Use the Ticketz tools for real data. You never complete a purchase yourself — any purchase is proposed and waits for the human to confirm it in the BotShield app; say so plainly when that happens. Keep replies short.';
+  const upstream = await fetch(`${env.AGENT_GATEWAY_URL.replace(/\/$/, '')}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.AGENT_GATEWAY_TOKEN}` },
+    body: JSON.stringify({ model: env.AGENT_MODEL || 'anthropic/claude-opus-5', messages: [{ role: 'system', content: system }, ...clean], max_tokens: 600 }),
+  });
+  const text = await upstream.text();
+  if (!upstream.ok) {
+    console.error('[agent] gateway', upstream.status, text.slice(0, 300));
+    return json({ error: `The gateway answered ${upstream.status}.` }, 502);
+  }
+  let data: any = {};
+  try { data = JSON.parse(text); } catch { return json({ error: 'The gateway answered something that was not JSON.' }, 502); }
+  const choice = data?.choices?.[0];
+  const reply: string = choice?.message?.content ?? '';
+  const events = (choice?.message?.tool_calls ?? []).map((t: any) => ({ type: 'tool', name: t?.function?.name ?? 'tool', args: (t?.function?.arguments ?? '').slice(0, 200) }));
+  return json({ reply, events, usage: data?.usage ?? null });
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    const path = url.pathname.replace(/\/+$/, '') || '/';
+
+    if (path === '/') return html(shellHtml());
+    if (path === '/ticketz') return html(ticketzHtml);
+    if (path === '/vapez') return html(vapezHtml);
+    if (path === '/agent') return html(agentHtml);
+    if (path === '/salesforce') return Response.redirect(SALESFORCE_DEMO, 302);
+
+    if (path === '/api/agent/health') {
+      const ok = !!(env.AGENT_GATEWAY_URL && env.AGENT_GATEWAY_TOKEN);
+      return json(ok ? { ok, model: env.AGENT_MODEL || 'anthropic/claude-opus-5' } : { ok, reason: 'The Ticketz agent is not connected to a gateway yet — the production gateway is being brought up.' });
+    }
+    if (path === '/api/agent/chat') {
+      if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
+      let body: any;
+      try { body = await request.json(); } catch { return json({ error: 'Bad request.' }, 400); }
+      return agentChat(env, Array.isArray(body?.messages) ? body.messages : []);
+    }
+
+    // Old deep links (?event=21 etc.) and anything else → the shell.
+    return Response.redirect(`${url.origin}/#ticketz`, 302);
+  },
+};
