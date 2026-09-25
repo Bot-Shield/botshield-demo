@@ -34,6 +34,7 @@ export const agentHtml = `<!DOCTYPE html>
     .msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
     .msg.user { align-self: flex-end; background: #7c3aed; color: #fff; border-bottom-right-radius: 4px; }
     .msg.agent { align-self: flex-start; background: #17171a; border: 1px solid #222; border-bottom-left-radius: 4px; }
+    .msg.agent b { color: #fff; } .msg.agent code { font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: #c9d1ff; }
     .msg.sys { align-self: center; background: transparent; color: #8a8a8a; font-size: 12.5px; text-align: center; max-width: 100%; }
     .msg.tool { align-self: flex-start; font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: #9aa0ad; background: #101216; border: 1px dashed #2a2f3a; }
     .msg.ask { align-self: flex-start; background: rgba(0, 212, 146, 0.08); border: 1px solid rgba(0, 212, 146, 0.35); color: #d7fff1; }
@@ -77,7 +78,7 @@ export const agentHtml = `<!DOCTYPE html>
       </div>
       <div class="chips">
         <button type="button" class="chip" data-q="What shows are on this weekend?">What shows are on this weekend?</button>
-        <button type="button" class="chip" data-q="Get me 2 GA floor tickets for Arcade Fire at MSG.">Buy 2 tickets for Arcade Fire</button>
+        <button type="button" class="chip" data-q="Buy me 2 tickets to the next show on sale.">Buy 2 tickets to the next show</button>
         <button type="button" class="chip" data-q="How does the approval on my phone work?">How does approval work?</button>
       </div>
       <form class="compose" id="compose">
@@ -147,10 +148,17 @@ export const agentHtml = `<!DOCTYPE html>
       else startLink();
     });
 
+    // Tiny markdown for agent replies: **bold**, `code`, "- " bullets. Escaped first.
+    function mdLite(t) {
+      var e = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      e = e.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\x60([^\x60]+)\x60/g, '<code>$1</code>');
+      e = e.replace(/^- (.*)$/gm, '\u2022 $1');
+      return e;
+    }
     function add(kind, text) {
       var d = document.createElement('div');
       d.className = 'msg ' + kind;
-      if (kind === 'ask') d.innerHTML = text; else d.textContent = text;
+      if (kind === 'ask') d.innerHTML = text; else if (kind === 'agent' && text !== '\u2026') d.innerHTML = mdLite(text); else d.textContent = text;
       log.appendChild(d);
       log.scrollTop = log.scrollHeight;
       return d;
