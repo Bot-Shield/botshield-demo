@@ -14,12 +14,14 @@ export interface DemoEntry {
   path?: string;      // framed page on this worker
   href?: string;      // external demo, opens in a new tab
   badge?: string;
+  /** Where the outcome is real today (e.g. platform age signals): shown as small pills. */
+  platforms?: string[];
 }
 
 export const DEMOS: DemoEntry[] = [
   { key: 'ticketz', group: 'Ticketz', label: 'BotShield Gate', hint: 'Human Gate at checkout', path: '/ticketz' },
   { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent' },
-  { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez' },
+  { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'] },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: 'https://salesforce-demo.botshield.ai/coralcloud/s/' },
 ];
 
@@ -31,7 +33,7 @@ export function shellHtml(): string {
         <div class="grp-h">${group}</div>
         ${items.map((d) => d.href
           ? `<a class="it" data-key="${d.key}" href="${d.href}" target="_blank" rel="noopener"><span class="it-l">${d.label}<span class="ext">&#8599;</span></span><span class="it-h">${d.hint}</span></a>`
-          : `<a class="it" data-key="${d.key}" href="#${d.key}"><span class="it-l">${d.label}${d.badge ? `<span class="badge">${d.badge}</span>` : ''}</span><span class="it-h">${d.hint}</span></a>`).join('')}
+          : `<a class="it" data-key="${d.key}" href="#${d.key}"><span class="it-l">${d.label}${d.badge ? `<span class="badge">${d.badge}</span>` : ''}${(d.platforms || []).map((pl) => `<span class="plat">${pl}</span>`).join('')}</span><span class="it-h">${d.hint}</span></a>`).join('')}
       </div>`).join('');
 
   return `<!DOCTYPE html>
@@ -63,6 +65,7 @@ export function shellHtml(): string {
     .it-l { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
     .it-h { font-size: 12px; color: var(--faint); }
     .ext { font-size: 12px; color: var(--faint); }
+    .plat { font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid #2a2e36; background: #14161b; border-radius: 999px; padding: 1px 7px; }
     .badge { font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); border: 1px solid rgba(20, 123, 170, .5); border-radius: 999px; padding: 1px 7px; }
     .spacer { flex: 1; }
     .foot { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 8px; }
