@@ -241,7 +241,7 @@ export const agentHtml = `<!DOCTYPE html>
       d.setAttribute('data-req', ev.request_id || '');
       d.innerHTML = '<span class="ph"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>'
         + '<span><b>Confirm in BotShield on your phone</b>' + (ev.text || '')
-        + '<span class="wait"><i></i><i></i><i></i><span class="wtxt">Waiting for you \\u2014 take your time, the card is good for 10 minutes.</span></span>'
+        + '<span class="wait"><i></i><i></i><i></i><span class="wtxt">Waiting for you \\u2014 take your time.</span></span>'
         + '<span class="links"><a href="https://app.botshield.ai/app/agents-ask" target="_blank" rel="noopener">Open BotShield</a><a class="ghost" href="https://app.botshield.ai" target="_blank" rel="noopener">New here? Sign up</a></span>'
         + '</span>';
       log.appendChild(d); log.scrollTop = log.scrollHeight;
@@ -256,17 +256,29 @@ export const agentHtml = `<!DOCTYPE html>
     // The page owns the wait: while a checkout is pending, re-ask the agent
     // every ~20s (each check itself waits on the server) until the card is
     // confirmed, declined or expired — up to the card's 10-minute TTL.
-    var waitTimer = null, waitStarted = 0, waitChecks = 0;
-    function stopWaiting() { if (waitTimer) clearTimeout(waitTimer); waitTimer = null; if (askCard) askCard.classList.add('done'); }
-    function scheduleCheck(reqId) {
+    // The card's expiry comes from the server (the partner's TTL policy) — the
+    // page never assumes a number. Countdown + re-checks run until it passes.
+    var waitTimer = null, waitChecks = 0, waitExpiresAt = 0, waitTick = null;
+    function fmtLeft(ms) { var m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000); return m + ':' + (s < 10 ? '0' : '') + s; }
+    function stopWaiting() {
+      if (waitTimer) clearTimeout(waitTimer); waitTimer = null;
+      if (waitTick) clearInterval(waitTick); waitTick = null;
+      if (askCard) askCard.classList.add('done');
+    }
+    function paintWait() {
+      var w = askCard && askCard.querySelector('.wtxt'); if (!w) return;
+      var left = waitExpiresAt ? waitExpiresAt - Date.now() : 0;
+      if (waitExpiresAt && left <= 0) { w.textContent = 'The card expired before you confirmed. Ask me again to send a new one.'; return; }
+      w.textContent = (waitChecks ? 'Still waiting \\u2014 checked ' + waitChecks + '\\u00d7 \\u00b7 ' : 'Waiting for you \\u2014 ') + (waitExpiresAt ? fmtLeft(left) + ' left on the card' : 'take your time') + '.';
+    }
+    function scheduleCheck(reqId, expiresAt) {
+      if (expiresAt) waitExpiresAt = Date.parse(expiresAt) || waitExpiresAt;
+      if (!waitTick) waitTick = setInterval(paintWait, 1000);
+      paintWait();
       if (waitTimer) return;
-      if (!waitStarted) waitStarted = Date.now();
-      var left = Math.max(0, 10 * 60 * 1000 - (Date.now() - waitStarted));
-      if (left <= 0) { stopWaiting(); add('sys', 'The approval card expired. Ask me again to send a new one.'); return; }
+      if (waitExpiresAt && waitExpiresAt - Date.now() <= 0) { stopWaiting(); paintWait(); return; }
       waitTimer = setTimeout(function() {
         waitTimer = null; waitChecks++;
-        var w = askCard && askCard.querySelector('.wtxt');
-        if (w) w.textContent = 'Still waiting \\u2014 checked ' + waitChecks + '\\u00d7 \\u00b7 ' + Math.ceil(left / 60000) + ' min left on the card.';
         ask('Check approval ' + reqId + ' again. If approved, finish the purchase; if still pending, say only "still pending"; if declined or expired, say so.', true);
       }, 20000);
     }
@@ -302,7 +314,7 @@ export const agentHtml = `<!DOCTYPE html>
 
     async function ask(q, hidden) {
       if (!q || !live) return;
-      if (!hidden) { add('user', q); stopWaiting(); waitStarted = 0; waitChecks = 0; }
+      if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; }
       turns.push({ role: 'user', content: q });
       input.value = '';
       send.disabled = true;
@@ -331,7 +343,7 @@ export const agentHtml = `<!DOCTYPE html>
         });
         if (!spoke && !stillPending) add('agent', j.reply || '(no reply)');
         turns.push({ role: 'assistant', content: j.reply || '' });
-        if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting); }
+        if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting, j.awaiting_expires_at); }
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
         clearTimeout(tick); clearTimeout(tick2);
