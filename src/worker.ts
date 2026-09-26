@@ -17,6 +17,9 @@ import { vapezHtml } from './pages/vapez';
 import { agentHtml } from './pages/agent';
 import { shellHtml } from './shell';
 import { FAVICON_ICO_B64 } from './favicon';
+import qrcode from 'qrcode-generator';
+
+const APP_URL = 'https://app.botshield.ai';
 
 interface Env {
   AGENT_GATEWAY_URL?: string;  // https://gateway-demo.botshield.ai — MCP at /mcp, Link ceremony at /oauth/link/*
@@ -152,6 +155,17 @@ export default {
       return json(ok ? { ok, model: env.AGENT_MODEL || 'claude-opus-5', gateway: env.AGENT_GATEWAY_URL } : { ok, reason: 'The Ticketz agent is not connected to a gateway yet — the production gateway is being brought up.' });
     }
     if (path === '/api/agent/link/start' && request.method === 'POST') return linkProxy(env, 'start', '');
+    // QR of the Link deep link (app.botshield.ai/bind?code=…). The URL is built
+    // HERE from the code alone, so the page can never QR an arbitrary link.
+    if (path === '/api/agent/link/qr') {
+      const code = (url.searchParams.get('code') || '').toUpperCase();
+      if (!/^[A-Z0-9]{4,12}$/.test(code)) return json({ error: 'bad code' }, 400);
+      const qr = qrcode(0, 'M');
+      qr.addData(`${APP_URL}/bind?code=${code}`);
+      qr.make();
+      const svg = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+      return new Response(svg, { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-store' } });
+    }
     if (path === '/api/agent/link/status') return linkProxy(env, 'status', url.search);
     if (path === '/api/agent/chat') {
       if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);

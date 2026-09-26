@@ -84,6 +84,13 @@ export const agentHtml = `<!DOCTYPE html>
     .link.bound .l b { color: #00d492; }
     .link button { background: #147baa; color: #fff; border: 0; border-radius: 9px; font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
     .link button.ghost { background: transparent; border: 1px solid #2a2a2a; color: #c9c9c9; }
+    .lk-row { display: flex; gap: 12px; align-items: center; }
+    .lk-qr { flex: none; width: 88px; height: 88px; border-radius: 8px; background: #fff; padding: 4px; box-sizing: border-box; }
+    .lk-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .lk-open { display: inline-block; align-self: flex-start; background: #2b7bd6; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 8px 14px; border-radius: 9px; }
+    .lk-open:hover { background: #3b8be6; }
+    .lk-hint { font-size: 12.5px; line-height: 1.5; color: #a5a8b0; }
+    .lk-hint .code { font-size: 15px; padding: 2px 8px 2px 10px; }
     .code { font-family: 'Roboto Mono', monospace; font-size: 22px; letter-spacing: .22em; color: #fff; background: #151517; border: 1px solid #2a2a2a; border-radius: 9px; padding: 4px 10px 4px 14px; }
     .foot { font-size: 11.5px; color: #5b5b5b; text-align: center; padding: 10px 8px 0; line-height: 1.5; max-width: 560px; }
     .foot b { color: #8a8a8a; font-weight: 600; }
@@ -159,7 +166,17 @@ export const agentHtml = `<!DOCTYPE html>
         var r = await fetch('/api/agent/link/start', { method: 'POST' });
         var j = await r.json();
         if (!r.ok || !j.code) { add('sys', 'Could not start the link: ' + (j.error || r.status)); return; }
-        linkText.innerHTML = 'In the BotShield app, open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span>';
+        // Same browser: the deep link opens the app's Link screen with the code
+        // filled in. Phone: scan the QR of that same link. Typing is the fallback.
+        var claim = (j.claim_url && /^https:\/\/app\.botshield\.ai\//.test(j.claim_url)) ? j.claim_url : null;
+        linkText.innerHTML =
+          '<div class="lk-row">' +
+            '<img class="lk-qr" src="/api/agent/link/qr?code=' + encodeURIComponent(j.code) + '" alt="QR: open BotShield to link" width="88" height="88">' +
+            '<div class="lk-body">' +
+              (claim ? '<a class="lk-open" href="' + claim + '" target="_blank" rel="noopener">Open BotShield</a>' : '') +
+              '<div class="lk-hint">Already signed in on your phone? Scan the code. Or in the app open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span></div>' +
+            '</div>' +
+          '</div>';
         linkBtn.textContent = 'Waiting\u2026';
         for (var i = 0; i < 18; i++) { // ~6 min of 20s long-polls
           var s = await fetch('/api/agent/link/status?code=' + encodeURIComponent(j.code));
