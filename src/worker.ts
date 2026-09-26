@@ -87,6 +87,7 @@ async function agentChat(env: Env, messages: ChatMessage[], bindToken: string | 
   // checking on the person's behalf (up to the card's TTL) instead of
   // relying on the model's patience.
   let awaiting: string | null = null;
+  let awaitingExpiresAt: string | null = null;
   for (const block of data.content ?? []) {
     if (block.type === 'text' && block.text?.trim()) { parts.push(block.text); events.push({ type: 'text', text: block.text }); }
     else if (block.type === 'mcp_tool_use') events.push({ type: 'tool', name: block.name, args: JSON.stringify(block.input ?? {}).slice(0, 220) });
@@ -95,13 +96,17 @@ async function agentChat(env: Env, messages: ChatMessage[], bindToken: string | 
       const last = [...events].reverse().find((e) => e.type === 'tool' && !e.result);
       if (last) { last.result = body.slice(0, 600); last.summary = summarizeToolResult(body); last.error = !!block.is_error; }
       let j: any = null; try { j = JSON.parse(body); } catch { /* not JSON */ }
-      if (j?.status === 'approval_sent') { awaiting = j.approval_request_id ?? awaiting; events.push({ type: 'ask', request_id: j.approval_request_id ?? null, text: 'The purchase is waiting for your confirmation.' }); }
+      if (j?.status === 'approval_sent') {
+        awaiting = j.approval_request_id ?? awaiting;
+        if (j.expires_at) awaitingExpiresAt = j.expires_at;
+        events.push({ type: 'ask', request_id: j.approval_request_id ?? null, expires_at: j.expires_at ?? null, text: 'The purchase is waiting for your confirmation.' });
+      }
       else if (j?.status === 'confirmed' && j?.order_id) { awaiting = null; events.push({ type: 'order', order_id: j.order_id, event: j.event ?? null, seats: j.seats ?? null, total: j.total ?? null, approved_by: j.attested?.approved_by_opaque_id ?? null, ceremony_id: j.attested?.ceremony_id ?? null }); }
       else if (/^(approval_pending|pending|awaiting_approval)$/.test(String(j?.status ?? ''))) { awaiting = j.approval_request_id ?? j.request_id ?? awaiting; }
       else if (/^(denied|declined|expired|cancelled|canceled)$/.test(String(j?.status ?? ''))) { awaiting = null; events.push({ type: 'closed', status: j.status, text: j.message ?? null }); }
     }
   }
-  return json({ reply: parts.join('\n').trim(), events, awaiting, usage: data.usage ?? null, stop: data.stop_reason ?? null });
+  return json({ reply: parts.join('\n').trim(), events, awaiting, awaiting_expires_at: awaitingExpiresAt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
 }
 
 /** One line for the chat timeline, computed from the FULL tool result before truncation. */
