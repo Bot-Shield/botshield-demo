@@ -265,6 +265,25 @@ export const trustedHtml = `<!DOCTYPE html>
       }
     }
 
+    // The hand-off can come back in ANOTHER tab (the widget opens the app in a
+    // new tab; the app returns there). Both tabs share this storage, so when
+    // the other tab marks the account secured, this one follows — on the
+    // storage event and whenever this tab becomes visible again.
+    function syncFromStorage() {
+      var before = acct().ref + ':' + !!acct().secured;
+      var next = load();
+      state = next;
+      var a = acct();
+      if (before !== a.ref + ':' + !!a.secured) {
+        bsVerify.setAttribute('platform-user-ref', a.ref);
+        render();
+        if (a.secured) { note('noteSecured'); say('Your account is secured.'); }
+      }
+    }
+    window.addEventListener('storage', function(e) { if (e.key === STORE_KEY) syncFromStorage(); });
+    document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible') syncFromStorage(); });
+    window.addEventListener('pageshow', function(e) { if (e.persisted) syncFromStorage(); });
+
     bsVerify.setAttribute('platform-user-ref', acct().ref);
     handleReturnToken();
     render();
