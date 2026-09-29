@@ -142,9 +142,7 @@ export const trustedHtml = `<!DOCTYPE html>
     // this page's own URL with ?token=. Opened on its own (not in the Demos
     // shell) → move into the shell and carry the query; the shell hands it to
     // this frame.
-    if (window.top === window.self && params.get('token')) {
-      window.location.replace('/' + window.location.search + '#trusted');
-    }
+    var returnTopLevel = window.top === window.self && !!params.get('token');
     // Production Ticketz org + key; the gate is "Ticketz Account" in its Console.
     var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
     var SCOPE = params.get('scope') || 'ticketz_account';
@@ -164,6 +162,17 @@ export const trustedHtml = `<!DOCTYPE html>
     function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (err) { /* private mode */ } }
     var state = params.get('fresh') ? { accounts: [newAccount()], active: 0 } : load();
     save();
+
+    // The tab the app returned to (opened by the widget for the hand-off):
+    // record the result — the original demo tab picks it up from storage —
+    // and close, so there is no second demo tab and no reload flash. A browser
+    // that refuses to close it gets the demo in the shell instead.
+    if (returnTopLevel) {
+      var rc = claimsOf(params.get('token')) || {};
+      if (rc.trusted === true) { state.accounts[state.active].secured = true; save(); }
+      try { window.close(); } catch (err) { /* not closable */ }
+      setTimeout(function() { window.location.replace('/' + window.location.search + '#trusted'); }, 400);
+    }
 
     var bsVerify = document.getElementById('bsVerify');
     bsVerify.setAttribute('site-key', SITE_KEY);
