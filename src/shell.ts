@@ -23,7 +23,7 @@ export const DEMOS: DemoEntry[] = [
   { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent' },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One human, one account', path: '/trusted' },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'] },
-  { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: 'https://salesforce-demo.botshield.ai/coralcloud/s/' },
+  { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: 'https://salesforce-demo.botshield.ai' },
 ];
 
 export function shellHtml(): string {

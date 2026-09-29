@@ -29,7 +29,7 @@ interface Env {
   AGENT_MODEL?: string;        // default claude-opus-5
 }
 
-const SALESFORCE_DEMO = 'https://salesforce-demo.botshield.ai/coralcloud/s/';
+const SALESFORCE_DEMO = 'https://salesforce-demo.botshield.ai';
 
 const html = (body: string) => new Response(body, {
   headers: {
