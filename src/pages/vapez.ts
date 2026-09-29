@@ -81,6 +81,8 @@ export const vapezHtml = `<!DOCTYPE html>
         <h1>You must be 18 or older to enter.</h1>
         <p>Vapez sells nicotine products. <b>Verify you&rsquo;re over 18 to continue.</b> BotShield checks the age your device already knows &mdash; no ID upload, no birthdate, nothing stored by Vapez.</p>
         <botshield-verify
+          site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
+          scope="enter_site_age_check"
           id="bsVerify"
           theme="dark"
           scan-mode="modal"

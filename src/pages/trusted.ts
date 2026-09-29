@@ -111,6 +111,8 @@ export const trustedHtml = `<!DOCTYPE html>
         <h1 id="panelTitle"></h1>
         <p id="panelBody">Link this Ticketz account to your <b>BotShield ID</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.</p>
         <botshield-verify
+          site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
+          scope="ticketz_account"
           id="bsVerify"
           theme="dark"
           scan-mode="modal"
