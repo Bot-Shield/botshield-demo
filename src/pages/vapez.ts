@@ -111,7 +111,8 @@ export const vapezHtml = `<!DOCTYPE html>
   </div>
   <div class="toast" id="toast"></div>
 
-  <script src="https://cdn.botshield.ai/sdk.js?v=17"></script>
+  <!-- ?sdk=next loads the prerelease widget (/next) for testing; default stays the stable /sdk.js. -->
+  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
   <script>
     var params = new URLSearchParams(window.location.search);
     // Same prod partner + key as Ticketz: the Vepez gate lives on that org.

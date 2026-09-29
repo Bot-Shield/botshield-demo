@@ -424,7 +424,8 @@ export const ticketzHtml = `<!DOCTYPE html>
        seeded "Demo (Ticketz)" site key below and an active production
        ticket_purchase gate. The scanning phone must run the prod app build.
        To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
-  <script src="https://cdn.botshield.ai/sdk.js?v=17"></script>
+  <!-- ?sdk=next loads the prerelease widget (/next) for testing; default stays the stable /sdk.js. -->
+  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
