@@ -385,6 +385,8 @@ export const ticketzHtml = `<!DOCTYPE html>
          (Census attribution + BotShield ID CTA). The demo only restyles/relabels
          the checkout button and listens for botshield:checkout. -->
     <botshield-verify
+      site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
+      scope="ticket_purchase"
       id="bsVerify"
       theme="dark"
       scan-mode="modal"
