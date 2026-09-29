@@ -54,9 +54,10 @@ export const trustedHtml = `<!DOCTYPE html>
     .chip.add { color: #a78bfa; border-style: dashed; }
 
     /* ── Secure panel ── */
-    .panel { background: #111; border: 1px solid #1f1f1f; border-radius: 18px; padding: 22px 18px; display: flex; flex-direction: column; gap: 12px; }
+    .panel { display: flex; flex-direction: column; gap: 12px; }
     .panel h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
-    .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; }
+    .panel h1:empty { display: none; }
+    .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; padding: 0 2px; }
     .panel p b { color: #e5e5e5; font-weight: 600; }
     botshield-verify { display: block; width: 100%; }
     botshield-verify.hide { display: none; }
@@ -107,21 +108,21 @@ export const trustedHtml = `<!DOCTYPE html>
       <div class="switch" id="switch"></div>
 
       <section class="panel">
-        <h1 id="panelTitle">Secure your account with BotShield</h1>
-        <p id="panelBody">Link this Ticketz account to your <b>BotShield ID</b>. From then on Ticketz knows a real human stands behind it &mdash; <b>never who</b>. One human, one account.</p>
+        <h1 id="panelTitle"></h1>
+        <p id="panelBody">Link this Ticketz account to your <b>BotShield ID</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.</p>
         <botshield-verify
           id="bsVerify"
           theme="dark"
           scan-mode="modal"
           signals="true"
           notarize
-          checkout-label="Continue"
+          checkout="false"
         ></botshield-verify>
         <button type="button" class="again" id="signInAgain">Sign in again</button>
       </section>
 
       <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Open the BotShield app &rarr; <b>Trusted Accounts</b>: Ticketz is there. Ticketz sees it too, in its Console registry &mdash; as a handle, never your name.<br><br>Now try <b>+ Second account</b> above.</div>
-      <div class="note one" id="noteOne"><b>One human, one account.</b> Your BotShield ID already secures another Ticketz account, so this one can&rsquo;t be secured by you. That is the promise to Ticketz: every trusted account is a different real person. <br><br>Switch back to your first account &mdash; it&rsquo;s still trusted.</div>
+      <div class="note one" id="noteOne"><b>Already secured by your BotShield ID.</b> Your BotShield ID secures one Ticketz account &mdash; that&rsquo;s the promise Ticketz relies on. This second account can&rsquo;t be secured by you.<br><br>Switch back to your first account &mdash; it&rsquo;s still secured.</div>
       <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same human, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.</div>
       <div class="note info" id="noteUnlinked"><b>Unlinked.</b> This Ticketz account is no longer secured by your BotShield ID &mdash; you unlinked it in the BotShield app, or Ticketz revoked it. Link it again any time.</div>
       <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Trusted Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
@@ -201,10 +202,10 @@ export const trustedHtml = `<!DOCTYPE html>
       document.getElementById('acctId').textContent = 'Account ' + a.ref;
       document.getElementById('avatar').textContent = a.name.replace('Guest ', '').slice(0, 2);
       document.getElementById('secured').classList.toggle('on', !!a.secured);
-      document.getElementById('panelTitle').textContent = a.secured ? 'Secured by BotShield' : 'Secure your account with BotShield';
+      document.getElementById('panelTitle').textContent = a.secured ? 'Secured by BotShield' : '';
       document.getElementById('panelBody').innerHTML = a.secured
         ? 'This Ticketz account is linked to your <b>BotShield ID</b>. Ticketz knows a real human stands behind it &mdash; <b>never who</b>. Come back any time: your next pass says so.'
-        : 'Link this Ticketz account to your <b>BotShield ID</b>. From then on Ticketz knows a real human stands behind it &mdash; <b>never who</b>. One human, one account.';
+        : 'Link this Ticketz account to your <b>BotShield ID</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.';
       var showWidget = !a.secured || returning;
       bsVerify.classList.toggle('hide', !showWidget);
       document.getElementById('signInAgain').classList.toggle('on', !showWidget);
@@ -274,7 +275,7 @@ export const trustedHtml = `<!DOCTYPE html>
     bsVerify.addEventListener('botshield:failure', function(e) {
       var r = e.detail && e.detail.reason;
       console.warn('[Ticketz] botshield:failure', e.detail);
-      if (r === 'already_trusted') { note('noteOne'); say('One human, one account.'); }
+      if (r === 'already_trusted') { note('noteOne'); say('Already secured by your BotShield ID.'); }
       else if (r === 'notarize_not_enabled') say('Trusted Accounts is off for this gate in the Console.');
       else if (r === 'gate_not_found') say('The Ticketz Account gate is not active yet.');
     });
