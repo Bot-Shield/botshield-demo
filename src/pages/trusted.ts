@@ -123,6 +123,7 @@ export const trustedHtml = `<!DOCTYPE html>
       <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Open the BotShield app &rarr; <b>Trusted Accounts</b>: Ticketz is there. Ticketz sees it too, in its Console registry &mdash; as a handle, never your name.<br><br>Now try <b>+ Second account</b> above.</div>
       <div class="note one" id="noteOne"><b>One human, one account.</b> Your BotShield ID already secures another Ticketz account, so this one can&rsquo;t be secured by you. That is the promise to Ticketz: every trusted account is a different real person. <br><br>Switch back to your first account &mdash; it&rsquo;s still trusted.</div>
       <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same human, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.</div>
+      <div class="note info" id="noteUnlinked"><b>Unlinked.</b> This Ticketz account is no longer secured by your BotShield ID &mdash; you unlinked it in the BotShield app, or Ticketz revoked it. Link it again any time.</div>
       <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Trusted Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
 
       <p class="how"><b>What you&rsquo;re watching:</b> the BotShield Gate widget with Trusted Accounts on, against production. The tap hands off to the BotShield app; your passkey confirms. Ticketz receives a yes and a per-platform handle &mdash; no email, no name, no device ID.</p>
@@ -135,7 +136,8 @@ export const trustedHtml = `<!DOCTYPE html>
   </div>
   <div class="toast" id="toast"></div>
 
-  <script src="https://cdn.botshield.ai/sdk.js?v=17"></script>
+  <!-- ?sdk=next loads the prerelease widget (the /next channel) for testing. -->
+  <script>(function () { var n = /[?&]sdk=next\\b/.test(window.location.search); var s = document.createElement('script'); s.src = n ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17'; document.head.appendChild(s); })();</script>
   <script>
     var params = new URLSearchParams(window.location.search);
     // Coming back from the BotShield app (phone hand-off): the app returns to
@@ -181,7 +183,7 @@ export const trustedHtml = `<!DOCTYPE html>
 
     var toast = document.getElementById('toast');
     function say(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 3400); }
-    function note(id) { ['noteSecured', 'noteOne', 'noteBack', 'noteReset'].forEach(function(n) { document.getElementById(n).classList.toggle('on', n === id); }); }
+    function note(id) { ['noteSecured', 'noteOne', 'noteBack', 'noteReset', 'noteUnlinked'].forEach(function(n) { document.getElementById(n).classList.toggle('on', n === id); }); }
     function acct() { return state.accounts[state.active]; }
 
     /** A secured account shows the finished state; "Sign in again" brings the widget back for a returning pass. */
@@ -254,6 +256,21 @@ export const trustedHtml = `<!DOCTYPE html>
         say('Verified human.');
       }
     });
+    // Live account state from BotShield (RFC 139 stream): the widget tells the
+    // page whether this Ticketz account is still a Trusted Account — no tap.
+    // none = not (or no longer) secured; fresh / stale = secured.
+    bsVerify.addEventListener('botshield:presence', function(e) {
+      var st = e.detail && e.detail.state;
+      var a = acct();
+      if (st === 'none' && a.secured) {
+        a.secured = false; returning = false; save(); render();
+        note('noteUnlinked'); say('This account is no longer secured.');
+      } else if ((st === 'fresh' || st === 'stale') && !a.secured) {
+        a.secured = true; save(); render();
+        note('noteSecured'); say('Your account is secured.');
+      }
+    });
+
     bsVerify.addEventListener('botshield:failure', function(e) {
       var r = e.detail && e.detail.reason;
       console.warn('[Ticketz] botshield:failure', e.detail);
