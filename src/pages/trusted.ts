@@ -134,6 +134,13 @@ export const trustedHtml = `<!DOCTYPE html>
   <script src="https://cdn.botshield.ai/sdk.js?v=17"></script>
   <script>
     var params = new URLSearchParams(window.location.search);
+    // Coming back from the BotShield app (phone hand-off): the app returns to
+    // this page's own URL with ?token=. Opened on its own (not in the Demos
+    // shell) → move into the shell and carry the query; the shell hands it to
+    // this frame.
+    if (window.top === window.self && params.get('token')) {
+      window.location.replace('/' + window.location.search + '#trusted');
+    }
     // Production Ticketz org + key; the gate is "Ticketz Account" in its Console.
     var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
     var SCOPE = params.get('scope') || 'ticketz_account';
@@ -234,7 +241,32 @@ export const trustedHtml = `<!DOCTYPE html>
       say('Fresh Ticketz account. Unlink the old one in the BotShield app first if you secured it.');
     });
 
+    // The return token (display only — a real Ticketz confirms it on its server
+    // with POST /sdk/verify-token). trusted: true → this account is secured.
+    function claimsOf(tok) {
+      try {
+        if (!tok || tok.split('.').length < 3) return null;
+        var b = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(b + '='.repeat((4 - b.length % 4) % 4)));
+      } catch (err) { return null; }
+    }
+    function handleReturnToken() {
+      var tok = params.get('token');
+      if (!tok) return;
+      var c = claimsOf(tok) || {};
+      var trusted = c.trusted === true || (c.botshield && c.botshield.trusted === true);
+      try { history.replaceState(null, '', window.location.pathname); } catch (err) { /* framed */ }
+      try { if (window.top !== window.self) window.top.history.replaceState(null, '', '/#trusted'); } catch (err) { /* cross-origin */ }
+      if (trusted) {
+        acct().secured = true;
+        save();
+        note('noteSecured');
+        say('Your account is secured.');
+      }
+    }
+
     bsVerify.setAttribute('platform-user-ref', acct().ref);
+    handleReturnToken();
     render();
   </script>
 </body>
