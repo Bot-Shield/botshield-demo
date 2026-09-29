@@ -3,6 +3,7 @@
 //   /            the Demos shell (rail + framed demo; #key selects one)
 //   /ticketz     Ticketz · BotShield Gate at checkout (Human Gate, inline passkey beta)
 //   /agent       Ticketz · Agents Ask (chat with the Ticketz agent; purchases wait for the human)
+//   /trusted     Ticketz · Trusted Accounts (secure the account with a BotShield ID; ticketz_account gate, notarize)
 //   /vapez       Vapez · Age Gate at the door (enter_site_age_check, 18+)
 //   /salesforce  → Coral Cloud on salesforce-demo.botshield.ai
 //   /api/agent/* the chat page's only backend: health · Link ceremony passthrough ·
@@ -15,6 +16,7 @@
 import { ticketzHtml } from './pages/ticketz';
 import { vapezHtml } from './pages/vapez';
 import { agentHtml } from './pages/agent';
+import { trustedHtml } from './pages/trusted';
 import { shellHtml } from './shell';
 import { FAVICON_ICO_B64 } from './favicon';
 import qrcode from 'qrcode-generator';
@@ -148,6 +150,7 @@ export default {
     if (path === '/ticketz') return html(ticketzHtml);
     if (path === '/vapez') return html(vapezHtml);
     if (path === '/agent') return html(agentHtml);
+    if (path === '/trusted') return html(trustedHtml);
     if (path === '/salesforce') return Response.redirect(SALESFORCE_DEMO, 302);
 
     if (path === '/api/agent/health') {
