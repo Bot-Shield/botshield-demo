@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "build": "wrangler deploy --dry-run"
+    "deploy": "node scripts/check-pages.mjs && wrangler deploy",
+    "build": "wrangler deploy --dry-run",
+    "check:pages": "node scripts/check-pages.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241230.0",

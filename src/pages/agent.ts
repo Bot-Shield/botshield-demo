@@ -168,7 +168,7 @@ export const agentHtml = `<!DOCTYPE html>
         if (!r.ok || !j.code) { add('sys', 'Could not start the link: ' + (j.error || r.status)); return; }
         // Same browser: the deep link opens the app's Link screen with the code
         // filled in. Phone: scan the QR of that same link. Typing is the fallback.
-        var claim = (j.claim_url && /^https:\/\/app\.botshield\.ai\//.test(j.claim_url)) ? j.claim_url : null;
+        var claim = (j.claim_url && String(j.claim_url).indexOf('https://app.botshield.ai/') === 0) ? j.claim_url : null;
         linkText.innerHTML =
           '<div class="lk-row">' +
             '<img class="lk-qr" src="/api/agent/link/qr?code=' + encodeURIComponent(j.code) + '" alt="QR: open BotShield to link" width="88" height="88">' +
