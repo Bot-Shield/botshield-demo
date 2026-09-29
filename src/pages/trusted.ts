@@ -59,6 +59,9 @@ export const trustedHtml = `<!DOCTYPE html>
     .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; }
     .panel p b { color: #e5e5e5; font-weight: 600; }
     botshield-verify { display: block; width: 100%; }
+    botshield-verify.hide { display: none; }
+    .again { display: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #fff; background: #7c3aed; border: 0; border-radius: 12px; padding: 13px 16px; cursor: pointer; }
+    .again.on { display: block; }
 
     /* ── Callouts for the demo moments ── */
     .note { display: none; border-radius: 14px; padding: 14px 16px; font-size: 13.5px; line-height: 1.55; }
@@ -114,6 +117,7 @@ export const trustedHtml = `<!DOCTYPE html>
           notarize
           checkout-label="Continue"
         ></botshield-verify>
+        <button type="button" class="again" id="signInAgain">Sign in again</button>
       </section>
 
       <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Open the BotShield app &rarr; <b>Trusted Accounts</b>: Ticketz is there. Ticketz sees it too, in its Console registry &mdash; as a handle, never your name.<br><br>Now try <b>+ Second account</b> above.</div>
@@ -171,13 +175,28 @@ export const trustedHtml = `<!DOCTYPE html>
     function note(id) { ['noteSecured', 'noteOne', 'noteBack', 'noteReset'].forEach(function(n) { document.getElementById(n).classList.toggle('on', n === id); }); }
     function acct() { return state.accounts[state.active]; }
 
+    /** A secured account shows the finished state; "Sign in again" brings the widget back for a returning pass. */
+    var returning = false;
+    document.getElementById('signInAgain').addEventListener('click', function() {
+      returning = true;
+      note(null);
+      if (typeof bsVerify.reset === 'function') bsVerify.reset();
+      render();
+    });
+
     function render() {
       var a = acct();
       document.getElementById('acctName').textContent = a.name;
       document.getElementById('acctId').textContent = 'Account ' + a.ref;
       document.getElementById('avatar').textContent = a.name.replace('Guest ', '').slice(0, 2);
       document.getElementById('secured').classList.toggle('on', !!a.secured);
-      document.getElementById('panelTitle').textContent = a.secured ? 'Signed in' : 'Secure your account with BotShield';
+      document.getElementById('panelTitle').textContent = a.secured ? 'Secured by BotShield' : 'Secure your account with BotShield';
+      document.getElementById('panelBody').innerHTML = a.secured
+        ? 'This Ticketz account is linked to your <b>BotShield ID</b>. Ticketz knows a real human stands behind it &mdash; <b>never who</b>. Come back any time: your next pass says so.'
+        : 'Link this Ticketz account to your <b>BotShield ID</b>. From then on Ticketz knows a real human stands behind it &mdash; <b>never who</b>. One human, one account.';
+      var showWidget = !a.secured || returning;
+      bsVerify.classList.toggle('hide', !showWidget);
+      document.getElementById('signInAgain').classList.toggle('on', !showWidget);
       var sw = document.getElementById('switch');
       sw.innerHTML = '';
       state.accounts.forEach(function(x, i) {
@@ -204,6 +223,7 @@ export const trustedHtml = `<!DOCTYPE html>
 
     function switchTo(i) {
       state.active = i;
+      returning = false;
       save();
       note(null);
       bsVerify.setAttribute('platform-user-ref', acct().ref);
@@ -219,7 +239,7 @@ export const trustedHtml = `<!DOCTYPE html>
         a.secured = true;
         save();
         render();
-        if (wasSecured) { note('noteBack'); say('Trusted \\u2014 the same human is back.'); }
+        if (wasSecured) { returning = false; render(); note('noteBack'); say('Trusted \\u2014 the same human is back.'); }
         else { note('noteSecured'); say('Your account is secured.'); }
       } else {
         say('Verified human.');
