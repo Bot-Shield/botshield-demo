@@ -57,6 +57,11 @@ export const trustedHtml = `<!DOCTYPE html>
     .panel { display: flex; flex-direction: column; gap: 12px; }
     .panel h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
     .panel h1:empty { display: none; }
+    .moment { display: none; flex-direction: column; gap: 10px; padding: 4px 2px 2px; }
+    .moment.on { display: flex; }
+    .moment-eyebrow { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #5fb6e8; }
+    .moment h2 { font-size: 30px; font-weight: 700; letter-spacing: -.025em; line-height: 1.1; }
+    .moment p { font-size: 15px; line-height: 1.5; color: #a3a3a3; padding: 0; }
     .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; padding: 0 2px; }
     .panel p b { color: #e5e5e5; font-weight: 600; }
     botshield-verify { display: block; width: 100%; }
@@ -109,6 +114,13 @@ export const trustedHtml = `<!DOCTYPE html>
 
       <section class="panel">
         <h1 id="panelTitle"></h1>
+        <!-- The page owns the moment (eyebrow · heading · body); the SDK renders only the
+             Link BotShield ID button (Paul + Devrin, 2026-09-29; Figma moment cards = examples). -->
+        <div class="moment" id="moment">
+          <div class="moment-eyebrow">A real person behind this account</div>
+          <h2>Secure your account with BotShield</h2>
+          <p>One tap, and Ticketz knows a real person runs this account. Never who.</p>
+        </div>
         <p id="panelBody">Link this Ticketz account to your <b>BotShield ID</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.</p>
         <botshield-verify
           site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
@@ -198,6 +210,9 @@ export const trustedHtml = `<!DOCTYPE html>
       render();
     });
 
+    /** The button-only widget (3.0.2+) renders no card: the page owns the moment. */
+    var PAGE_OWNS_MOMENT = true;
+
     function render() {
       var a = acct();
       document.getElementById('acctName').textContent = a.name;
@@ -205,6 +220,8 @@ export const trustedHtml = `<!DOCTYPE html>
       document.getElementById('avatar').textContent = a.name.replace('Guest ', '').slice(0, 2);
       document.getElementById('secured').classList.toggle('on', !!a.secured);
       document.getElementById('panelTitle').textContent = a.secured ? 'Secured by BotShield' : '';
+      document.getElementById('moment').classList.toggle('on', PAGE_OWNS_MOMENT && !a.secured);
+      document.getElementById('panelBody').style.display = PAGE_OWNS_MOMENT && !a.secured ? 'none' : '';
       document.getElementById('panelBody').innerHTML = a.secured
         ? 'This Ticketz account is linked to your <b>BotShield ID</b>. Ticketz knows a real human stands behind it &mdash; <b>never who</b>. Come back any time: your next pass says so.'
         : 'Link this Ticketz account to your <b>BotShield ID</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.';
