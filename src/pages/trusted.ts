@@ -210,8 +210,8 @@ export const trustedHtml = `<!DOCTYPE html>
       render();
     });
 
-    /** The button-only widget (3.0.2+, on /next first) needs the page to own the moment. */
-    var PAGE_OWNS_MOMENT = window.location.search.indexOf('sdk=next') >= 0;
+    /** The button-only widget (3.0.2+) renders no card: the page owns the moment. */
+    var PAGE_OWNS_MOMENT = true;
 
     function render() {
       var a = acct();
