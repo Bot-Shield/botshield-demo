@@ -23,7 +23,8 @@ export const DEMOS: DemoEntry[] = [
   { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent' },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted' },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'] },
-  { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: 'https://salesforce-demo.botshield.ai' },
+  // Via the worker's /salesforce redirect so the click-out is counted (same destination).
+  { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
 ];
 
 export function shellHtml(): string {
@@ -33,7 +34,7 @@ export function shellHtml(): string {
       <div class="grp">
         <div class="grp-h">${group}</div>
         ${items.map((d) => d.href
-          ? `<a class="it" data-key="${d.key}" href="${d.href}" target="_blank" rel="noopener"><span class="it-l">${d.label}<span class="ext">&#8599;</span></span><span class="it-h">${d.hint}</span></a>`
+          ? `<a class="it" data-key="${d.key}" data-cta="${d.key}" href="${d.href}" target="_blank" rel="noopener"><span class="it-l">${d.label}<span class="ext">&#8599;</span></span><span class="it-h">${d.hint}</span></a>`
           : `<a class="it" data-key="${d.key}" href="#${d.key}"><span class="it-l">${d.label}${d.badge ? `<span class="badge">${d.badge}</span>` : ''}${(d.platforms || []).map((pl) => `<span class="plat">${pl}</span>`).join('')}</span><span class="it-h">${d.hint}</span></a>`).join('')}
       </div>`).join('');
 
@@ -127,9 +128,11 @@ export function shellHtml(): string {
       ${nav}
       <div class="spacer"></div>
       <div class="foot">
-        <a href="https://docs.botshield.ai" target="_blank" rel="noopener">Documentation &#8599;</a>
-        <a href="https://console.botshield.ai" target="_blank" rel="noopener">Partner Console &#8599;</a>
-        <a href="https://botshield.ai" target="_blank" rel="noopener">botshield.ai &#8599;</a>
+        <a data-cta="docs" href="https://docs.botshield.ai" target="_blank" rel="noopener">Documentation &#8599;</a>
+        <a data-cta="console" href="https://console.botshield.ai" target="_blank" rel="noopener">Partner Console &#8599;</a>
+        <a data-cta="botshield" href="https://botshield.ai" target="_blank" rel="noopener">botshield.ai &#8599;</a>
+        <a data-cta="pricing" href="https://botshield.ai/pricing" target="_blank" rel="noopener">Pricing &#8599;</a>
+        <a href="#" data-cookie-settings>Cookie settings</a>
         <span class="pill">Live on production</span>
       </div>
     </nav>
