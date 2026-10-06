@@ -5,7 +5,9 @@
 //   /agent       Ticketz · Agents Ask (chat with the Ticketz agent; purchases wait for the human)
 //   /trusted     Ticketz · Trusted Accounts (secure the account with a BotShield ID; ticketz_account gate, notarize)
 //   /vapez       Vapez · Age Gate at the door (enter_site_age_check, 18+)
-//   /salesforce  → Coral Cloud on salesforce-demo.botshield.ai
+//   /salesforce  → Coral Cloud on salesforce-demo.botshield.ai (counted as a click-out)
+//   /api/e       same-origin analytics beacon (allowlisted browser steps; src/analytics.ts)
+//   /stats       demo usage dashboard (?key=STATS_KEY; src/stats.ts)
 //   /api/agent/* the chat page's only backend: health · Link ceremony passthrough ·
 //                chat = Claude (Messages API, MCP connector → the demo gateway's /mcp,
 //                the visitor's bind JWT as the connector bearer). Unset → 503, and the
@@ -20,10 +22,12 @@ import { trustedHtml } from './pages/trusted';
 import { shellHtml } from './shell';
 import { FAVICON_ICO_B64 } from './favicon';
 import qrcode from 'qrcode-generator';
+import { record, beacon, withAnalytics, type AnalyticsEnv } from './analytics';
+import { statsPage, type StatsEnv } from './stats';
 
 const APP_URL = 'https://app.botshield.ai';
 
-interface Env {
+interface Env extends AnalyticsEnv, StatsEnv {
   AGENT_GATEWAY_URL?: string;  // https://gateway-demo.botshield.ai — MCP at /mcp, Link ceremony at /oauth/link/*
   ANTHROPIC_API_KEY?: string;  // secret — the demo's own Claude key (the agent runs here, tools run behind the gateway)
   AGENT_MODEL?: string;        // default claude-opus-5
@@ -53,13 +57,15 @@ Rules: use the tools for anything factual (events, prices, availability). You ne
  * gateway's authorization rules (checkout needs a linked human) apply to the
  * agent exactly as they would to any MCP client.
  */
-async function agentChat(env: Env, messages: ChatMessage[], bindToken: string | null): Promise<Response> {
+async function agentChat(env: Env, request: Request, messages: ChatMessage[], bindToken: string | null): Promise<Response> {
   if (!env.AGENT_GATEWAY_URL || !env.ANTHROPIC_API_KEY) {
     return json({ error: 'The Ticketz agent is not connected to a gateway yet.' }, 503);
   }
   const clean = messages.filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
     .slice(-20).map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }));
   if (!clean.length || clean[clean.length - 1].role !== 'user') return json({ error: 'Nothing to send.' }, 400);
+  // The page's own re-checks while a purchase waits ("Check approval … again") aren't the visitor talking.
+  record(env, request, /^Check approval /.test(clean[clean.length - 1].content) ? 'chat_recheck' : 'chat_turn', 'agent');
 
   const mcp: Record<string, unknown> = { type: 'url', url: `${env.AGENT_GATEWAY_URL.replace(/\/$/, '')}/mcp`, name: 'ticketz' };
   if (bindToken) mcp.authorization_token = bindToken;
@@ -105,10 +111,11 @@ async function agentChat(env: Env, messages: ChatMessage[], bindToken: string | 
         awaiting = j.approval_request_id ?? awaiting;
         if (j.expires_at) awaitingExpiresAt = j.expires_at;
         events.push({ type: 'ask', request_id: j.approval_request_id ?? null, expires_at: j.expires_at ?? null, text: 'The purchase is waiting for your confirmation.' });
+        record(env, request, 'ask_sent', 'agent');
       }
-      else if (j?.status === 'confirmed' && j?.order_id) { awaiting = null; events.push({ type: 'order', order_id: j.order_id, event: j.event ?? null, seats: j.seats ?? null, total: j.total ?? null, approved_by: j.attested?.approved_by_opaque_id ?? null, ceremony_id: j.attested?.ceremony_id ?? null }); }
+      else if (j?.status === 'confirmed' && j?.order_id) { awaiting = null; record(env, request, 'ask_approved', 'agent'); events.push({ type: 'order', order_id: j.order_id, event: j.event ?? null, seats: j.seats ?? null, total: j.total ?? null, approved_by: j.attested?.approved_by_opaque_id ?? null, ceremony_id: j.attested?.ceremony_id ?? null }); }
       else if (/^(approval_pending|pending|awaiting_approval)$/.test(String(j?.status ?? ''))) { awaiting = j.approval_request_id ?? j.request_id ?? awaiting; }
-      else if (/^(denied|declined|expired|cancelled|canceled)$/.test(String(j?.status ?? ''))) { awaiting = null; events.push({ type: 'closed', status: j.status, text: j.message ?? null }); }
+      else if (/^(denied|declined|expired|cancelled|canceled)$/.test(String(j?.status ?? ''))) { awaiting = null; record(env, request, /^(denied|declined)$/.test(String(j.status)) ? 'ask_denied' : 'ask_expired', 'agent'); events.push({ type: 'closed', status: j.status, text: j.message ?? null }); }
     }
   }
   return json({ reply: parts.join('\n').trim(), events, awaiting, awaiting_expires_at: awaitingExpiresAt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
@@ -130,10 +137,18 @@ function summarizeToolResult(body: string): string {
 }
 
 /** Link ceremony passthrough: the page never talks to the gateway directly. */
-async function linkProxy(env: Env, path: 'start' | 'status', search: string): Promise<Response> {
+async function linkProxy(env: Env, request: Request, path: 'start' | 'status', search: string): Promise<Response> {
   if (!env.AGENT_GATEWAY_URL) return json({ error: 'not_connected' }, 503);
   const r = await fetch(`${env.AGENT_GATEWAY_URL.replace(/\/$/, '')}/oauth/link/${path}${path === 'status' ? search : ''}`, { method: path === 'start' ? 'POST' : 'GET' });
   const body = await r.text();
+  // Funnel steps only — the body (which carries the bind token) is never logged or stored.
+  if (path === 'start' && r.ok) record(env, request, 'link_start', 'agent');
+  if (path === 'status') {
+    let st = '';
+    try { st = String(JSON.parse(body)?.status ?? ''); } catch { /* not JSON */ }
+    if (st === 'bound') record(env, request, 'link_bound', 'agent');
+    else if (st === 'expired' || st === 'denied') record(env, request, `link_${st}`, 'agent');
+  }
   return new Response(body, { status: r.status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 }
 
@@ -146,37 +161,44 @@ export default {
       const bytes = Uint8Array.from(atob(FAVICON_ICO_B64), (c) => c.charCodeAt(0));
       return new Response(bytes, { headers: { 'Content-Type': 'image/x-icon', 'Cache-Control': 'public, max-age=86400' } });
     }
-    if (path === '/') return html(shellHtml());
-    if (path === '/ticketz') return html(ticketzHtml);
-    if (path === '/vapez') return html(vapezHtml);
-    if (path === '/agent') return html(agentHtml);
-    if (path === '/trusted') return html(trustedHtml);
-    if (path === '/salesforce') return Response.redirect(SALESFORCE_DEMO, 302);
+    // Pages: count the view (cookieless, layer 1), then serve with the consent banner + GTM loader (layer 2).
+    const PAGES: Record<string, [string, () => string]> = {
+      '/': ['shell', shellHtml], '/ticketz': ['ticketz', () => ticketzHtml], '/vapez': ['vapez', () => vapezHtml],
+      '/agent': ['agent', () => agentHtml], '/trusted': ['trusted', () => trustedHtml],
+    };
+    if (PAGES[path] && request.method === 'GET') {
+      record(env, request, 'view', PAGES[path][0]);
+      return html(withAnalytics(PAGES[path][1]()));
+    }
+    if (path === '/salesforce') { record(env, request, 'salesforce_click', 'salesforce'); return Response.redirect(SALESFORCE_DEMO, 302); }
+    if (path === '/api/e' && request.method === 'POST') return beacon(env, request);
+    if (path === '/stats') return statsPage(env, request);
 
     if (path === '/api/agent/health') {
       const ok = !!(env.AGENT_GATEWAY_URL && env.ANTHROPIC_API_KEY);
       return json(ok ? { ok, model: env.AGENT_MODEL || 'claude-opus-5', gateway: env.AGENT_GATEWAY_URL } : { ok, reason: 'The Ticketz agent is not connected to a gateway yet — the production gateway is being brought up.' });
     }
-    if (path === '/api/agent/link/start' && request.method === 'POST') return linkProxy(env, 'start', '');
+    if (path === '/api/agent/link/start' && request.method === 'POST') return linkProxy(env, request, 'start', '');
     // QR of the Link deep link (app.botshield.ai/bind?code=…). The URL is built
     // HERE from the code alone, so the page can never QR an arbitrary link.
     if (path === '/api/agent/link/qr') {
       const code = (url.searchParams.get('code') || '').toUpperCase();
       if (!/^[A-Z0-9]{4,12}$/.test(code)) return json({ error: 'bad code' }, 400);
+      record(env, request, 'qr_shown', 'agent');
       const qr = qrcode(0, 'M');
       qr.addData(`${APP_URL}/bind?code=${code}`);
       qr.make();
       const svg = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
       return new Response(svg, { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-store' } });
     }
-    if (path === '/api/agent/link/status') return linkProxy(env, 'status', url.search);
+    if (path === '/api/agent/link/status') return linkProxy(env, request, 'status', url.search);
     if (path === '/api/agent/chat') {
       if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
       let body: any;
       try { body = await request.json(); } catch { return json({ error: 'Bad request.' }, 400); }
       const auth = request.headers.get('Authorization') || '';
       const bind = auth.startsWith('Bearer ') ? auth.slice(7).trim() : null;
-      return agentChat(env, Array.isArray(body?.messages) ? body.messages : [], bind);
+      return agentChat(env, request, Array.isArray(body?.messages) ? body.messages : [], bind);
     }
 
     // Old deep links (?event=21 etc.) and anything else → the shell.

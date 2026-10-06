@@ -166,6 +166,7 @@ export const agentHtml = `<!DOCTYPE html>
         var r = await fetch('/api/agent/link/start', { method: 'POST' });
         var j = await r.json();
         if (!r.ok || !j.code) { add('sys', 'Could not start the link: ' + (j.error || r.status)); return; }
+        if (window.bsTrack) bsTrack('agent_link_start');
         // Same browser: the deep link opens the app's Link screen with the code
         // filled in. Phone: scan the QR of that same link. Typing is the fallback.
         var claim = (j.claim_url && String(j.claim_url).indexOf('https://app.botshield.ai/') === 0) ? j.claim_url : null;
@@ -173,7 +174,7 @@ export const agentHtml = `<!DOCTYPE html>
           '<div class="lk-row">' +
             '<img class="lk-qr" src="/api/agent/link/qr?code=' + encodeURIComponent(j.code) + '" alt="QR: open BotShield to link" width="88" height="88">' +
             '<div class="lk-body">' +
-              (claim ? '<a class="lk-open" href="' + claim + '" target="_blank" rel="noopener">Open BotShield</a>' : '') +
+              (claim ? '<a class="lk-open" data-cta="app" href="' + claim + '" target="_blank" rel="noopener">Open BotShield</a>' : '') +
               '<div class="lk-hint">Already signed in on your phone? Scan the code. Or in the app open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span></div>' +
             '</div>' +
           '</div>';
@@ -183,6 +184,7 @@ export const agentHtml = `<!DOCTYPE html>
           var sj = await s.json();
           if (sj.status === 'bound' && sj.token) {
             bindToken = sj.token; sessionStorage.setItem(LINK_KEY, bindToken);
+            if (window.bsTrack) bsTrack('agent_linked');
             add('sys', 'Linked. Purchases will be proposed to your phone.');
             return;
           }
@@ -259,14 +261,16 @@ export const agentHtml = `<!DOCTYPE html>
       d.innerHTML = '<span class="ph"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>'
         + '<span><b>Confirm in BotShield on your phone</b>' + (ev.text || '')
         + '<span class="wait"><i></i><i></i><i></i><span class="wtxt">Waiting for you \\u2014 take your time.</span></span>'
-        + '<span class="links"><a href="https://app.botshield.ai/app/agents-ask" target="_blank" rel="noopener">Open BotShield</a><a class="ghost" href="https://app.botshield.ai" target="_blank" rel="noopener">New here? Sign up</a></span>'
+        + '<span class="links"><a data-cta="app" href="https://app.botshield.ai/app/agents-ask" target="_blank" rel="noopener">Open BotShield</a><a class="ghost" data-cta="app_signup" href="https://app.botshield.ai" target="_blank" rel="noopener">New here? Sign up</a></span>'
         + '</span>';
       log.appendChild(d); log.scrollTop = log.scrollHeight;
       askCard = d;
+      if (window.bsTrack) bsTrack('agent_ask_sent');
       return d;
     }
     function addClosed(ev) {
       var d = document.createElement('div'); d.className = 'msg closed';
+      if (window.bsTrack) bsTrack(/^(denied|declined)$/.test(String(ev.status || '')) ? 'agent_ask_denied' : 'agent_ask_expired');
       d.textContent = 'Purchase ' + (ev.status || 'closed') + (ev.text ? ' \\u2014 ' + ev.text : '') + '. Nothing was charged.';
       log.appendChild(d); log.scrollTop = log.scrollHeight;
     }
@@ -302,6 +306,7 @@ export const agentHtml = `<!DOCTYPE html>
     function addOrder(ev) {
       var d = document.createElement('div');
       d.className = 'msg order';
+      if (window.bsTrack) bsTrack('agent_ask_approved');
       var rows = [['Order', ev.order_id], ['Event', ev.event], ['Seats', ev.seats], ['Total', ev.total]].filter(function(r) { return r[1] != null; });
       d.innerHTML = '<b>Order confirmed \\u2014 approved by you</b>' + rows.map(function(r) { return '<div class="row"><span>' + r[0] + '</span><span></span></div>'; }).join('') + (ev.approved_by ? '<div class="att">approved_by ' + ev.approved_by + (ev.ceremony_id ? ' \\u00b7 ceremony ' + ev.ceremony_id : '') + '</div>' : '');
       var spans = d.querySelectorAll('.row span:last-child');
@@ -331,7 +336,7 @@ export const agentHtml = `<!DOCTYPE html>
 
     async function ask(q, hidden) {
       if (!q || !live) return;
-      if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; }
+      if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; if (window.bsTrack) bsTrack('agent_chat_turn'); }
       turns.push({ role: 'user', content: q });
       input.value = '';
       send.disabled = true;

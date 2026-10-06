@@ -13,12 +13,13 @@ const require = createRequire(import.meta.url);
 const out = mkdtempSync(join(tmpdir(), 'demo-pages-'));
 const pages = readdirSync('src/pages').filter((f) => f.endsWith('.ts'));
 let bad = 0;
-for (const f of [...pages.map((p) => `src/pages/${p}`), 'src/shell.ts']) {
+// src/analytics.ts: the consent banner + GTM loader + bsTrack injected into every page.
+for (const f of [...pages.map((p) => `src/pages/${p}`), 'src/shell.ts', 'src/analytics.ts']) {
   const file = join(out, f.replace(/\W/g, '_') + '.cjs');
   await build({ entryPoints: [f], bundle: true, format: 'cjs', platform: 'node', outfile: file, logLevel: 'error' });
   const mod = require(file);
   for (const [name, val] of Object.entries(mod)) {
-    const html = typeof val === 'function' ? (() => { try { return val(); } catch { return ''; } })() : val;
+    const html = typeof val === 'function' ? (() => { try { const r = val(); if (r && typeof r.then === 'function') { r.catch(() => {}); return ''; } return r; } catch { return ''; } })() : val;
     if (typeof html !== 'string' || !html.includes('<script')) continue;
     const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
     scripts.forEach((src, i) => {
