@@ -125,7 +125,7 @@ export const signupHtml = `<!DOCTYPE html>
           <div class="f"><label for="pw">Password</label><input id="pw" type="password" value="correcthorsebattery" autocomplete="off"></div>
 
           <div class="f gate">
-            <label for="bsVerify">Human check <span>the only field a script can’t fill</span></label>
+            <label for="bsVerify">The fifth field <span>the only one a script can’t fill</span></label>
             <botshield-verify
               site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
               scope="account_signup"
