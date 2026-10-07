@@ -60,7 +60,7 @@ export const ticketzHtml = `<!DOCTYPE html>
       width: 31px;
       height: 31px;
       border-radius: 50%;
-      background: #7c3aed;
+      background: #15c39a;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -351,7 +351,7 @@ export const ticketzHtml = `<!DOCTYPE html>
 
       <!-- Event -->
       <div class="event-card">
-        <div class="event-art" style="background: linear-gradient(135deg, #2a1a3e, #1a1a2e); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#7c3aed;">AF</div>
+        <div class="event-art" style="background: #17191c; border: 1px solid #22262f; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#61656c;">AF</div>
         <div class="event-details">
           <div class="event-artist">Arcade Fire</div>
           <div class="event-tour" id="eventTour">World Tour</div>

@@ -31,7 +31,7 @@ export const trustedHtml = `<!DOCTYPE html>
     .page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .top-spacer { flex-shrink: 0; height: 34px; }
     .header { display: flex; align-items: center; justify-content: center; gap: 9.5px; flex-shrink: 0; }
-    .header-logo { width: 31px; height: 31px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; }
+    .header-logo { width: 31px; height: 31px; border-radius: 50%; background: #15c39a; display: flex; align-items: center; justify-content: center; }
     .header-logo svg { width: 16px; height: 16px; fill: #fff; }
     .header-brand { font-size: 19px; font-weight: 600; line-height: 28.7px; }
     .wrap { width: 100%; max-width: 430px; display: flex; flex-direction: column; gap: 16px; }
@@ -39,7 +39,7 @@ export const trustedHtml = `<!DOCTYPE html>
     /* ── Account card ── */
     .kicker { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6b6b6b; }
     .acct { background: #111; border: 1px solid #1f1f1f; border-radius: 18px; padding: 18px; display: flex; align-items: center; gap: 14px; }
-    .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #2a1a3e, #1a1a2e); border: 1px solid #2c2140; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #a78bfa; font-size: 16px; flex-shrink: 0; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: #17191c; border: 1px solid #373a41; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #a78bfa; font-size: 16px; flex-shrink: 0; }
     .acct-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
     .acct-name { font-size: 17px; font-weight: 600; }
     .acct-id { font-family: 'Roboto Mono', monospace; font-size: 11px; color: #6b6b6b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -50,7 +50,7 @@ export const trustedHtml = `<!DOCTYPE html>
     /* ── Switcher between the visitor's demo accounts ── */
     .switch { display: flex; gap: 8px; flex-wrap: wrap; }
     .chip { font-family: inherit; font-size: 12.5px; font-weight: 600; color: #bdbdbd; background: #111; border: 1px solid #262626; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
-    .chip.on { color: #fff; border-color: #7c3aed; background: #1a1230; }
+    .chip.on { color: #fff; border-color: #373a41; background: #262a30; }
     .chip.add { color: #a78bfa; border-style: dashed; }
 
     /* ── Secure panel ── */
@@ -66,7 +66,7 @@ export const trustedHtml = `<!DOCTYPE html>
     .panel p b { color: #e5e5e5; font-weight: 600; }
     botshield-verify { display: block; width: 100%; }
     botshield-verify.hide { display: none; }
-    .again { display: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #fff; background: #7c3aed; border: 0; border-radius: 12px; padding: 13px 16px; cursor: pointer; }
+    .again { display: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #fff; background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41; border-radius: 12px; padding: 13px 16px; cursor: pointer; }
     .again.on { display: block; }
 
     /* ── Callouts for the demo moments ── */

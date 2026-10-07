@@ -22,7 +22,7 @@ export const vapezHtml = `<!DOCTYPE html>
     html, body { height: 100%; background: #000; color: #fff; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
     .page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: 22px; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .header { display: flex; align-items: center; gap: 12px; }
-    .header-mark { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #0ea5e9, #6366f1); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; letter-spacing: -.04em; }
+    .header-mark { width: 40px; height: 40px; border-radius: 12px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; letter-spacing: -.04em; }
     .header-brand { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
     .header-sub { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #6b6b6b; }
     .wrap { width: 100%; max-width: 430px; display: flex; flex-direction: column; gap: 16px; }

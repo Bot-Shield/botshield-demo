@@ -24,7 +24,7 @@ export const agentHtml = `<!DOCTYPE html>
 
     .page { height: 100dvh; display: flex; flex-direction: column; align-items: center; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
     .header { display: flex; align-items: center; gap: 12px; padding: 18px 0 14px; flex-shrink: 0; }
-    .header-mark { width: 36px; height: 36px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; }
+    .header-mark { width: 36px; height: 36px; border-radius: 50%; background: #15c39a; display: flex; align-items: center; justify-content: center; }
     .header-brand { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
     .header-sub { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; }
     .chat { width: 100%; max-width: 560px; flex: 1; min-height: 0; display: flex; flex-direction: column; background: #0b0e12; border: 1px solid #22262f; border-radius: 18px; overflow: hidden; }
@@ -35,7 +35,7 @@ export const agentHtml = `<!DOCTYPE html>
     .log { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
     .log > * { flex-shrink: 0; }
     .msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
-    .msg.user { align-self: flex-end; background: #7c3aed; color: #fff; border-bottom-right-radius: 4px; }
+    .msg.user { align-self: flex-end; background: #262a30; color: #f7f7f7; border: 1px solid #373a41; border-bottom-right-radius: 4px; }
     .msg.agent { align-self: flex-start; background: #111418; border: 1px solid #22262f; border-bottom-left-radius: 4px; }
     .msg.agent b { color: #fff; } .msg.agent code { font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: #7dc0e4; }
     .msg.agent .trow { margin: 6px 0; padding: 8px 10px; border-radius: 10px; background: #0b0e12; border: 1px solid #22262f; white-space: normal; }
@@ -74,8 +74,8 @@ export const agentHtml = `<!DOCTYPE html>
     .msg.typing small { margin-left: 8px; font-size: 12px; color: #7a7a7a; }
     .compose { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #22262f; }
     .compose input { flex: 1; min-width: 0; background: #111418; border: 1px solid #22262f; border-radius: 11px; color: #fff; font-family: inherit; font-size: 15px; padding: 11px 13px; outline: none; }
-    .compose input:focus { border-color: #7c3aed; }
-    .compose button { background: #7c3aed; color: #fff; border: 0; border-radius: 11px; font-family: inherit; font-size: 14px; font-weight: 600; padding: 0 16px; cursor: pointer; }
+    .compose input:focus { border-color: #373a41; }
+    .compose button { background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41; color: #fff; border-radius: 11px; font-family: inherit; font-size: 14px; font-weight: 600; padding: 0 16px; cursor: pointer; }
     .compose button:disabled { opacity: .45; cursor: not-allowed; }
     .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 10px; }
     .chip { background: #17191c; border: 1px solid #262a30; border-radius: 999px; color: #94979c; font-family: inherit; font-size: 12.5px; padding: 6px 11px; cursor: pointer; }
