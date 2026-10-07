@@ -58,8 +58,8 @@ export const DEMOS: DemoEntry[] = [
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
     run: {
-      line: 'Your password can change hands. You can\u2019t.',
-      what: 'Secure it, and Ticketz knows a person is holding this account \u2014 never which one. Keeping it trusted takes presence, and presence doesn\u2019t spread to a second account.',
+      line: 'Anyone can sign in. Someone has to witness the person.',
+      what: 'You secure the account. Ticketz trusts it. BotShield notarizes what it witnessed \u2014 this account, a real person, this date. Never a name.',
       steps: [
         'Tap <b>Secure your account with BotShield</b>.',
         'A passkey confirms it. Ticketz gets a handle, not your name.',
