@@ -58,8 +58,8 @@ export const DEMOS: DemoEntry[] = [
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
     run: {
-      line: 'A signature is just ink until someone watched it.',
-      what: 'You secure the account. Ticketz trusts it. BotShield notarizes what it witnessed \u2014 this account, a real person, this date. Never a name.',
+      line: 'A notary doesn\u2019t read the document. They confirm you signed it.',
+      what: 'Same here. You secure the account, Ticketz trusts it, and BotShield notarizes what it witnessed \u2014 this account, a real person, this date. Never your name, never what you do there.',
       steps: [
         'Tap <b>Secure your account with BotShield</b>.',
         'A passkey confirms it. Ticketz gets a handle, not your name.',
