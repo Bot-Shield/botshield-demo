@@ -21,6 +21,7 @@ import { agentHtml } from './pages/agent';
 import { trustedHtml } from './pages/trusted';
 import { signupHtml } from './pages/signup';
 import { dropHtml } from './pages/drop';
+import { firmHtml } from './pages/firm';
 import { shellHtml } from './shell';
 import { FAVICON_ICO_B64 } from './favicon';
 import qrcode from 'qrcode-generator';
@@ -192,7 +193,7 @@ export default {
     const PAGES: Record<string, [string, () => string]> = {
       '/': ['shell', shellHtml], '/ticketz': ['ticketz', () => ticketzHtml], '/vapez': ['vapez', () => vapezHtml],
       '/agent': ['agent', () => agentHtml], '/trusted': ['trusted', () => trustedHtml],
-      '/signup': ['signup', () => signupHtml], '/drop': ['drop', () => dropHtml],
+      '/signup': ['signup', () => signupHtml], '/drop': ['drop', () => dropHtml], '/firm': ['firm', () => firmHtml],
     };
     if (PAGES[path] && request.method === 'GET') {
       record(env, request, 'view', PAGES[path][0]);

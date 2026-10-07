@@ -73,6 +73,16 @@ export const DEMOS: DemoEntry[] = [
         'The pair is held for you. Come back for a second \u2014 new account, new card, new browser \u2014 and the cart says no before the card is ever asked for.',
       ],
     } },
+  { key: 'firm', group: 'Whitlock & Barr', label: 'Human Gate', hint: 'On the form that gets spammed', path: '/firm',
+    run: {
+      line: 'Captcha proves it is not a script. It cannot prove a person is there.',
+      what: 'A free case review form \u2014 the most mundane surface there is, and the one spam hits hardest. A solicitor reads every enquiry, so junk is already being paid for in someone\u2019s morning.',
+      steps: [
+        'The enquiry is written. Tap <b>Verify you\u2019re human</b>.',
+        'A passkey answers it. No account, no puzzle, no pictures of traffic lights.',
+        'It lands in the firm\u2019s inbox marked as a person \u2014 and the next thousand fakes now cost a human each instead of nothing.',
+      ],
+    } },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
 ];
 
