@@ -16,13 +16,52 @@ export interface DemoEntry {
   badge?: string;
   /** Where the outcome is real today (e.g. platform age signals): shown as small pills. */
   platforms?: string[];
+  /* What the run panel says beside this demo: the line it proves, and the
+     steps to run it. Without this every demo inherits Ticketz's pitch. */
+  run?: { line: string; what: string; steps: string[] };
 }
 
 export const DEMOS: DemoEntry[] = [
-  { key: 'ticketz', group: 'Ticketz', label: 'BotShield Gate', hint: 'Human Gate at checkout', path: '/ticketz' },
-  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent' },
-  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted' },
-  { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'] },
+  { key: 'ticketz', group: 'Ticketz', label: 'BotShield Gate', hint: 'Human Gate at checkout', path: '/ticketz',
+    run: {
+      line: 'A checkout a bot cannot complete.',
+      what: 'The Gate asks for a human at the moment it matters. No puzzle, no street signs \u2014 the passkey the person already carries.',
+      steps: [
+        'Fill the checkout and tap <b>Verify you\u2019re human</b>.',
+        'Touch ID on this Mac answers it. No account, no sign-up.',
+        'Checkout completes with a signed result. Ticketz learns that a human was there \u2014 never who.',
+      ],
+    } },
+  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent',
+    run: {
+      line: 'An agent buys. A human approves.',
+      what: 'Claude runs the Ticketz tools through the BotShield gateway. Anything that spends money stops and waits for a person.',
+      steps: [
+        'Tap <b>Link</b> and scan the code, or open the web app here.',
+        'Ask the agent to buy tickets.',
+        'Approve it with a passkey. The agent finishes with a signed Proof of Resolution \u2014 never your card.',
+      ],
+    } },
+  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
+    run: {
+      line: 'One account per human.',
+      what: 'An account bound to a person, not a password. The same human cannot quietly hold a hundred of them.',
+      steps: [
+        'Pick a provider and link the account.',
+        'Confirm it with a passkey.',
+        'The account carries a notarised link. Change the credential and the link breaks \u2014 by design.',
+      ],
+    } },
+  { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'],
+    run: {
+      line: 'Proof of age without proof of identity.',
+      what: 'BotShield reads the age assertion the device already holds. Vapez receives <b>verified</b> or <b>unavailable</b> \u2014 never a birthdate, never a document, nothing to store and nothing to leak.',
+      steps: [
+        'Tap <b>Verify you\u2019re over 18</b>.',
+        'The device answers from the age it already knows. No upload, no form.',
+        'The store opens. With no age assertion the door stays shut and says why \u2014 that is the honest state, not a failure.',
+      ],
+    } },
   // Via the worker's /salesforce redirect so the click-out is counted (same destination).
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
 ];
@@ -75,7 +114,7 @@ export function shellHtml(): string {
     .foot a:hover { color: var(--ink); }
     .pill { display: inline-flex; align-items: center; gap: 6px; margin: 4px 10px 0; font-family: 'Roboto Mono', monospace; font-size: 10.5px; letter-spacing: .08em; color: var(--ok); border: 1px solid rgba(0, 212, 146, .4); border-radius: 999px; padding: 3px 9px; width: max-content; }
     .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
-    .main { display: flex; flex-direction: column; min-width: 0; }
+    .main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
     .top { display: none; }
     .crumb { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px; border-bottom: 1px solid var(--line); font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
     .crumb b { color: var(--ink); font-weight: 500; }
@@ -90,12 +129,29 @@ export function shellHtml(): string {
     .rp-mark { width: 128px; height: auto; align-self: center; }
     .rp-h { font-size: 25px; font-weight: 600; letter-spacing: -.4px; color: #fff; text-align: center; margin: 0; }
     .rp-s { font-size: 13px; line-height: 19px; color: #94979c; text-align: center; margin: 0; }
+    .rp-steps { display: flex; flex-direction: column; gap: 10px; margin: 2px 0; padding-top: 14px; border-top: 1px solid #22262f; }
+    .rp-steps .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #61656c; }
+    .rp-step { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 18px; color: #94979c; }
+    .rp-step i { flex: none; width: 18px; height: 18px; border-radius: 50%; background: #1c2027; color: #e6e8ea;
+                 font-family: 'Roboto Mono', monospace; font-size: 10px; font-style: normal; display: flex;
+                 align-items: center; justify-content: center; margin-top: 1px; }
+    .rp-step b { color: #e6e8ea; font-weight: 600; }
     .rp-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
     .rp-primary { display: block; text-align: center; text-decoration: none; background: #f7f7f7; color: #0b0e12; border-radius: 11px; padding: 12px 16px; font-size: 14.5px; font-weight: 500; }
     .rp-primary small { display: block; font-size: 10.5px; font-weight: 400; opacity: .7; margin-top: 2px; }
     .rp-secondary { display: block; text-align: center; text-decoration: none; background: #17191c; color: #e6e8ea; border: 1px solid #373a41; border-radius: 11px; padding: 11px 16px; font-size: 13.5px; font-weight: 500; }
     .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
+    /* Below the two-column width the sell stacks UNDER the demo instead of
+       vanishing — the run steps are the point of the page, not decoration. */
     @media (min-width: 1100px) { .runpanel { display: flex; } }
+    @media (max-width: 1099px) {
+      .frame { flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; gap: 20px; }
+      .bezel { height: auto; max-height: none; }
+      .frame iframe { height: 760px; max-height: calc(100dvh - 120px); }
+      .runpanel { display: flex; width: 100%; max-width: 430px; margin-bottom: 24px; }
+      .rp-mark { width: 92px; }
+      .rp-h { font-size: 22px; }
+    }
     .bezel { flex-shrink: 0; height: 100%; max-height: 900px; padding: 11px; border-radius: 42px; background: #15181c;
              border: 1.5px solid #454a52; box-shadow: 0 28px 64px -10px rgba(0,0,0,.7); box-sizing: border-box; display: flex; }
     .frame iframe { width: 430px; max-width: 100%; height: 100%; border: 1px solid #23262c; border-radius: 32px; display: block; background: #08090b; }
@@ -109,9 +165,11 @@ export function shellHtml(): string {
       .top .title { font-size: 15px; font-weight: 600; }
       .top .title small { display: block; font-size: 11.5px; font-weight: 400; color: var(--faint); }
       .crumb { display: none; }
-      .frame { padding: 0; }
+      .frame { padding: 0; gap: 0; }
       .bezel { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; max-height: none; width: 100%; }
-      .frame iframe { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; }
+      /* The demo still owns the first screen; the sell sits one scroll below. */
+      .frame iframe { width: 100%; height: calc(100dvh - 52px - env(safe-area-inset-top, 0px)); max-height: none; border: 0; border-radius: 0; box-shadow: none; }
+      .runpanel { border-radius: 0; border-left: 0; border-right: 0; border-bottom: 0; margin-bottom: 0; max-width: none; padding: 26px 20px calc(env(safe-area-inset-bottom, 0px) + 26px); }
       .rail .close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 14px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: #14161b; color: var(--ink); display: flex; align-items: center; justify-content: center; }
     }
     @media (min-width: 768px) { .rail .close { display: none; } }
@@ -160,14 +218,10 @@ export function shellHtml(): string {
       <div class="frame">
         <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
         <aside class="runpanel" aria-label="Run this demo">
-          <svg class="rp-mark" viewBox="0 0 120 116" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M60 4 112 24v34c0 30-21 48-52 54C29 106 8 88 8 58V24L60 4Z" stroke="#1a9fd6" stroke-width="7"/>
-            <rect x="36" y="44" width="48" height="32" rx="12" stroke="#1a9fd6" stroke-width="6"/>
-            <circle cx="50" cy="60" r="4.5" fill="#1a9fd6"/><circle cx="70" cy="60" r="4.5" fill="#1a9fd6"/>
-            <path d="M60 44V33" stroke="#1a9fd6" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="29" r="4.5" fill="#1a9fd6"/>
-          </svg>
-          <h2 class="rp-h">Live Demo is Ready</h2>
-          <p class="rp-s">No phone needed. Open the web app and Touch ID signs the purchase, right in the browser.</p>
+          <svg class="rp-mark" aria-hidden="true" viewBox="0 0 33 35.6743" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Group"> <path id="Vector" d="M32.4713 6.64943C32.4499 6.54586 32.4033 6.4492 32.3355 6.36805C32.2677 6.28689 32.1808 6.22378 32.0827 6.18433L16.7357 0.0430144C16.5838 -0.0143381 16.4162 -0.0143381 16.2643 0.0430144L0.91728 6.18433C0.819167 6.22378 0.73234 6.28689 0.664537 6.36805C0.596735 6.4492 0.550064 6.54586 0.528686 6.64943C-2.01959 18.5945 4.86076 31.1638 16.5 35.6743C28.1392 31.1702 35.0196 18.5945 32.4713 6.64943ZM16.5 32.4889C6.93759 28.8385 1.28684 18.4925 3.37002 8.69438C3.39235 8.59122 3.43938 8.49501 3.50706 8.41401C3.57474 8.33301 3.66106 8.26964 3.75862 8.22934L16.2643 3.22839C16.4162 3.17104 16.5838 3.17104 16.7357 3.22839L29.2414 8.22937C29.339 8.26968 29.4253 8.33304 29.493 8.41404C29.5606 8.49504 29.6077 8.59125 29.63 8.69441C31.7132 18.4925 26.0624 28.8385 16.5 32.4889Z" fill="#1A9FD6"/> <path id="Vector_2" d="M13.91 17.2172C14.329 17.2174 14.6691 17.5573 14.6691 17.9764C14.6691 18.3955 14.3291 18.7353 13.91 18.7355C13.4907 18.7355 13.1508 18.3956 13.1508 17.9764C13.1509 17.5571 13.4907 17.2172 13.91 17.2172Z" fill="#1A9FD6"/> <path id="Vector_3" d="M19.0853 17.2172C19.5046 17.2172 19.8445 17.5571 19.8445 17.9764C19.8445 18.3956 19.5046 18.7355 19.0853 18.7355C18.6662 18.7354 18.3262 18.3956 18.3262 17.9764C18.3262 17.5572 18.6662 17.2174 19.0853 17.2172Z" fill="#1A9FD6"/> <path id="Vector_4" fill-rule="evenodd" clip-rule="evenodd" d="M16.4811 8.96938C17.0943 8.96941 17.5912 9.39546 17.5912 9.92102C17.5912 10.3007 17.3316 10.6277 16.9565 10.7804V11.8243H17.7944C18.2807 11.8243 18.6753 12.2189 18.6753 12.7052C18.6753 12.7293 18.6737 12.7532 18.6717 12.7768H19.4945C21.6385 12.7768 23.4703 14.1068 24.2142 15.9863C24.28 15.974 24.348 15.9675 24.4174 15.9675C25.0272 15.9675 25.5221 16.4623 25.5221 17.0722C25.5219 17.6337 25.1023 18.0955 24.5597 18.1653C24.3979 20.8226 22.1925 22.9279 19.4945 22.9279H13.4677C10.7697 22.9279 8.56335 20.8226 8.40158 18.1653C7.85937 18.0952 7.44026 17.6334 7.44009 17.0722C7.44009 16.4625 7.93426 15.9677 8.54392 15.9675C8.6132 15.9675 8.6814 15.9741 8.74714 15.9863C9.49094 14.1066 11.3236 12.7768 13.4677 12.7768H14.3307C14.3288 12.7532 14.3272 12.7293 14.3272 12.7052C14.3272 12.2191 14.7211 11.8245 15.2072 11.8243H16.0048V10.7796C15.6302 10.6267 15.371 10.3004 15.371 9.92102C15.371 9.39544 15.8679 8.96938 16.4811 8.96938ZM13.3093 15.3148C11.8201 15.3148 10.6128 16.5221 10.6128 18.0113C10.6132 19.5001 11.8203 20.7068 13.3093 20.7068H19.6538C21.1426 20.7067 22.3498 19.5 22.3503 18.0113C22.3503 16.5222 21.1429 15.315 19.6538 15.3148H13.3093Z" fill="#1A9FD6"/> </g> </svg>
+          <h2 class="rp-h" id="rpH">Live Demo is Ready</h2>
+          <p class="rp-s" id="rpS"></p>
+          <div class="rp-steps" id="rpSteps"></div>
           <div class="rp-actions">
             <a class="rp-primary" href="https://app.botshield.ai" target="_blank" rel="noopener">Open the web app<small>Works on this Mac</small></a>
             <a class="rp-secondary" href="https://app.botshield.ai" target="_blank" rel="noopener">Or use your phone instead</a>
@@ -185,7 +239,24 @@ export function shellHtml(): string {
       var d = DEMOS.find(function(x) { return x.key === key && x.path; }) || DEMOS[0];
       Array.prototype.forEach.call(document.querySelectorAll('.it'), function(a) { a.classList.toggle('on', a.getAttribute('data-key') === d.key); });
       var qs = window.location.search.replace(/^\\?/, '');
-      if (frame.getAttribute('data-key') !== d.key) { frame.src = d.path + (qs ? '?' + qs : ''); frame.setAttribute('data-key', d.key); }
+      var vp = (window.innerWidth < 1024) ? 'm=1' : 'm=0';
+      if (frame.getAttribute('data-key') !== d.key) {
+        frame.src = d.path + '?' + ((qs ? qs + '&' : '') + vp);
+        frame.setAttribute('data-key', d.key);
+      }
+      var rpH = document.getElementById('rpH'), rpS = document.getElementById('rpS'), rpSteps = document.getElementById('rpSteps');
+      if (d.run) {
+        rpH.textContent = d.run.line;
+        rpS.innerHTML = d.run.what;
+        rpSteps.innerHTML = '<div class="rp-k">How to run it</div>' + d.run.steps.map(function(t, i) {
+          return '<div class="rp-step"><i>' + (i + 1) + '</i><div>' + t + '</div></div>';
+        }).join('');
+        rpSteps.style.display = '';
+      } else {
+        rpH.textContent = 'Live Demo is Ready';
+        rpS.textContent = 'Open the web app and a passkey answers the check, right in the browser.';
+        rpSteps.style.display = 'none';
+      }
       document.getElementById('crumbGroup').textContent = d.group;
       document.getElementById('crumbLabel').textContent = d.label;
       document.getElementById('crumbHint').textContent = d.hint;
@@ -200,6 +271,17 @@ export function shellHtml(): string {
     document.getElementById('menu').addEventListener('click', function() { rail.classList.add('open'); });
     document.getElementById('close').addEventListener('click', function() { rail.classList.remove('open'); });
     window.addEventListener('hashchange', function() { pick(window.location.hash.slice(1), false); });
+    // Same origin, so set the flag directly. Reloading the iframe would wipe the chat.
+    function syncViewport() {
+      var m = window.innerWidth < 1024;
+      try {
+        var d = frame.contentDocument;
+        if (d && d.documentElement) d.documentElement.classList.toggle('is-mobile', m);
+      } catch (e) {}
+      frame.setAttribute('data-vp', m ? 'm=1' : 'm=0');
+    }
+    window.addEventListener('resize', syncViewport);
+    frame.addEventListener('load', syncViewport);
     var initial = (new URLSearchParams(window.location.search).get('demo')) || window.location.hash.slice(1) || 'ticketz';
     pick(initial, true);
   </script>

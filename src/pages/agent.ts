@@ -17,7 +17,7 @@ export const agentHtml = `<!DOCTYPE html>
   <title>Ticketz - Agent</title>
   <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; background: #000; color: #fff; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -79,37 +79,66 @@ export const agentHtml = `<!DOCTYPE html>
     .compose button:disabled { opacity: .45; cursor: not-allowed; }
     .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 10px; }
     .chip { background: #131316; border: 1px solid #262626; border-radius: 999px; color: #c9c9c9; font-family: inherit; font-size: 12.5px; padding: 6px 11px; cursor: pointer; }
+    /* The Link ceremony, built to the DS frame on the Website Demo Page
+       (section 3249:3932, in-chat state 3253:3889). At rest it is a one-line
+       strip; the ceremony turns it into the card that frame specifies. */
     .link { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #1a1a1a; background: #0b0d12; font-size: 13px; }
     .link .l { color: #c9c9c9; }
     .link .l b { color: #fff; font-weight: 600; }
-    .link.bound .l b { color: #00d492; }
-    .link button { background: #147baa; color: #fff; border: 0; border-radius: 9px; font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
-    .link button.ghost { background: transparent; border: 1px solid #2a2a2a; color: #c9c9c9; }
-    .lk-row { display: flex; gap: 12px; align-items: center; }
-    /* A QR shown ON the phone cannot be scanned BY that phone. Desktop only. */
-    .lk-hint .desktop-only { display: inline; }
-    .lk-hint .mobile-only { display: none; }
-    @media (max-width: 1023px) {
-      .lk-qr { display: none; }
-      .lk-row { gap: 0; }
-      .lk-open { align-self: stretch; text-align: center; font-size: 15px; padding: 13px 18px; }
-      .lk-body { width: 100%; gap: 10px; }
-      .lk-hint .desktop-only { display: none; }
-      .lk-hint .mobile-only { display: inline; }
-      .code { font-size: 18px; letter-spacing: .16em; }
-    }
-    .lk-qr { flex: none; width: 88px; height: 88px; border-radius: 8px; background: #fff; padding: 4px; box-sizing: border-box; }
-    .lk-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .lk-open { display: inline-block; align-self: flex-start; background: #1a9fd6; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 8px 14px; border-radius: 9px; }
+    .link.bound .l b { color: #23cb78; }
+    .link button { background: #1a9fd6; color: #fff; border: 0; border-radius: 10px; font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
+    .link button.ghost { background: transparent; border: 1px solid #373a41; color: #c9c9c9; }
+
+    .link.linking { display: block; position: relative; margin: 12px; padding: 18px; background: #111418; border: 1px solid #22262f; border-bottom-color: #22262f; border-radius: 14px; }
+    .link.linking .l { display: block; }
+    .link.linking > button { position: absolute; top: 15px; right: 15px; }
+    .lk-wrap { position: relative; }
+
+    .lk-h { font-size: 19px; line-height: 24px; letter-spacing: -0.4px; font-weight: 600; color: #f7f7f7; padding-right: 72px; }
+    .lk-sub { margin-top: 7px; font-size: 13px; line-height: 20px; color: #94979c; }
+    .lk-open { display: block; margin-top: 14px; background: #1a9fd6; color: #fff; text-decoration: none; text-align: center; font-weight: 600; font-size: 15px; padding: 13px 18px; border-radius: 10px; }
     .lk-open:hover { background: #7dc0e4; }
-    .lk-hint { font-size: 12.5px; line-height: 1.5; color: #a5a8b0; }
-    .lk-hint .code { font-size: 15px; padding: 2px 8px 2px 10px; }
-    .code { font-family: 'Roboto Mono', monospace; font-size: 22px; letter-spacing: .22em; color: #fff; background: #151517; border: 1px solid #2a2a2a; border-radius: 9px; padding: 4px 10px 4px 14px; }
+
+    .lk-row { display: flex; gap: 14px; align-items: center; margin-top: 14px; }
+    .lk-qr { flex: none; width: 128px; height: 128px; border-radius: 12px; background: #fff; padding: 10px; box-sizing: border-box; }
+    .lk-label { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 10px; letter-spacing: 2px; color: #61656c; }
+    .lk-code { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 17px; letter-spacing: 3.6px; color: #f7f7f7; margin-top: 5px; }
+    .lk-hint { margin-top: 13px; font-size: 12.5px; line-height: 19px; color: #94979c; }
+
+    .lk-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 15px; padding-top: 14px; border-top: 1px solid #22262f; }
+    .lk-chip { display: flex; align-items: center; gap: 5px; padding: 6px 12px 6px 6px; border: 1px solid #373a41; border-radius: 8px;
+               background: linear-gradient(180deg, #16191f 0%, #0e1116 100%); box-shadow: inset 0 1px 0 0 rgba(255,255,255,.05); }
+    .lk-chip svg { flex: none; width: 29px; height: 22px; }
+    .lk-chip .t1 { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: #94979c; }
+    .lk-chip .t2 { font-size: 14px; font-weight: 600; letter-spacing: -0.16px; color: #f7f7f7; margin-top: 2px; }
+    .lk-pk { display: flex; align-items: center; gap: 5px; }
+    .lk-pk svg { flex: none; width: 26px; height: 26px; }
+    .lk-pk .p1 { font-size: 11px; line-height: 13px; color: #8f8f8f; }
+    .lk-pk .p2 { font-size: 15.5px; line-height: 18px; font-weight: 700; color: #fff; }
+
+    /* The real viewport is passed in by the shell as ?m=1 — this page lives in a
+       430px iframe, so its own media queries can never see the browser width.
+       A QR shown ON the phone cannot be scanned BY that phone. */
+    .link .desktop-only { display: inline; }
+    .link .mobile-only { display: none; }
+    html.is-mobile .link .desktop-only { display: none; }
+    html.is-mobile .link .mobile-only { display: inline; }
+    html.is-mobile .lk-qr { display: none; }
+    html.is-mobile .lk-row { gap: 0; }
+
+    .code { font-family: 'JetBrains Mono', monospace; font-size: 17px; letter-spacing: .2em; color: #f7f7f7; }
     .foot { font-size: 11.5px; color: #5b5b5b; text-align: center; padding: 10px 8px 0; line-height: 1.5; max-width: 560px; }
     .foot b { color: #8a8a8a; font-weight: 600; }
   </style>
 </head>
 <body>
+  <script>(function(){try{
+    /* The shell always passes ?m= because only it sees the real browser width.
+       Opened on its own (no shell, no param), fall back to our own width. */
+    var m = new URLSearchParams(location.search).get('m');
+    var mobile = (m === null) ? (window.innerWidth < 1024) : (m === '1');
+    if (mobile) document.documentElement.classList.add('is-mobile');
+  }catch(e){}})();</script>
   <div class="page">
     <div class="header">
       <div class="header-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4Z"/></svg></div>
@@ -155,7 +184,10 @@ export const agentHtml = `<!DOCTYPE html>
     var linkEl = document.getElementById('link');
     var linkText = document.getElementById('linkText');
     var linkBtn = document.getElementById('linkBtn');
-    var linkPolling = false;
+    var AGENT_NAME = 'Ticketz';
+    var ROBOT_SVG = '<svg viewBox="0 0 34.7937 26.8591" fill="none" xmlns="http://www.w3.org/2000/svg"> <path id="Vector" d="M17.3975 0C18.5771 0.00025 19.5335 0.819875 19.5337 1.83113C19.5337 2.56113 19.034 3.1885 18.313 3.48275V5.49437H19.9244C20.86 5.49437 21.6186 6.253 21.6186 7.18875C21.6186 7.23488 21.615 7.28038 21.6114 7.3255H23.1957C27.322 7.32563 30.8482 9.886 32.279 13.5035C32.4055 13.48 32.5364 13.4669 32.6696 13.4669C33.843 13.4671 34.7937 14.4188 34.7937 15.5921C34.7935 16.6729 33.9864 17.5626 32.9419 17.6966C32.6299 22.8091 28.3867 26.8589 23.1957 26.8591H11.5979C6.40637 26.859 2.16191 22.8086 1.85059 17.6954C0.806975 17.5606 0.0002 16.6724 0 15.5921C0 14.4186 0.951725 13.4669 2.12525 13.4669C2.25831 13.4669 2.38836 13.48 2.51465 13.5035C3.94539 9.886 7.47162 7.32563 11.5979 7.3255H13.2592C13.2556 7.28038 13.252 7.23488 13.252 7.18875C13.252 6.25313 14.0106 5.4945 14.9462 5.49437H16.4819V3.48387C15.7604 3.18987 15.2612 2.5615 15.2612 1.83113C15.2614 0.819875 16.2176 0 17.3975 0ZM11.2927 12.2083C8.42762 12.2086 6.10512 14.5312 6.10475 17.3962C6.10475 20.2617 8.42737 22.5853 11.2927 22.5855H23.5022C26.3676 22.5853 28.6901 20.2617 28.6901 17.3962C28.6897 14.5312 26.3672 12.2085 23.5022 12.2083H11.2927ZM12.4487 15.8716C13.2555 15.8717 13.9099 16.526 13.9099 17.3328C13.9097 18.1394 13.2554 18.7927 12.4487 18.7927C11.6421 18.7927 10.9877 18.1394 10.9875 17.3328C10.9875 16.526 11.6419 15.8716 12.4487 15.8716ZM22.4085 15.8716C23.2151 15.8716 23.8695 16.525 23.8696 17.3316C23.8696 18.1384 23.2152 18.7927 22.4085 18.7927C21.6017 18.7926 20.9485 18.1383 20.9485 17.3316C20.9486 16.525 21.6019 15.8717 22.4085 15.8716Z" fill="#1A9FD6"/> </svg>';
+    var PASSKEY_SVG = '<svg viewBox="0 0 44.1964 44.1964" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Passkey 1"> <path id="Vector" d="M5.52459 36.8304V31.6742C5.52459 30.6306 5.79345 29.6718 6.33118 28.7977C6.8689 27.9236 7.58218 27.2558 8.47102 26.7941C10.3739 25.8427 12.3075 25.1294 14.2718 24.6543C16.2361 24.1792 18.2311 23.941 20.2567 23.9398C20.8706 23.9398 21.4844 23.9631 22.0983 24.0098C22.7121 24.0564 23.3259 24.1252 23.9398 24.216C23.817 25.9962 24.1393 27.6768 24.9066 29.2581C25.6739 30.8393 26.7941 32.1358 28.2673 33.1474V36.8304H5.52459ZM34.9889 42.355L32.2266 39.5927V31.0296C30.8762 30.6306 29.7712 29.8713 28.9119 28.7517C28.0525 27.632 27.6228 26.335 27.6228 24.8606C27.6228 23.0804 28.252 21.5612 29.5104 20.3028C30.7687 19.0444 32.288 18.4152 34.0681 18.4152C35.8482 18.4152 37.3675 19.0444 38.6259 20.3028C39.8842 21.5612 40.5134 23.0804 40.5134 24.8606C40.5134 26.2417 40.1218 27.4694 39.3385 28.5436C38.5553 29.6178 37.5658 30.3851 36.37 30.8455L38.6719 33.1474L35.9096 35.9097L38.6719 38.6719L34.9889 42.355ZM20.2567 22.0983C18.2311 22.0983 16.497 21.377 15.0544 19.9345C13.6119 18.492 12.8907 16.7579 12.8907 14.7322C12.8907 12.7065 13.6119 10.9724 15.0544 9.52992C16.497 8.08739 18.2311 7.36613 20.2567 7.36613C22.2824 7.36613 24.0165 8.08739 25.459 9.52992C26.9015 10.9724 27.6228 12.7065 27.6228 14.7322C27.6228 16.7579 26.9015 18.492 25.459 19.9345C24.0165 21.377 22.2824 22.0983 20.2567 22.0983ZM35.3811 25.2528C35.7335 24.8992 35.9096 24.4616 35.9096 23.9398C35.9096 23.418 35.7328 22.981 35.3793 22.6286C35.0257 22.2763 34.5887 22.0995 34.0681 22.0983C33.5476 22.097 33.1105 22.2738 32.757 22.6286C32.4034 22.9834 32.2266 23.4205 32.2266 23.9398C32.2266 24.4591 32.4034 24.8968 32.757 25.2528C33.1105 25.6088 33.5476 25.785 34.0681 25.7813C34.5887 25.7776 35.0263 25.6008 35.3811 25.251" fill="white"/> </g> </svg>';
+    var linkRun = 0; // bumped on cancel so a stale poll can't repaint the strip
 
     function renderLink() {
       if (bindToken) {
@@ -171,31 +203,58 @@ export const agentHtml = `<!DOCTYPE html>
     renderLink();
 
     // The Link ceremony: a 6-character code, entered in the BotShield app
-    // (Agents Ask → Link), answered with a bind JWT the gateway trusts.
+    // entered under the agent icon top right on the BotShield tab, answered
+    // with a bind JWT the gateway trusts. Agents Ask is the inbox the ask lands
+    // in afterwards — it is not where you link.
+    // Both viewports' copy ships in the markup and CSS picks one, because the
+    // shell can flip is-mobile on resize long after the card was built.
     async function startLink() {
-      if (linkPolling) return;
-      linkPolling = true;
+      var run = ++linkRun;
       linkBtn.disabled = true;
       try {
         var r = await fetch('/api/agent/link/start', { method: 'POST' });
         var j = await r.json();
+        if (run !== linkRun) return;
         if (!r.ok || !j.code) { add('sys', 'Could not start the link: ' + (j.error || r.status)); return; }
         if (window.bsTrack) bsTrack('agent_link_start');
         // Same browser: the deep link opens the app's Link screen with the code
         // filled in. Phone: scan the QR of that same link. Typing is the fallback.
         var claim = (j.claim_url && String(j.claim_url).indexOf('https://app.botshield.ai/') === 0) ? j.claim_url : null;
+        linkEl.classList.add('linking');
         linkText.innerHTML =
-          '<div class="lk-row">' +
-            '<img class="lk-qr" src="/api/agent/link/qr?code=' + encodeURIComponent(j.code) + '" alt="QR: open BotShield to link" width="88" height="88">' +
-            '<div class="lk-body">' +
-              (claim ? '<a class="lk-open" data-cta="app" href="' + claim + '" target="_blank" rel="noopener">Open BotShield</a>' : '') +
-              '<div class="lk-hint"><span class="desktop-only">Already signed in on your phone? Scan the code. Or in</span><span class="mobile-only">Tap above to open BotShield on this phone. Or in</span> the app open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span></div>' +
+          '<div class="lk-wrap">' +
+            '<div class="lk-h">Link ' + AGENT_NAME + ' Agent with BotShield.</div>' +
+            '<div class="lk-sub">' +
+              '<span class="desktop-only">Scan to trust this agent and link it to your BotShield ID with a passkey.</span>' +
+              '<span class="mobile-only">Trust this agent and link it to your BotShield ID with a passkey.</span>' +
+            '</div>' +
+            (claim ? '<a class="lk-open" data-cta="app" href="' + claim + '" target="_blank" rel="noopener">' +
+                       '<span class="desktop-only">Open the web app</span>' +
+                       '<span class="mobile-only">Open BotShield on this phone</span>' +
+                     '</a>' : '') +
+            '<div class="lk-row">' +
+              '<img class="lk-qr" src="/api/agent/link/qr?code=' + encodeURIComponent(j.code) + '" alt="QR: open BotShield to link" width="128" height="128">' +
+              '<div><div class="lk-label">LINK CODE</div><div class="lk-code">' + j.code + '</div></div>' +
+            '</div>' +
+            '<div class="lk-hint">' +
+              '<span class="desktop-only">Scan it, or tap</span>' +
+              '<span class="mobile-only">Already in the app? Tap</span>' +
+              ' the agent icon, top right, and enter the code.' +
+            '</div>' +
+            '<div class="lk-foot">' +
+              '<div class="lk-chip">' + ROBOT_SVG +
+                '<div><div class="t1">Link with</div><div class="t2">BotShield</div></div>' +
+              '</div>' +
+              '<div class="lk-pk">' + PASSKEY_SVG +
+                '<div><div class="p1">Secured with</div><div class="p2">Passkey</div></div>' +
+              '</div>' +
             '</div>' +
           '</div>';
-        linkBtn.textContent = 'Waiting\u2026';
+        linkBtn.textContent = 'Cancel'; linkBtn.className = 'ghost'; linkBtn.disabled = false;
         for (var i = 0; i < 18; i++) { // ~6 min of 20s long-polls
           var s = await fetch('/api/agent/link/status?code=' + encodeURIComponent(j.code));
           var sj = await s.json();
+          if (run !== linkRun) return;
           if (sj.status === 'bound' && sj.token) {
             bindToken = sj.token; sessionStorage.setItem(LINK_KEY, bindToken);
             if (window.bsTrack) bsTrack('agent_linked');
@@ -205,11 +264,13 @@ export const agentHtml = `<!DOCTYPE html>
           if (sj.status === 'expired' || sj.status === 'denied') { add('sys', 'Link ' + sj.status + ' \u2014 try again.'); return; }
         }
         add('sys', 'Link timed out \u2014 try again.');
-      } catch (e) { add('sys', 'Link failed \u2014 try again.'); }
-      finally { linkPolling = false; linkBtn.disabled = false; renderLink(); }
+      } catch (e) { if (run === linkRun) add('sys', 'Link failed \u2014 try again.'); }
+      // A cancel bumps linkRun, so a superseded poll never repaints the strip.
+      finally { if (run === linkRun) { linkEl.classList.remove('linking'); linkBtn.disabled = false; renderLink(); } }
     }
     linkBtn.addEventListener('click', function() {
-      if (bindToken) { bindToken = null; sessionStorage.removeItem(LINK_KEY); renderLink(); add('sys', 'Unlinked.'); }
+      if (linkEl.classList.contains('linking')) { linkRun++; linkEl.classList.remove('linking'); linkBtn.disabled = false; renderLink(); }
+      else if (bindToken) { bindToken = null; sessionStorage.removeItem(LINK_KEY); renderLink(); add('sys', 'Unlinked.'); }
       else startLink();
     });
 

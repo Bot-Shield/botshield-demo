@@ -20,8 +20,7 @@ export const vapezHtml = `<!DOCTYPE html>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; background: #000; color: #fff; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
-    .page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
-    .top-spacer { flex-shrink: 0; height: 34px; }
+    .page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: 22px; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .header { display: flex; align-items: center; gap: 12px; }
     .header-mark { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #0ea5e9, #6366f1); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; letter-spacing: -.04em; }
     .header-brand { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
@@ -29,34 +28,35 @@ export const vapezHtml = `<!DOCTYPE html>
     .wrap { width: 100%; max-width: 430px; display: flex; flex-direction: column; gap: 16px; }
 
     /* ── Age wall ── */
-    .wall { background: #111; border: 1px solid #1f1f1f; border-radius: 18px; padding: 26px 22px; display: flex; flex-direction: column; gap: 14px; }
-    .wall-kicker { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #ffb547; display: flex; align-items: center; gap: 8px; }
-    .wall-kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: #ffb547; }
-    .wall h1 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
-    .wall p { font-size: 14.5px; line-height: 1.55; color: #a3a3a3; }
-    .wall p b { color: #e5e5e5; font-weight: 600; }
-    .wall-note { font-size: 12.5px; color: #6b6b6b; line-height: 1.5; }
-    .wall-note em { color: #c9c9c9; font-style: normal; }
+    .wall { background: #111418; border: 1px solid #22262f; border-radius: 16px; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .wall-kicker { font-family: 'Roboto Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #ff5d25; display: flex; align-items: center; gap: 8px; }
+    .wall-kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: #ff5d25; }
+    .wall h1 { font-size: 25px; font-weight: 600; letter-spacing: -.5px; line-height: 1.18; color: #f7f7f7; }
+    .wall p { font-size: 14px; line-height: 1.55; color: #94979c; }
+    .wall p b { color: #e6e8ea; font-weight: 600; }
+    .wall-note { font-size: 12.5px; color: #61656c; line-height: 1.5; }
+    .wall-note em { color: #94979c; font-style: normal; }
 
     /* ── Store (revealed after the gate) ── */
     .store { display: none; flex-direction: column; gap: 16px; }
     .store.open { display: flex; }
-    .store-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(0, 212, 146, 0.08); border: 1px solid rgba(0, 212, 146, 0.35); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
-    .store-banner b { color: #00d492; font-weight: 600; }
+    .store-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(35, 203, 120, .08); border: 1px solid rgba(35, 203, 120, .35); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
+    .store-banner b { color: #23cb78; font-weight: 600; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .item { background: #111; border: 1px solid #1f1f1f; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .item { background: #111418; border: 1px solid #22262f; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
     .item-art { height: 92px; border-radius: 10px; background: linear-gradient(160deg, #1b1f2a, #0f1117); display: flex; align-items: center; justify-content: center; font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .1em; color: #5b6070; }
     .item-name { font-size: 14px; font-weight: 600; }
-    .item-meta { font-size: 12px; color: #7a7a7a; }
+    .item-meta { font-size: 12px; color: #94979c; }
     .item-price { font-size: 14px; font-weight: 700; }
-    .item-btn { margin-top: 2px; padding: 9px 10px; border-radius: 9px; border: 1px solid #2a2a2a; background: #161616; color: #d4d4d4; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .item-btn:active { background: #202020; }
-    .legal { font-size: 11.5px; line-height: 1.5; color: #5b5b5b; text-align: center; padding: 0 8px; }
+    .item-btn { margin-top: 2px; padding: 9px 10px; border-radius: 10px; border: 1px solid #373a41; background: #17191c; color: #e6e8ea; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .item-btn:active { background: #262a30; }
+    .legal { font-size: 11.5px; line-height: 1.5; color: #61656c; text-align: center; padding: 0 8px; }
 
     /* ── Demo chrome (not part of the Vapez design) ── */
-    .demo-controls { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 30000; }
-    .demo-reset { background: rgba(26, 26, 26, 0.9); border: 1px solid #2a2a2a; border-radius: 8px; color: #c0c0c0; font-family: inherit; font-size: 12px; padding: 6px 10px; cursor: pointer; }
-    .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%) translateY(20px); background: #0f2a20; border: 1px solid rgba(0, 212, 146, 0.4); color: #e6fff5; padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 92vw; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 30001; text-align: center; }
+    .demo-controls { width: 100%; max-width: 430px; margin: 0 auto; display: flex; justify-content: center; gap: 8px; padding: 0 16px 20px; }
+    .demo-reset { background: transparent; border: 1px solid #262a30; border-radius: 999px; color: #61656c; font-family: 'Roboto Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 7px 13px; cursor: pointer; }
+    .demo-reset:hover { color: #94979c; border-color: #373a41; }
+    .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%) translateY(20px); background: #0f2a20; border: 1px solid rgba(35, 203, 120, .4); color: #e6fff5; padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 92vw; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 30001; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* The widget's verify card + component-owned continue button. */
@@ -65,7 +65,6 @@ export const vapezHtml = `<!DOCTYPE html>
 </head>
 <body>
   <div class="page">
-    <div class="top-spacer"></div>
     <div class="header">
       <div class="header-mark">V</div>
       <div>
@@ -105,12 +104,14 @@ export const vapezHtml = `<!DOCTYPE html>
         <p class="legal">WARNING: This product contains nicotine. Nicotine is an addictive chemical. Demo storefront &mdash; nothing is for sale.</p>
       </section>
     </div>
+
+    <!-- Demo chrome, not part of the Vapez design — kept off the storefront. -->
+    <div class="demo-controls">
+      <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
+      <button type="button" class="demo-reset" id="demoReset">Reset</button>
+    </div>
   </div>
 
-  <div class="demo-controls">
-    <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
-    <button type="button" class="demo-reset" id="demoReset">Reset</button>
-  </div>
   <div class="toast" id="toast"></div>
 
   <!-- ?sdk=next loads the prerelease widget (/next) for testing; default stays the stable /sdk.js. -->
