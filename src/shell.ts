@@ -45,7 +45,7 @@ export const DEMOS: DemoEntry[] = [
       ],
     } },
   // Via the worker's /salesforce redirect so the click-out is counted (same destination).
-  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent asks, a human answers', path: '/agent',
+  { key: 'agent', group: 'Ticketz', label: 'Agents Ask\u2122', hint: 'An agent asks, a human answers', path: '/agent',
     run: {
       line: 'The agent can ask. It cannot pay.',
       what: 'Claude runs the Ticketz tools through the BotShield gateway. It has no way to pay, so nothing starts without your yes.',
@@ -128,6 +128,8 @@ export function shellHtml(): string {
     .it:hover { color: var(--ink); background: #14161b; }
     .it.on { color: var(--ink); background: #15191f; border-color: #242a33; }
     .it-l { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    /* the filed mark sits small and high, never at label size */
+    .tm { font-size: .62em; vertical-align: .5em; letter-spacing: 0; font-weight: 500; }
     .it-h { font-size: 12px; color: var(--faint); }
     .ext { font-size: 12px; color: var(--faint); }
     .plat { font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid #2a2e36; background: #14161b; border-radius: 999px; padding: 1px 7px; }
