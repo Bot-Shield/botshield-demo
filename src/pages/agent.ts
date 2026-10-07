@@ -160,7 +160,7 @@ export const agentHtml = `<!DOCTYPE html>
     <div class="chat">
       <div class="status" id="status"><span class="dot"></span><span id="statusText">Connecting&hellip;</span></div>
       <div class="link" id="link">
-        <span class="l" id="linkText"><b>Link your BotShield ID</b> &mdash; so a purchase can be sent to <i>your</i> phone.</span>
+        <span class="l" id="linkText"><b>Link with BotShield</b> &mdash; so only the agents you allow can ask.</span>
         <button type="button" id="linkBtn">Link</button>
       </div>
       <div class="log" id="log">
@@ -204,11 +204,11 @@ export const agentHtml = `<!DOCTYPE html>
     function renderLink() {
       if (bindToken) {
         linkEl.classList.add('bound');
-        linkText.innerHTML = '<b>BotShield ID linked.</b> Purchases go to your phone for approval.';
+        linkText.innerHTML = '<b>Linked with BotShield.</b> This agent can ask now \u2014 every request waits for your yes.';
         linkBtn.textContent = 'Unlink'; linkBtn.className = 'ghost';
       } else {
         linkEl.classList.remove('bound');
-        linkText.innerHTML = '<b>Link your BotShield ID</b> \u2014 so a purchase can be sent to <i>your</i> phone.';
+        linkText.innerHTML = '<b>Link with BotShield</b> \u2014 so only the agents you allow can ask.';
         linkBtn.textContent = 'Link'; linkBtn.className = '';
       }
     }

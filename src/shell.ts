@@ -56,7 +56,7 @@ export const DEMOS: DemoEntry[] = [
       ],
       cta: { label: 'Open BotShield', sub: 'You answer the request there' },
     } },
-  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
+  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
     run: {
       line: 'Signing in proves the password. It never proved the person.',
       what: 'Ticketz knows the address. It cannot tell whether these four are four people or one.',
@@ -259,8 +259,9 @@ export function shellHtml(): string {
       .rail .it.on { background: none; }
       .rail .it-l { font-size: 20px; font-weight: 600; color: var(--muted); }
       .rail .it.on .it-l { color: var(--ink); }
-      /* The hints crowd the menu at this size — they belong to the desktop rail. */
-      .rail .it-h { display: none; }
+      /* Three rows read "Human Gate" — the hint is the only thing that tells
+         them apart, so it is load-bearing here, not decoration. */
+      .rail .it-h { display: block; font-size: 13px; line-height: 1.35; color: var(--faint); margin-top: 2px; }
       .rail .spacer { display: none; }
       .rail .foot { margin-top: 10px; padding-top: 22px; }
       .rail .foot a { font-size: 15px; padding: 7px 0; }
