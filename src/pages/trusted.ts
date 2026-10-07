@@ -49,6 +49,7 @@ export const trustedHtml = `<!DOCTYPE html>
 
     /* ── Switcher between the visitor's demo accounts ── */
     .switch { display: flex; gap: 8px; flex-wrap: wrap; }
+    .switch:empty { display: none; }
     .chip { font-family: inherit; font-size: 12.5px; font-weight: 600; color: #94979c; background: #111418; border: 1px solid #22262f; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
     .chip.on { color: #fff; border-color: #373a41; background: #262a30; }
     .chip.add { color: #94979c; border-style: dashed; }
@@ -179,6 +180,7 @@ export const trustedHtml = `<!DOCTYPE html>
     // Deliberately one person's alts. Ticketz cannot tell them apart today; what
     // changes after securing is the cost of keeping them all trusted at once.
     // Two accounts make the whole point. A third is just more email to read.
+    var MAX_ACCOUNTS = 2;
     var ALTS = ['jordan.reyes', 'j.reyes91'];
     function newAccount(i) {
       var mail = ALTS[Math.min(ALTS.length - 1, i || 0)] + '@example.com';
@@ -188,6 +190,10 @@ export const trustedHtml = `<!DOCTYPE html>
       try {
         var s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
         if (s && Array.isArray(s.accounts) && s.accounts.length) {
+          // A browser that used the demo when it allowed three accounts still
+          // has three in storage; the cap only ever stopped new ones. Trim on
+          // read, or the switcher keeps showing a row of near-identical emails.
+          if (s.accounts.length > MAX_ACCOUNTS) s.accounts = s.accounts.slice(0, MAX_ACCOUNTS);
           // The active index was never validated. One that is missing or past
           // the end of the array handed acct() undefined, which threw on the
           // first line of render() — so the card kept its placeholder and read
@@ -257,15 +263,18 @@ export const trustedHtml = `<!DOCTYPE html>
       document.getElementById('signInAgain').classList.toggle('on', !showWidget);
       var sw = document.getElementById('switch');
       sw.innerHTML = '';
+      // Only the accounts you are NOT on. The one you are signed into is the
+      // card above — printing it again as a chip was the same email twice.
       state.accounts.forEach(function(x, i) {
+        if (i === state.active) return;
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'chip' + (i === state.active ? ' on' : '');
-        b.textContent = x.name + (x.secured ? ' \\u2713' : '');
+        b.className = 'chip';
+        b.textContent = 'Switch to ' + x.name + (x.secured ? ' \\u2713' : '');
         b.addEventListener('click', function() { switchTo(i); });
         sw.appendChild(b);
       });
-      if (state.accounts.length < 2) {
+      if (state.accounts.length < MAX_ACCOUNTS) {
         var add = document.createElement('button');
         add.type = 'button';
         add.className = 'chip add';
