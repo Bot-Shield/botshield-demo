@@ -56,11 +56,11 @@ export const DEMOS: DemoEntry[] = [
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
     run: {
       line: 'One account per human.',
-      what: 'An account bound to a person, not a password. The same human cannot quietly hold a hundred of them.',
+      what: 'An account bound to a person, not a password \u2014 and the proof that the same human cannot quietly hold a second one.',
       steps: [
-        'Pick a provider and link the account.',
-        'Confirm it with a passkey.',
-        'The account carries a notarised link. Change the credential and the link breaks \u2014 by design.',
+        'You already have a Ticketz account. Tap <b>Secure your account with BotShield</b>.',
+        'A passkey confirms it. Ticketz gets a yes and a per-platform handle \u2014 no email, no name, no device.',
+        'Now tap <b>+ Second account</b> and try to secure that one too. Same human, so it is refused \u2014 which is the whole promise.',
       ],
     } },
   { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',

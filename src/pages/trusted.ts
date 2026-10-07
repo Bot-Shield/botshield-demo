@@ -39,19 +39,19 @@ export const trustedHtml = `<!DOCTYPE html>
     /* ── Account card ── */
     .kicker { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6b6b6b; }
     .acct { background: #111; border: 1px solid #1f1f1f; border-radius: 18px; padding: 18px; display: flex; align-items: center; gap: 14px; }
-    .avatar { width: 48px; height: 48px; border-radius: 50%; background: #17191c; border: 1px solid #373a41; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #a78bfa; font-size: 16px; flex-shrink: 0; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: #17191c; border: 1px solid #373a41; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #94979c; font-size: 16px; flex-shrink: 0; }
     .acct-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
     .acct-name { font-size: 17px; font-weight: 600; }
-    .acct-id { font-family: 'Roboto Mono', monospace; font-size: 11px; color: #6b6b6b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acct-id { font-family: 'Roboto Mono', monospace; font-size: 11px; color: #61656c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .secured { display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #00d492; border: 1px solid rgba(0, 212, 146, .4); background: rgba(0, 212, 146, .08); border-radius: 999px; padding: 5px 10px; white-space: nowrap; }
     .secured.on { display: inline-flex; }
     .secured svg { width: 13px; height: 13px; }
 
     /* ── Switcher between the visitor's demo accounts ── */
     .switch { display: flex; gap: 8px; flex-wrap: wrap; }
-    .chip { font-family: inherit; font-size: 12.5px; font-weight: 600; color: #bdbdbd; background: #111; border: 1px solid #262626; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+    .chip { font-family: inherit; font-size: 12.5px; font-weight: 600; color: #94979c; background: #111418; border: 1px solid #22262f; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
     .chip.on { color: #fff; border-color: #373a41; background: #262a30; }
-    .chip.add { color: #a78bfa; border-style: dashed; }
+    .chip.add { color: #94979c; border-style: dashed; }
 
     /* ── Secure panel ── */
     .panel { display: flex; flex-direction: column; gap: 12px; }
