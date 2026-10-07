@@ -53,16 +53,12 @@ export const trustedHtml = `<!DOCTYPE html>
     .chip.on { color: #fff; border-color: #373a41; background: #262a30; }
     .chip.add { color: #94979c; border-style: dashed; }
 
-    /* ── Secure panel ── */
-    .panel { display: flex; flex-direction: column; gap: 12px; }
-    .panel h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
-    .panel h1:empty { display: none; }
-    .moment { display: none; flex-direction: column; gap: 10px; padding: 4px 2px 2px; }
-    .moment.on { display: flex; }
-    .moment-eyebrow { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #5fb6e8; }
-    .moment h2 { font-size: 30px; font-weight: 700; letter-spacing: -.025em; line-height: 1.1; }
-    .moment p { font-size: 15px; line-height: 1.5; color: #a3a3a3; padding: 0; }
-    .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; padding: 0 2px; }
+    /* ── Security section ── the same card as .acct, so the page reads as two
+       labelled sections of a settings page rather than a brochure panel. */
+    .panel { background: #111; border: 1px solid #1f1f1f; border-radius: 18px; padding: 18px;
+             display: flex; flex-direction: column; gap: 10px; }
+    .panel h2 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; line-height: 1.3; }
+    .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; }
     .panel p b { color: #e5e5e5; font-weight: 600; }
     botshield-verify { display: block; width: 100%; }
     /* The widget's checkout button ships #7f56d9. It declares that on the button
@@ -93,12 +89,12 @@ export const trustedHtml = `<!DOCTYPE html>
     .note ol { margin: 8px 0 0 18px; }
     .note li { margin: 3px 0; }
 
-    .how { font-size: 12.5px; line-height: 1.55; color: #6b6b6b; text-align: center; padding: 0 6px; }
-    .how b { color: #9a9a9a; font-weight: 600; }
-
     /* ── Demo chrome (not part of the Ticketz design) ── */
-    .demo-controls { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 30000; }
-    .demo-reset { background: rgba(26, 26, 26, 0.9); border: 1px solid #2a2a2a; border-radius: 8px; color: #c0c0c0; font-family: inherit; font-size: 12px; padding: 6px 10px; cursor: pointer; }
+    .demo-controls { width: 100%; max-width: 430px; display: flex; justify-content: center; gap: 8px; padding: 4px 16px 0; }
+    .demo-reset { background: transparent; border: 1px solid #262a30; border-radius: 999px; color: #61656c;
+                  font-family: 'Roboto Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+                  padding: 7px 13px; cursor: pointer; }
+    .demo-reset:hover { color: #94979c; border-color: #373a41; }
     .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%) translateY(20px); background: #0f2a20; border: 1px solid rgba(0, 212, 146, 0.4); color: #e6fff5; padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 92vw; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 30001; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -112,7 +108,7 @@ export const trustedHtml = `<!DOCTYPE html>
     </div>
 
     <div class="wrap">
-      <div class="kicker">Signed in to Ticketz</div>
+      <div class="kicker">Account</div>
       <div class="acct">
         <div class="avatar" id="avatar">G</div>
         <div class="acct-who">
@@ -123,16 +119,13 @@ export const trustedHtml = `<!DOCTYPE html>
       </div>
       <div class="switch" id="switch"></div>
 
+      <div class="kicker">Security</div>
       <section class="panel">
-        <h1 id="panelTitle"></h1>
-        <!-- The page owns the moment (eyebrow · heading · body); the SDK renders only the
-             Link BotShield ID button (Paul + Devrin, 2026-09-29; Figma moment cards = examples). -->
-        <div class="moment" id="moment">
-          <div class="moment-eyebrow">A real person behind this account</div>
-          <h2>Secure your account with BotShield</h2>
-          <p>One tap, and Ticketz knows a real person runs this account. Never who.</p>
-        </div>
-        <p id="panelBody">Link this Ticketz account with <b>BotShield</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.</p>
+        <!-- The page owns the copy; the SDK renders only the Link BotShield ID
+             button (Paul + Devrin, 2026-09-29). One block, two states — the
+             moment/panelTitle pair said the same thing twice. -->
+        <h2 id="panelH">Secure your account with BotShield</h2>
+        <p id="panelBody">One tap, and Ticketz can confirm a person runs this account. <b>Never your name.</b></p>
         <botshield-verify
           site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
           scope="ticketz_account"
@@ -152,13 +145,11 @@ export const trustedHtml = `<!DOCTYPE html>
       <div class="note info" id="noteUnlinked"><b>Unlinked.</b> This Ticketz account is no longer secured with BotShield &mdash; you unlinked it in the BotShield app, or Ticketz revoked it. Link it again any time.</div>
       <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Trusted Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
 
-      <p class="how"><b>What you&rsquo;re watching:</b> the BotShield Gate widget with Trusted Accounts on, against production. The tap hands off to the BotShield app; your passkey confirms. Ticketz receives a yes and a per-platform handle &mdash; no email, no name, no device ID.</p>
     </div>
-  </div>
-
-  <div class="demo-controls">
-    <button type="button" class="demo-reset" id="demoHowReset">How to reset</button>
-    <button type="button" class="demo-reset" id="demoStartOver">Start over</button>
+    <div class="demo-controls">
+      <button type="button" class="demo-reset" id="demoHowReset">How to reset</button>
+      <button type="button" class="demo-reset" id="demoStartOver">Start over</button>
+    </div>
   </div>
   <div class="toast" id="toast"></div>
 
@@ -225,20 +216,18 @@ export const trustedHtml = `<!DOCTYPE html>
     });
 
     /** The button-only widget (3.0.2+) renders no card: the page owns the moment. */
-    var PAGE_OWNS_MOMENT = true;
-
     function render() {
       var a = acct();
       document.getElementById('acctName').textContent = a.name;
       document.getElementById('acctId').textContent = 'Signed in \u00b7 ' + a.ref;
       document.getElementById('avatar').textContent = a.name.slice(0, 1).toUpperCase();
       document.getElementById('secured').classList.toggle('on', !!a.secured);
-      document.getElementById('panelTitle').textContent = a.secured ? 'Secured by BotShield' : '';
-      document.getElementById('moment').classList.toggle('on', PAGE_OWNS_MOMENT && !a.secured);
-      document.getElementById('panelBody').style.display = PAGE_OWNS_MOMENT && !a.secured ? 'none' : '';
+      document.getElementById('panelH').textContent = a.secured
+        ? 'Secured with BotShield'
+        : 'Secure your account with BotShield';
       document.getElementById('panelBody').innerHTML = a.secured
-        ? 'This Ticketz account is linked with <b>BotShield</b>. Ticketz knows a real human stands behind it &mdash; <b>never who</b>. Come back any time: your next pass says so.'
-        : 'Link this Ticketz account with <b>BotShield</b>. Ticketz learns a real person is behind it &mdash; <b>never who</b>.';
+        ? 'Ticketz can confirm a real person runs this account &mdash; <b>never your name</b>. Come back any time: your next pass says so.'
+        : 'One tap, and Ticketz can confirm a person runs this account. <b>Never your name.</b>';
       var showWidget = !a.secured || returning;
       bsVerify.classList.toggle('hide', !showWidget);
       document.getElementById('signInAgain').classList.toggle('on', !showWidget);
