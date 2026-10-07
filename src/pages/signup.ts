@@ -138,12 +138,12 @@ export const signupHtml = `<!DOCTYPE html>
           </div>
         </div>
 
-        <p class="legal">One account per human. That is the whole rule here.</p>
+        <p class="legal">Making an account here takes a person.</p>
         <p class="alt">Already on Commons? <a href="#">Log in</a></p>
       </section>
 
       <section class="feed" id="feed">
-        <div class="welcome"><b>You’re on Commons.</b> Every account in this feed is one human. Including yours.</div>
+        <div class="welcome"><b>You’re on Commons.</b> Every account in this feed got past that check. Including yours.</div>
         <div class="feed-k">Your feed</div>
 
         <div class="post me">

@@ -22,14 +22,14 @@ export interface DemoEntry {
 }
 
 export const DEMOS: DemoEntry[] = [
-  { key: 'signup', group: 'Commons', label: 'Human Gate', hint: 'At sign-up \u00b7 one account per human', path: '/signup',
+  { key: 'signup', group: 'Commons', label: 'Human Gate', hint: 'At sign-up \u00b7 a person has to be there', path: '/signup',
     run: {
       line: 'A feed is only worth reading if the people in it are people.',
       what: 'A script fills all four in a second, and again tomorrow under another name. The Gate is the one it cannot.',
       steps: [
         'Tap <b>Verify you\u2019re human</b>.',
         'A passkey answers it. No new account, no second password.',
-        'You land in the feed. Every account in it is one person.',
+        'You land in the feed. Every account in it got past the same check.',
       ],
     } },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: 'At the door \u00b7 18+ to enter', path: '/vapez', platforms: ['iOS', 'Android'],
