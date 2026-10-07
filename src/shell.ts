@@ -42,6 +42,16 @@ export const DEMOS: DemoEntry[] = [
         'Approve it with a passkey. The agent finishes with a signed Proof of Resolution \u2014 never your card.',
       ],
     } },
+  { key: 'signup', group: 'Ticketz', label: 'Sign up', hint: 'A human on account creation', path: '/signup',
+    run: {
+      line: 'A form says who you claim to be. Nothing in it says you are there.',
+      what: 'Name, email, password, date of birth \u2014 every field is something a script can type. The Gate is the only one that cannot be.',
+      steps: [
+        'The form is already filled in. Tap <b>Verify you\u2019re human</b>.',
+        'A passkey on this device answers it. No new account, no second password.',
+        'The account is created with one thing added: a human was here. Never who.',
+      ],
+    } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
     run: {
       line: 'One account per human.',
@@ -124,11 +134,19 @@ export function shellHtml(): string {
        composition as the app's web rail. Phone: it IS the screen. */
     .frame { flex: 1; min-height: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; gap: 28px; padding: 28px 24px; }
     /* The phone is the iframe. The sell lives beside it, where the real pixels are. */
-    .runpanel { display: none; width: 340px; flex-shrink: 0; flex-direction: column; justify-content: center; gap: 16px;
+    .runpanel { display: none; width: 360px; flex-shrink: 0; flex-direction: column; justify-content: center; gap: 13px;
                 background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 30px 24px; }
-    .rp-mark { width: 128px; height: auto; align-self: center; }
-    .rp-h { font-size: 25px; font-weight: 600; letter-spacing: -.4px; color: #fff; text-align: center; margin: 0; }
-    .rp-s { font-size: 13px; line-height: 19px; color: #94979c; text-align: center; margin: 0; }
+    .rp-mark { width: 96px; height: auto; align-self: center; margin-bottom: 2px; }
+    /* Names the demo you are in, so the panel answers "where am I" before
+       it answers "what do I do". */
+    .rp-eyebrow { align-self: center; font-family: 'Roboto Mono', monospace; font-size: 9px;
+                  letter-spacing: .18em; text-transform: uppercase; color: var(--faint);
+                  border: 1px solid #22262f; border-radius: 999px; padding: 5px 11px; margin: 0; }
+    .rp-h { font-size: 29px; line-height: 33px; font-weight: 600; letter-spacing: -.9px; color: #fff;
+            text-align: center; margin: 0; text-wrap: balance; }
+    /* A measure, so the sell never runs the full width of the column. */
+    .rp-s { font-size: 13.5px; line-height: 20px; color: #94979c; text-align: center; margin: 0 auto;
+            max-width: 34ch; text-wrap: pretty; }
     .rp-steps { display: flex; flex-direction: column; gap: 10px; margin: 2px 0; padding-top: 14px; border-top: 1px solid #22262f; }
     .rp-steps .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #61656c; }
     .rp-step { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 18px; color: #94979c; }
@@ -171,8 +189,8 @@ export function shellHtml(): string {
       .runpanel { display: flex; width: 100%; max-width: 460px; flex-shrink: 0; }
       .bezel { height: auto; max-height: none; flex-shrink: 0; }
       .frame iframe { height: 740px; max-height: none; }
-      .rp-mark { width: 84px; }
-      .rp-h { font-size: 21px; }
+      .rp-mark { width: 80px; }
+      .rp-h { font-size: 25px; line-height: 29px; letter-spacing: -.7px; }
     }
     .bezel { flex-shrink: 0; height: 100%; max-height: 900px; padding: 11px; border-radius: 42px; background: #15181c;
              border: 1.5px solid #454a52; box-shadow: 0 28px 64px -10px rgba(0,0,0,.7); box-sizing: border-box; display: flex; }
@@ -280,6 +298,7 @@ export function shellHtml(): string {
       <div class="frame">
         <aside class="runpanel" id="runpanel" aria-label="Run this demo">
           <svg class="rp-mark" aria-hidden="true" viewBox="0 0 33 35.6743" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Group"> <path id="Vector" d="M32.4713 6.64943C32.4499 6.54586 32.4033 6.4492 32.3355 6.36805C32.2677 6.28689 32.1808 6.22378 32.0827 6.18433L16.7357 0.0430144C16.5838 -0.0143381 16.4162 -0.0143381 16.2643 0.0430144L0.91728 6.18433C0.819167 6.22378 0.73234 6.28689 0.664537 6.36805C0.596735 6.4492 0.550064 6.54586 0.528686 6.64943C-2.01959 18.5945 4.86076 31.1638 16.5 35.6743C28.1392 31.1702 35.0196 18.5945 32.4713 6.64943ZM16.5 32.4889C6.93759 28.8385 1.28684 18.4925 3.37002 8.69438C3.39235 8.59122 3.43938 8.49501 3.50706 8.41401C3.57474 8.33301 3.66106 8.26964 3.75862 8.22934L16.2643 3.22839C16.4162 3.17104 16.5838 3.17104 16.7357 3.22839L29.2414 8.22937C29.339 8.26968 29.4253 8.33304 29.493 8.41404C29.5606 8.49504 29.6077 8.59125 29.63 8.69441C31.7132 18.4925 26.0624 28.8385 16.5 32.4889Z" fill="#1A9FD6"/> <path id="Vector_2" d="M13.91 17.2172C14.329 17.2174 14.6691 17.5573 14.6691 17.9764C14.6691 18.3955 14.3291 18.7353 13.91 18.7355C13.4907 18.7355 13.1508 18.3956 13.1508 17.9764C13.1509 17.5571 13.4907 17.2172 13.91 17.2172Z" fill="#1A9FD6"/> <path id="Vector_3" d="M19.0853 17.2172C19.5046 17.2172 19.8445 17.5571 19.8445 17.9764C19.8445 18.3956 19.5046 18.7355 19.0853 18.7355C18.6662 18.7354 18.3262 18.3956 18.3262 17.9764C18.3262 17.5572 18.6662 17.2174 19.0853 17.2172Z" fill="#1A9FD6"/> <path id="Vector_4" fill-rule="evenodd" clip-rule="evenodd" d="M16.4811 8.96938C17.0943 8.96941 17.5912 9.39546 17.5912 9.92102C17.5912 10.3007 17.3316 10.6277 16.9565 10.7804V11.8243H17.7944C18.2807 11.8243 18.6753 12.2189 18.6753 12.7052C18.6753 12.7293 18.6737 12.7532 18.6717 12.7768H19.4945C21.6385 12.7768 23.4703 14.1068 24.2142 15.9863C24.28 15.974 24.348 15.9675 24.4174 15.9675C25.0272 15.9675 25.5221 16.4623 25.5221 17.0722C25.5219 17.6337 25.1023 18.0955 24.5597 18.1653C24.3979 20.8226 22.1925 22.9279 19.4945 22.9279H13.4677C10.7697 22.9279 8.56335 20.8226 8.40158 18.1653C7.85937 18.0952 7.44026 17.6334 7.44009 17.0722C7.44009 16.4625 7.93426 15.9677 8.54392 15.9675C8.6132 15.9675 8.6814 15.9741 8.74714 15.9863C9.49094 14.1066 11.3236 12.7768 13.4677 12.7768H14.3307C14.3288 12.7532 14.3272 12.7293 14.3272 12.7052C14.3272 12.2191 14.7211 11.8245 15.2072 11.8243H16.0048V10.7796C15.6302 10.6267 15.371 10.3004 15.371 9.92102C15.371 9.39544 15.8679 8.96938 16.4811 8.96938ZM13.3093 15.3148C11.8201 15.3148 10.6128 16.5221 10.6128 18.0113C10.6132 19.5001 11.8203 20.7068 13.3093 20.7068H19.6538C21.1426 20.7067 22.3498 19.5 22.3503 18.0113C22.3503 16.5222 21.1429 15.315 19.6538 15.3148H13.3093Z" fill="#1A9FD6"/> </g> </svg>
+          <p class="rp-eyebrow" id="rpEyebrow"></p>
           <h2 class="rp-h" id="rpH">Live Demo is Ready</h2>
           <p class="rp-s" id="rpS"></p>
           <div class="rp-steps" id="rpSteps"></div>
@@ -308,6 +327,7 @@ export function shellHtml(): string {
         frame.setAttribute('data-key', d.key);
       }
       var rpH = document.getElementById('rpH'), rpS = document.getElementById('rpS'), rpSteps = document.getElementById('rpSteps');
+      document.getElementById('rpEyebrow').textContent = d.group + ' \u00b7 ' + d.label;
       if (d.run) {
         rpH.textContent = d.run.line;
         rpS.innerHTML = d.run.what;
