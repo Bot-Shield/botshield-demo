@@ -163,42 +163,17 @@ export function shellHtml(): string {
     .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
     @media (min-width: 1100px) { .runpanel { display: flex; } }
 
-    /* Under the two-column width the sell becomes a sheet you raise, not a
-       slab below the fold nobody scrolls to. The trigger doubles as the
-       progress read-out, so the payoff is visible without opening it. */
-    .rp-trigger { display: none; position: fixed; left: 50%; transform: translateX(-50%);
-                  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); z-index: 60;
-                  align-items: center; gap: 9px; max-width: calc(100vw - 32px);
-                  background: rgba(17, 20, 24, .92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-                  border: 1px solid #373a41; border-radius: 999px; padding: 11px 18px;
-                  color: #e6e8ea; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
-                  box-shadow: 0 12px 32px -8px rgba(0,0,0,.8); }
-    .rp-trigger b { font-weight: 600; color: #fff; }
-    .rp-trigger .rpt-dot { width: 7px; height: 7px; border-radius: 50%; background: #1a9fd6; flex: none; }
-    .rp-trigger.done .rpt-dot { background: #23cb78; }
-    .rp-trigger .rpt-x { color: #61656c; font-size: 15px; line-height: 1; }
-    .rp-scrim { display: none; position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,.6);
-                opacity: 0; transition: opacity .22s ease; }
-    .rp-scrim.show { opacity: 1; }
-
+    /* Below the two-column width the instructions stack ABOVE the demo, so
+       they are read before anyone scrolls down to run it. */
     @media (max-width: 1099px) {
-      .rp-trigger { display: flex; }
-      .rp-scrim { display: block; pointer-events: none; }
-      .rp-scrim.show { pointer-events: auto; }
-      .runpanel { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 56;
-                  width: 100%; max-width: none; margin: 0; border-radius: 20px 20px 0 0;
-                  border-left: 0; border-right: 0; border-bottom: 0;
-                  max-height: 86dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
-                  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 78px);
-                  transform: translateY(101%); transition: transform .26s cubic-bezier(.32,.72,0,1); }
-      .runpanel.open { transform: none; }
+      .frame { flex-direction: column; align-items: center; justify-content: flex-start;
+               overflow-y: auto; gap: 18px; padding: 18px 16px 28px; }
+      .runpanel { display: flex; width: 100%; max-width: 460px; flex-shrink: 0; }
+      .bezel { height: auto; max-height: none; flex-shrink: 0; }
+      .frame iframe { height: 740px; max-height: none; }
       .rp-mark { width: 84px; }
       .rp-h { font-size: 21px; }
-      .rp-grab { display: block; width: 36px; height: 4px; border-radius: 2px; background: #373a41;
-                 margin: -12px auto 2px; flex: none; }
     }
-    .rp-grab { display: none; }
-    @media (prefers-reduced-motion: reduce) { .runpanel { transition: none; } .rp-scrim { transition: none; } }
     .bezel { flex-shrink: 0; height: 100%; max-height: 900px; padding: 11px; border-radius: 42px; background: #15181c;
              border: 1.5px solid #454a52; box-shadow: 0 28px 64px -10px rgba(0,0,0,.7); box-sizing: border-box; display: flex; }
     .frame iframe { width: 430px; max-width: 100%; height: 100%; border: 1px solid #23262c; border-radius: 32px; display: block; background: #08090b; }
@@ -226,7 +201,6 @@ export function shellHtml(): string {
       .rail .foot a { font-size: 15px; padding: 7px 0; }
       .rail .pill { margin: 10px 0 0; }
       /* The run-panel pill must not sit on top of the open menu. */
-      body.menu-open .rp-trigger { display: none; }
       /* The site's own header, to the letter (botshield.ai .topbar/.mlogo/.burger).
          The only change: the word is Demo, and the mark carries BotShield. */
       .top { display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -238,11 +212,11 @@ export function shellHtml(): string {
       .top .menu { display: flex; flex-direction: column; gap: 4px; padding: 8px; background: none; border: 0; cursor: pointer; }
       .top .menu span { width: 22px; height: 2px; background: #f4f5f7; border-radius: 2px; display: block; }
       .crumb { display: none; }
-      .frame { padding: 0; gap: 0; }
+      .frame { padding: 16px 0 0; gap: 16px; }
       .bezel { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; max-height: none; width: 100%; }
       /* The demo still owns the first screen; the sell sits one scroll below. */
       .frame iframe { width: 100%; height: calc(100dvh - 52px - env(safe-area-inset-top, 0px)); max-height: none; border: 0; border-radius: 0; box-shadow: none; }
-      .runpanel { padding-left: 20px; padding-right: 20px; }
+      .runpanel { border-radius: 0; border-left: 0; border-right: 0; max-width: none; padding-left: 20px; padding-right: 20px; }
       .rail .close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 14px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: #14161b; color: var(--ink); display: flex; align-items: center; justify-content: center; }
     }
     @media (min-width: 768px) { .rail .close { display: none; } }
@@ -304,13 +278,7 @@ export function shellHtml(): string {
       </div>
       <div class="crumb"><span>Demos</span><span class="sep">&middot;</span><b id="crumbGroup"></b><span class="sep">&middot;</span><span id="crumbLabel"></span><span class="right" id="crumbHint"></span></div>
       <div class="frame">
-        <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
-        <div class="rp-scrim" id="rpScrim"></div>
-        <button type="button" class="rp-trigger" id="rpTrigger" aria-expanded="false" aria-controls="runpanel">
-          <span class="rpt-dot"></span><span id="rptLabel">How to run it</span>
-        </button>
         <aside class="runpanel" id="runpanel" aria-label="Run this demo">
-          <span class="rp-grab" aria-hidden="true"></span>
           <svg class="rp-mark" aria-hidden="true" viewBox="0 0 33 35.6743" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Group"> <path id="Vector" d="M32.4713 6.64943C32.4499 6.54586 32.4033 6.4492 32.3355 6.36805C32.2677 6.28689 32.1808 6.22378 32.0827 6.18433L16.7357 0.0430144C16.5838 -0.0143381 16.4162 -0.0143381 16.2643 0.0430144L0.91728 6.18433C0.819167 6.22378 0.73234 6.28689 0.664537 6.36805C0.596735 6.4492 0.550064 6.54586 0.528686 6.64943C-2.01959 18.5945 4.86076 31.1638 16.5 35.6743C28.1392 31.1702 35.0196 18.5945 32.4713 6.64943ZM16.5 32.4889C6.93759 28.8385 1.28684 18.4925 3.37002 8.69438C3.39235 8.59122 3.43938 8.49501 3.50706 8.41401C3.57474 8.33301 3.66106 8.26964 3.75862 8.22934L16.2643 3.22839C16.4162 3.17104 16.5838 3.17104 16.7357 3.22839L29.2414 8.22937C29.339 8.26968 29.4253 8.33304 29.493 8.41404C29.5606 8.49504 29.6077 8.59125 29.63 8.69441C31.7132 18.4925 26.0624 28.8385 16.5 32.4889Z" fill="#1A9FD6"/> <path id="Vector_2" d="M13.91 17.2172C14.329 17.2174 14.6691 17.5573 14.6691 17.9764C14.6691 18.3955 14.3291 18.7353 13.91 18.7355C13.4907 18.7355 13.1508 18.3956 13.1508 17.9764C13.1509 17.5571 13.4907 17.2172 13.91 17.2172Z" fill="#1A9FD6"/> <path id="Vector_3" d="M19.0853 17.2172C19.5046 17.2172 19.8445 17.5571 19.8445 17.9764C19.8445 18.3956 19.5046 18.7355 19.0853 18.7355C18.6662 18.7354 18.3262 18.3956 18.3262 17.9764C18.3262 17.5572 18.6662 17.2174 19.0853 17.2172Z" fill="#1A9FD6"/> <path id="Vector_4" fill-rule="evenodd" clip-rule="evenodd" d="M16.4811 8.96938C17.0943 8.96941 17.5912 9.39546 17.5912 9.92102C17.5912 10.3007 17.3316 10.6277 16.9565 10.7804V11.8243H17.7944C18.2807 11.8243 18.6753 12.2189 18.6753 12.7052C18.6753 12.7293 18.6737 12.7532 18.6717 12.7768H19.4945C21.6385 12.7768 23.4703 14.1068 24.2142 15.9863C24.28 15.974 24.348 15.9675 24.4174 15.9675C25.0272 15.9675 25.5221 16.4623 25.5221 17.0722C25.5219 17.6337 25.1023 18.0955 24.5597 18.1653C24.3979 20.8226 22.1925 22.9279 19.4945 22.9279H13.4677C10.7697 22.9279 8.56335 20.8226 8.40158 18.1653C7.85937 18.0952 7.44026 17.6334 7.44009 17.0722C7.44009 16.4625 7.93426 15.9677 8.54392 15.9675C8.6132 15.9675 8.6814 15.9741 8.74714 15.9863C9.49094 14.1066 11.3236 12.7768 13.4677 12.7768H14.3307C14.3288 12.7532 14.3272 12.7293 14.3272 12.7052C14.3272 12.2191 14.7211 11.8245 15.2072 11.8243H16.0048V10.7796C15.6302 10.6267 15.371 10.3004 15.371 9.92102C15.371 9.39544 15.8679 8.96938 16.4811 8.96938ZM13.3093 15.3148C11.8201 15.3148 10.6128 16.5221 10.6128 18.0113C10.6132 19.5001 11.8203 20.7068 13.3093 20.7068H19.6538C21.1426 20.7067 22.3498 19.5 22.3503 18.0113C22.3503 16.5222 21.1429 15.315 19.6538 15.3148H13.3093Z" fill="#1A9FD6"/> </g> </svg>
           <h2 class="rp-h" id="rpH">Live Demo is Ready</h2>
           <p class="rp-s" id="rpS"></p>
@@ -322,6 +290,7 @@ export function shellHtml(): string {
           </div>
           <p class="rp-trust">Built on passkeys &middot; FIDO Alliance member</p>
         </aside>
+        <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
       </div>
     </div>
   </div>
@@ -348,14 +317,10 @@ export function shellHtml(): string {
         rpSteps.style.display = '';
         markStep(0);
         showResult(null);
-        stepCount = d.run.steps.length; stepDone = 0; lastResult = null;
-        setSheet(false); syncTrigger();
       } else {
         rpH.textContent = 'Live Demo is Ready';
         rpS.textContent = 'Open the web app and a passkey answers the check, right in the browser.';
         rpSteps.style.display = 'none';
-        stepCount = 0; stepDone = 0; lastResult = null;
-        setSheet(false); syncTrigger();
       }
       document.getElementById('crumbGroup').textContent = d.group;
       document.getElementById('crumbLabel').textContent = d.label;
@@ -393,39 +358,13 @@ export function shellHtml(): string {
                      (r.note ? '<div class="n">' + r.note + '</div>' : '');
       el.classList.add('on');
     }
-    // The sheet lives in the shell, not the demo — only the shell sees the
-    // real viewport, and only it can cover the whole screen.
-    var panel = document.getElementById('runpanel');
-    var scrim = document.getElementById('rpScrim');
-    var trigger = document.getElementById('rpTrigger');
-    var rptLabel = document.getElementById('rptLabel');
-    function setSheet(open) {
-      panel.classList.toggle('open', open);
-      scrim.classList.toggle('show', open);
-      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      trigger.querySelector('.rpt-x') && trigger.querySelector('.rpt-x').remove();
-      if (open) { var x = document.createElement('span'); x.className = 'rpt-x'; x.textContent = '\u2715'; trigger.appendChild(x); }
-    }
-    trigger.addEventListener('click', function() { setSheet(!panel.classList.contains('open')); });
-    scrim.addEventListener('click', function() { setSheet(false); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') setSheet(false); });
-
-    // The trigger is also the progress read-out, so the payoff is visible
-    // without opening the sheet at all.
-    var stepCount = 0, stepDone = 0, lastResult = null;
-    function syncTrigger() {
-      if (lastResult) { trigger.classList.add('done'); rptLabel.innerHTML = lastResult.label + ': <b>' + lastResult.value + '</b>'; return; }
-      trigger.classList.remove('done');
-      rptLabel.textContent = stepDone > 0 && stepCount ? 'Step ' + Math.min(stepDone + 1, stepCount) + ' of ' + stepCount : 'How to run it';
-    }
-
     window.addEventListener('message', function(e) {
       if (e.source !== frame.contentWindow) return;      // only the demo we are showing
       var d = e.data;
       if (!d || typeof d !== 'object') return;
-      if (d.bs === 'step') { markStep(d.n); stepDone = d.n; syncTrigger(); }
-      else if (d.bs === 'result') { showResult(d.result); lastResult = d.result; syncTrigger(); }
-      else if (d.bs === 'reset') { markStep(0); showResult(null); stepDone = 0; lastResult = null; syncTrigger(); }
+      if (d.bs === 'step') markStep(d.n);
+      else if (d.bs === 'result') showResult(d.result);
+      else if (d.bs === 'reset') { markStep(0); showResult(null); }
     });
     // Same origin, so set the flag directly. Reloading the iframe would wipe the chat.
     function syncViewport() {
