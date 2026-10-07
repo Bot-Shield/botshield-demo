@@ -18,9 +18,7 @@ export interface DemoEntry {
   platforms?: string[];
   /* What the run panel says beside this demo: the line it proves, and the
      steps to run it. Without this every demo inherits Ticketz's pitch. */
-  /* `cta` only where the person genuinely has to go somewhere — the gates
-     finish with a passkey on the device in their hand. */
-  run?: { line: string; what: string; steps: string[]; cta?: { label: string; sub: string } };
+  run?: { line: string; what: string; steps: string[] };
 }
 
 export const DEMOS: DemoEntry[] = [
@@ -54,7 +52,6 @@ export const DEMOS: DemoEntry[] = [
         'Ask for tickets. It comes back with a request.',
         'Say yes with a passkey. Ticketz checks the signature, never your card.',
       ],
-      cta: { label: 'Open BotShield', sub: 'You answer the request there' },
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
     run: {
@@ -65,7 +62,6 @@ export const DEMOS: DemoEntry[] = [
         'A passkey confirms it. Ticketz gets a handle, not your name.',
         'Tap <b>+ Second account</b>, then secure that one too \u2014 Ticketz trusts one per person, so it is refused.',
       ],
-      cta: { label: 'Open BotShield', sub: 'You confirm the account there' },
     } },
   { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',
     run: {
@@ -182,15 +178,6 @@ export function shellHtml(): string {
                     text-transform: uppercase; color: #61656c; }
     .rp-result .v { font-family: 'Roboto Mono', monospace; font-size: 14px; color: #23cb78; margin-top: 5px; }
     .rp-result .n { font-size: 11.5px; line-height: 16px; color: #61656c; margin-top: 7px; }
-    .rp-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
-    /* The site's .btn and .btn.ghost — one button, the ghost just drops the ground. */
-    .rp-primary, .rp-secondary { display: block; text-align: center; text-decoration: none; color: #fff;
-                                 border: 1px solid #373a41; border-radius: 10px; padding: 14px 22px; font-size: 15px;
-                                 font-weight: 600; line-height: 1; transition: border-color .15s, box-shadow .15s; }
-    .rp-primary { background: linear-gradient(180deg, #16181b, #0e1013); }
-    .rp-primary:hover, .rp-primary:active, .rp-secondary:hover, .rp-secondary:active {
-      border-color: #1a9fd6; box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
-    .rp-primary small { display: block; font-size: 10.5px; font-weight: 400; color: #94979c; margin-top: 4px; }
     .rail-col { display: none; flex-direction: column; width: 360px; flex-shrink: 0;
                 max-height: 100%; overflow-y: auto; scrollbar-width: none; }
     .rail-col::-webkit-scrollbar { display: none; }
@@ -358,7 +345,6 @@ export function shellHtml(): string {
           <p class="rp-s" id="rpS"></p>
           <div class="rp-steps" id="rpSteps"></div>
           <div class="rp-result" id="rpResult"></div>
-          <div class="rp-actions" id="rpActions"></div>
           <p class="rp-trust">Built on passkeys &middot; FIDO Alliance member</p>
         </aside>
         </div>
@@ -388,11 +374,6 @@ export function shellHtml(): string {
         rpSteps.innerHTML = '<div class="rp-k">How to run it</div>' + d.run.steps.map(function(t, i) {
           return '<div class="rp-step"><i>' + (i + 1) + '</i><div>' + t + '</div></div>';
         }).join('');
-        var acts = document.getElementById('rpActions');
-        acts.innerHTML = d.run.cta
-          ? '<a class="rp-primary" href="https://app.botshield.ai" target="_blank" rel="noopener">' +
-            d.run.cta.label + '<small>' + d.run.cta.sub + '</small></a>'
-          : '';
         rpSteps.style.display = '';
         markStep(0);
         showResult(null);
@@ -400,7 +381,6 @@ export function shellHtml(): string {
       } else {
         rpH.textContent = 'Live Demo is Ready';
         rpS.textContent = 'Open the web app and a passkey answers the check, right in the browser.';
-        document.getElementById('rpActions').innerHTML = '';
         rpSteps.style.display = 'none';
       }
       document.getElementById('crumbGroup').textContent = d.group;
