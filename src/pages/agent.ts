@@ -153,7 +153,7 @@ export const agentHtml = `<!DOCTYPE html>
       <div class="header-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4Z"/></svg></div>
       <div>
         <div class="header-brand">Ticketz Agent</div>
-        <div class="header-sub">Agents Ask &middot; a human approves every purchase</div>
+        <div class="header-sub">Agents Ask &middot; nothing moves without your yes</div>
       </div>
     </div>
 
@@ -164,7 +164,7 @@ export const agentHtml = `<!DOCTYPE html>
         <button type="button" id="linkBtn">Link</button>
       </div>
       <div class="log" id="log">
-        <div class="msg agent">Hi, I&rsquo;m the Ticketz agent. I can find shows and buy tickets for you &mdash; but I never spend without you. When it&rsquo;s time to pay, the request goes to your phone and <b>you</b> confirm with BotShield.</div>
+        <div class="msg agent">Hi, I&rsquo;m the Ticketz agent. I can find shows and hold seats for you. I have no card of my own, so when it&rsquo;s time to pay I send the request to your phone and <b>you</b> answer it with BotShield.</div>
       </div>
       <div class="chips">
         <button type="button" class="chip" data-q="What shows are on this weekend?">What shows are on this weekend?</button>
@@ -177,7 +177,7 @@ export const agentHtml = `<!DOCTYPE html>
       </form>
     </div>
 
-    <p class="foot"><b>What you&rsquo;re watching:</b> Claude runs the Ticketz tools through the BotShield gateway. Any tool that spends is held until a verified human confirms it in the BotShield app &mdash; the agent gets a signed Proof of Resolution, never your card.</p>
+    <p class="foot"><b>What you&rsquo;re watching:</b> Claude runs the Ticketz tools through the BotShield gateway. Nothing on the agent&rsquo;s side of it can move money &mdash; a purchase starts with your yes, answered in the BotShield app. The agent receives a signed Proof of Resolution, never your card.</p>
   </div>
 
   <script>

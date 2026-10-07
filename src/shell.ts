@@ -43,14 +43,14 @@ export const DEMOS: DemoEntry[] = [
       ],
     } },
   // Via the worker's /salesforce redirect so the click-out is counted (same destination).
-  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent',
+  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent asks, a human answers', path: '/agent',
     run: {
-      line: 'An agent buys. A human approves.',
-      what: 'Claude runs the Ticketz tools through the BotShield gateway. Anything that spends money stops and waits for a person.',
+      line: 'The agent has no card. Asking is the whole of what it can do.',
+      what: 'Claude runs the Ticketz tools through the BotShield gateway. Nothing on its side can move money \u2014 so a purchase is not something it does and you interrupt. It is something only your yes can start.',
       steps: [
         'Tap <b>Link</b> and scan the code, or open the web app here.',
-        'Ask the agent to buy tickets.',
-        'Approve it with a passkey. The agent finishes with a signed Proof of Resolution \u2014 never your card.',
+        'Ask the agent for tickets. It comes back with a request, because that is all it has.',
+        'Say yes with a passkey. Ticketz receives a signed answer that you meant this charge \u2014 never your card.',
       ],
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
