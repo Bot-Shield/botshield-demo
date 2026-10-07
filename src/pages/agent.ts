@@ -197,6 +197,9 @@ export const agentHtml = `<!DOCTYPE html>
     var ROBOT_SVG = '<svg viewBox="0 0 34.7937 26.8591" fill="none" xmlns="http://www.w3.org/2000/svg"> <path id="Vector" d="M17.3975 0C18.5771 0.00025 19.5335 0.819875 19.5337 1.83113C19.5337 2.56113 19.034 3.1885 18.313 3.48275V5.49437H19.9244C20.86 5.49437 21.6186 6.253 21.6186 7.18875C21.6186 7.23488 21.615 7.28038 21.6114 7.3255H23.1957C27.322 7.32563 30.8482 9.886 32.279 13.5035C32.4055 13.48 32.5364 13.4669 32.6696 13.4669C33.843 13.4671 34.7937 14.4188 34.7937 15.5921C34.7935 16.6729 33.9864 17.5626 32.9419 17.6966C32.6299 22.8091 28.3867 26.8589 23.1957 26.8591H11.5979C6.40637 26.859 2.16191 22.8086 1.85059 17.6954C0.806975 17.5606 0.0002 16.6724 0 15.5921C0 14.4186 0.951725 13.4669 2.12525 13.4669C2.25831 13.4669 2.38836 13.48 2.51465 13.5035C3.94539 9.886 7.47162 7.32563 11.5979 7.3255H13.2592C13.2556 7.28038 13.252 7.23488 13.252 7.18875C13.252 6.25313 14.0106 5.4945 14.9462 5.49437H16.4819V3.48387C15.7604 3.18987 15.2612 2.5615 15.2612 1.83113C15.2614 0.819875 16.2176 0 17.3975 0ZM11.2927 12.2083C8.42762 12.2086 6.10512 14.5312 6.10475 17.3962C6.10475 20.2617 8.42737 22.5853 11.2927 22.5855H23.5022C26.3676 22.5853 28.6901 20.2617 28.6901 17.3962C28.6897 14.5312 26.3672 12.2085 23.5022 12.2083H11.2927ZM12.4487 15.8716C13.2555 15.8717 13.9099 16.526 13.9099 17.3328C13.9097 18.1394 13.2554 18.7927 12.4487 18.7927C11.6421 18.7927 10.9877 18.1394 10.9875 17.3328C10.9875 16.526 11.6419 15.8716 12.4487 15.8716ZM22.4085 15.8716C23.2151 15.8716 23.8695 16.525 23.8696 17.3316C23.8696 18.1384 23.2152 18.7927 22.4085 18.7927C21.6017 18.7926 20.9485 18.1383 20.9485 17.3316C20.9486 16.525 21.6019 15.8717 22.4085 15.8716Z" fill="#1A9FD6"/> </svg>';
     var PASSKEY_SVG = '<svg viewBox="0 0 44.1964 44.1964" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Passkey 1"> <path id="Vector" d="M5.52459 36.8304V31.6742C5.52459 30.6306 5.79345 29.6718 6.33118 28.7977C6.8689 27.9236 7.58218 27.2558 8.47102 26.7941C10.3739 25.8427 12.3075 25.1294 14.2718 24.6543C16.2361 24.1792 18.2311 23.941 20.2567 23.9398C20.8706 23.9398 21.4844 23.9631 22.0983 24.0098C22.7121 24.0564 23.3259 24.1252 23.9398 24.216C23.817 25.9962 24.1393 27.6768 24.9066 29.2581C25.6739 30.8393 26.7941 32.1358 28.2673 33.1474V36.8304H5.52459ZM34.9889 42.355L32.2266 39.5927V31.0296C30.8762 30.6306 29.7712 29.8713 28.9119 28.7517C28.0525 27.632 27.6228 26.335 27.6228 24.8606C27.6228 23.0804 28.252 21.5612 29.5104 20.3028C30.7687 19.0444 32.288 18.4152 34.0681 18.4152C35.8482 18.4152 37.3675 19.0444 38.6259 20.3028C39.8842 21.5612 40.5134 23.0804 40.5134 24.8606C40.5134 26.2417 40.1218 27.4694 39.3385 28.5436C38.5553 29.6178 37.5658 30.3851 36.37 30.8455L38.6719 33.1474L35.9096 35.9097L38.6719 38.6719L34.9889 42.355ZM20.2567 22.0983C18.2311 22.0983 16.497 21.377 15.0544 19.9345C13.6119 18.492 12.8907 16.7579 12.8907 14.7322C12.8907 12.7065 13.6119 10.9724 15.0544 9.52992C16.497 8.08739 18.2311 7.36613 20.2567 7.36613C22.2824 7.36613 24.0165 8.08739 25.459 9.52992C26.9015 10.9724 27.6228 12.7065 27.6228 14.7322C27.6228 16.7579 26.9015 18.492 25.459 19.9345C24.0165 21.377 22.2824 22.0983 20.2567 22.0983ZM35.3811 25.2528C35.7335 24.8992 35.9096 24.4616 35.9096 23.9398C35.9096 23.418 35.7328 22.981 35.3793 22.6286C35.0257 22.2763 34.5887 22.0995 34.0681 22.0983C33.5476 22.097 33.1105 22.2738 32.757 22.6286C32.4034 22.9834 32.2266 23.4205 32.2266 23.9398C32.2266 24.4591 32.4034 24.8968 32.757 25.2528C33.1105 25.6088 33.5476 25.785 34.0681 25.7813C34.5887 25.7776 35.0263 25.6008 35.3811 25.251" fill="white"/> </g> </svg>';
     var linkRun = 0; // bumped on cancel so a stale poll can't repaint the strip
+    // The run panel lives outside this iframe, so the demo reports its progress
+    // to the shell. Same origin; the shell checks the source.
+    function narrate(msg) { try { if (window.parent !== window) window.parent.postMessage(msg, '*'); } catch (err) {} }
 
     function renderLink() {
       if (bindToken) {
@@ -226,6 +229,7 @@ export const agentHtml = `<!DOCTYPE html>
         if (run !== linkRun) return;
         if (!r.ok || !j.code) { add('sys', 'Could not start the link: ' + (j.error || r.status)); return; }
         if (window.bsTrack) bsTrack('agent_link_start');
+        narrate({ bs: 'step', n: 1 });
         // Same browser: the deep link opens the app's Link screen with the code
         // filled in. Phone: scan the QR of that same link. Typing is the fallback.
         var claim = (j.claim_url && String(j.claim_url).indexOf('https://app.botshield.ai/') === 0) ? j.claim_url : null;
@@ -269,6 +273,7 @@ export const agentHtml = `<!DOCTYPE html>
           if (sj.status === 'bound' && sj.token) {
             bindToken = sj.token; sessionStorage.setItem(LINK_KEY, bindToken);
             if (window.bsTrack) bsTrack('agent_linked');
+            narrate({ bs: 'step', n: 2 });
             add('sys', 'Linked. Purchases will be proposed to your phone.');
             return;
           }
@@ -281,7 +286,7 @@ export const agentHtml = `<!DOCTYPE html>
     }
     linkBtn.addEventListener('click', function() {
       if (linkEl.classList.contains('linking')) { linkRun++; linkEl.classList.remove('linking'); linkBtn.disabled = false; renderLink(); }
-      else if (bindToken) { bindToken = null; sessionStorage.removeItem(LINK_KEY); renderLink(); add('sys', 'Unlinked.'); }
+      else if (bindToken) { bindToken = null; sessionStorage.removeItem(LINK_KEY); renderLink(); add('sys', 'Unlinked.'); narrate({ bs: 'reset' }); }
       else startLink();
     });
 
@@ -393,6 +398,11 @@ export const agentHtml = `<!DOCTYPE html>
       var d = document.createElement('div');
       d.className = 'msg order';
       if (window.bsTrack) bsTrack('agent_ask_approved');
+      narrate({ bs: 'step', n: 3 });
+      // The point of the whole demo: a signature, not a card number.
+      narrate({ bs: 'result', result: { label: 'What Ticketz received',
+        value: 'Proof of Resolution',
+        note: 'A signed record that a verified human approved this purchase. Ticketz never sees your card, and BotShield never sees the basket.' } });
       var rows = [['Order', ev.order_id], ['Event', ev.event], ['Seats', ev.seats], ['Total', ev.total]].filter(function(r) { return r[1] != null; });
       d.innerHTML = '<b>Order confirmed \\u2014 approved by you</b>' + rows.map(function(r) { return '<div class="row"><span>' + r[0] + '</span><span></span></div>'; }).join('') + (ev.approved_by ? '<div class="att">approved_by ' + ev.approved_by + (ev.ceremony_id ? ' \\u00b7 ceremony ' + ev.ceremony_id : '') + '</div>' : '');
       var spans = d.querySelectorAll('.row span:last-child');

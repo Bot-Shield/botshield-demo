@@ -157,10 +157,22 @@ export const vapezHtml = `<!DOCTYPE html>
       } catch (err) { return null; }
     }
 
+    // The shell's run panel sits outside this iframe, so the demo tells it
+    // where it has got to. Same origin; the shell checks the source.
+    function narrate(msg) { try { if (window.parent !== window) window.parent.postMessage(msg, '*'); } catch (err) {} }
+    bsVerify.addEventListener('click', function() { narrate({ bs: 'step', n: 1 }); });
+
     bsVerify.addEventListener('botshield:success', function(e) {
       var v = ageVerdictOf(e.detail);
-      if (v === 'unavailable') say('Human verified \\u2014 but no age assertion on this device. The door stays closed; finish on a phone that has one.');
-      else say('Over 18 \\u2014 verified. Tap Enter site.');
+      if (v === 'unavailable') {
+        say('Human verified \\u2014 but no age assertion on this device. The door stays closed; finish on a phone that has one.');
+        narrate({ bs: 'step', n: 2 });
+        narrate({ bs: 'result', result: { label: 'What Vapez received', value: 'unavailable',
+          note: 'No age assertion on this device, so the door stays shut and says why. The honest state, not a failure.' } });
+      } else {
+        say('Over 18 \\u2014 verified. Tap Enter site.');
+        narrate({ bs: 'step', n: 2 });
+      }
     });
     bsVerify.addEventListener('botshield:failure', function(e) {
       console.error('[Vapez] verification failed:', e.detail);
@@ -174,11 +186,16 @@ export const vapezHtml = `<!DOCTYPE html>
       store.classList.add('open');
       document.getElementById('storeRef').textContent = userRef;
       window.scrollTo(0, 0);
+      narrate({ bs: 'step', n: 3 });
+      // The whole argument in one line: this is the entire payload.
+      narrate({ bs: 'result', result: { label: 'What Vapez received', value: 'verified',
+        note: 'That is the whole payload. No birthdate, no document, no name \\u2014 nothing for Vapez to store or leak.' } });
     });
 
     document.getElementById('demoReset').addEventListener('click', function() {
       store.classList.remove('open'); wall.style.display = '';
       bsVerify.reset();
+      narrate({ bs: 'reset' });
     });
     document.getElementById('demoNewVisitor').addEventListener('click', function() {
       localStorage.removeItem(REF_KEY);

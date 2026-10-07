@@ -136,6 +136,18 @@ export function shellHtml(): string {
                  font-family: 'Roboto Mono', monospace; font-size: 10px; font-style: normal; display: flex;
                  align-items: center; justify-content: center; margin-top: 1px; }
     .rp-step b { color: #e6e8ea; font-weight: 600; }
+    /* The panel narrates: a step dims and ticks once the demo passes it. */
+    .rp-step.done { color: #61656c; }
+    .rp-step.done b { color: #61656c; font-weight: 400; }
+    .rp-step.done i { background: #16302a; color: #23cb78; }
+    .rp-step.now i { background: #1a9fd6; color: #fff; }
+    .rp-result { display: none; margin-top: 2px; padding: 12px 14px; border-radius: 11px;
+                 background: rgba(35,203,120,.08); border: 1px solid rgba(35,203,120,.35); }
+    .rp-result.on { display: block; }
+    .rp-result .k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em;
+                    text-transform: uppercase; color: #61656c; }
+    .rp-result .v { font-family: 'Roboto Mono', monospace; font-size: 14px; color: #23cb78; margin-top: 5px; }
+    .rp-result .n { font-size: 11.5px; line-height: 16px; color: #61656c; margin-top: 7px; }
     .rp-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
     /* The site's .btn and .btn.ghost — one button, the ghost just drops the ground. */
     .rp-primary, .rp-secondary { display: block; text-align: center; text-decoration: none; color: #fff;
@@ -249,6 +261,7 @@ export function shellHtml(): string {
           <h2 class="rp-h" id="rpH">Live Demo is Ready</h2>
           <p class="rp-s" id="rpS"></p>
           <div class="rp-steps" id="rpSteps"></div>
+          <div class="rp-result" id="rpResult"></div>
           <div class="rp-actions">
             <a class="rp-primary" href="https://app.botshield.ai" target="_blank" rel="noopener">Open the web app<small>Works on this Mac</small></a>
             <a class="rp-secondary" href="https://app.botshield.ai" target="_blank" rel="noopener">Or use your phone instead</a>
@@ -279,6 +292,8 @@ export function shellHtml(): string {
           return '<div class="rp-step"><i>' + (i + 1) + '</i><div>' + t + '</div></div>';
         }).join('');
         rpSteps.style.display = '';
+        markStep(0);
+        showResult(null);
       } else {
         rpH.textContent = 'Live Demo is Ready';
         rpS.textContent = 'Open the web app and a passkey answers the check, right in the browser.';
@@ -297,6 +312,33 @@ export function shellHtml(): string {
     document.getElementById('menu').addEventListener('click', function() { rail.classList.add('open'); });
     document.getElementById('close').addEventListener('click', function() { rail.classList.remove('open'); });
     window.addEventListener('hashchange', function() { pick(window.location.hash.slice(1), false); });
+
+    // The demo inside the iframe reports where it has got to, so the panel
+    // beside it stops being a manual and becomes the commentary.
+    function markStep(n) {
+      var rows = document.querySelectorAll('#rpSteps .rp-step');
+      for (var i = 0; i < rows.length; i++) {
+        rows[i].classList.toggle('done', i < n);
+        rows[i].classList.toggle('now', i === n);
+        var num = rows[i].querySelector('i');
+        if (num) num.textContent = i < n ? '\u2713' : String(i + 1);
+      }
+    }
+    function showResult(r) {
+      var el = document.getElementById('rpResult');
+      if (!r) { el.classList.remove('on'); el.innerHTML = ''; return; }
+      el.innerHTML = '<div class="k">' + r.label + '</div><div class="v">' + r.value + '</div>' +
+                     (r.note ? '<div class="n">' + r.note + '</div>' : '');
+      el.classList.add('on');
+    }
+    window.addEventListener('message', function(e) {
+      if (e.source !== frame.contentWindow) return;      // only the demo we are showing
+      var d = e.data;
+      if (!d || typeof d !== 'object') return;
+      if (d.bs === 'step') markStep(d.n);
+      else if (d.bs === 'result') showResult(d.result);
+      else if (d.bs === 'reset') { markStep(0); showResult(null); }
+    });
     // Same origin, so set the flag directly. Reloading the iframe would wipe the chat.
     function syncViewport() {
       var m = window.innerWidth < 1024;
