@@ -58,12 +58,12 @@ export const DEMOS: DemoEntry[] = [
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
     run: {
-      line: 'Signing in proves the password. It never proved the person.',
-      what: 'Ticketz knows the address. It cannot tell whether these four are four people or one.',
+      line: 'One account is one password. It was never one person.',
+      what: 'Opening another is free, and always has been. Securing this one is what makes the next one cost a human.',
       steps: [
         'Tap <b>Secure your account with BotShield</b>.',
         'A passkey confirms it. Ticketz gets a handle, not your name.',
-        'Try a <b>second account</b>. One per person, so it is refused.',
+        'Tap <b>+ Second account</b>, then secure that one too \u2014 one per person, so it is refused.',
       ],
       cta: { label: 'Open BotShield', sub: 'You confirm the account there' },
     } },
