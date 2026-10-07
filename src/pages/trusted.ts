@@ -179,8 +179,8 @@ export const trustedHtml = `<!DOCTYPE html>
     // The visitor's demo Ticketz accounts: stable per browser, never an email.
     var STORE_KEY = 'tkz_demo_accounts_v1';
     function hex(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(function(b) { return b.toString(16).padStart(2, '0'); }).join(''); }
-    // Deliberately one person's alts — the sockpuppet door, shown rather than
-    // described. The index picks the next address.
+    // Deliberately one person's alts. Ticketz cannot tell them apart today; what
+    // changes after securing is the cost of keeping them all trusted at once.
     var ALTS = ['jordan.reyes', 'j.reyes91', 'jreyes.tickets', 'reyesj.alt'];
     function newAccount(i) {
       var mail = ALTS[Math.min(ALTS.length - 1, i || 0)] + '@example.com';

@@ -183,7 +183,7 @@ export const signupHtml = `<!DOCTYPE html>
           <div class="row"><span>Account</span><b id="acct">&mdash;</b></div>
           <div class="row"><span>Human present</span><b style="color:#23cb78">yes</b></div>
           <div class="row"><span>Ceremony</span><b class="mono" id="cer">&mdash;</b></div>
-          <p class="note">Commons still only knows what Jordan typed. What the check adds is that a person was there to type it &mdash; and that the same person cannot quietly hold a hundred of these. Never a name, never a document.</p>
+          <p class="note">Commons still only knows what Jordan typed. What the check adds is that a person was there to type it &mdash; so the hundredth account costs what the first one did. Never a name, never a document.</p>
         </div>
       </section>
     </div>

@@ -25,7 +25,7 @@ export const DEMOS: DemoEntry[] = [
   { key: 'signup', group: 'Commons', label: 'Human Gate', hint: 'At sign-up \u00b7 one account per human', path: '/signup',
     run: {
       line: 'A feed is only worth reading if the people in it are people.',
-      what: 'Name, handle, email, password \u2014 a script can fill all four, and fill them again tomorrow under another name. The Gate is the only field it cannot fill.',
+      what: 'Name, handle, email, password \u2014 a script can fill all four, and fill them again tomorrow under another name. The Gate is the only field it cannot fill, which is what makes the hundredth account cost as much as the first.',
       steps: [
         'The form is already filled in. Tap <b>Verify you\u2019re human</b>.',
         'A passkey on this device answers it. No new account, no second password.',
@@ -56,11 +56,11 @@ export const DEMOS: DemoEntry[] = [
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
     run: {
       line: 'Signing in proves the password. It never proved the person.',
-      what: 'You are already signed in \u2014 Ticketz knows the address. What it does not know is whether the four addresses in this demo are four people or one. That gap is the sockpuppet door.',
+      what: 'You are already signed in \u2014 Ticketz knows the address. What it cannot tell is whether the four addresses here are four people or one. Securing the account inverts the economics: an account that stays trusted costs real presence, continuously, and that cost will not spread across accounts.',
       steps: [
         'You are signed in as jordan.reyes@example.com. Tap <b>Secure your account with BotShield</b>.',
         'A passkey confirms it. Ticketz gets a yes and a per-platform handle \u2014 no email, no name, no device.',
-        'Now take a <b>second account</b> and try to secure it too. Same human, so it is refused. The door is shut.',
+        'Now take a <b>second account</b> and try to secure it too. Ticketz holds one per human, so it is refused \u2014 and holding both would have cost two people\u2019s time, not one script.',
       ],
     } },
   { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',
