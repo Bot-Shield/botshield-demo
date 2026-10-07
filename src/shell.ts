@@ -42,16 +42,6 @@ export const DEMOS: DemoEntry[] = [
         'Approve it with a passkey. The agent finishes with a signed Proof of Resolution \u2014 never your card.',
       ],
     } },
-  { key: 'signup', group: 'Ticketz', label: 'Sign up', hint: 'A human on account creation', path: '/signup',
-    run: {
-      line: 'A form says who you claim to be. Nothing in it says you are there.',
-      what: 'Name, email, password, date of birth \u2014 every field is something a script can type. The Gate is the only one that cannot be.',
-      steps: [
-        'The form is already filled in. Tap <b>Verify you\u2019re human</b>.',
-        'A passkey on this device answers it. No new account, no second password.',
-        'The account is created with one thing added: a human was here. Never who.',
-      ],
-    } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
     run: {
       line: 'One account per human.',
@@ -60,6 +50,16 @@ export const DEMOS: DemoEntry[] = [
         'Pick a provider and link the account.',
         'Confirm it with a passkey.',
         'The account carries a notarised link. Change the credential and the link breaks \u2014 by design.',
+      ],
+    } },
+  { key: 'signup', group: 'Commons', label: 'Sign up', hint: 'One account per human', path: '/signup',
+    run: {
+      line: 'A feed is only worth reading if the people in it are people.',
+      what: 'Name, handle, email, password \u2014 a script can fill all four, and fill them again tomorrow under another name. The Gate is the only field it cannot fill.',
+      steps: [
+        'The form is already filled in. Tap <b>Verify you\u2019re human</b>.',
+        'A passkey on this device answers it. No new account, no second password.',
+        'You land in the feed. Every account in it is one human, including yours.',
       ],
     } },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'],
