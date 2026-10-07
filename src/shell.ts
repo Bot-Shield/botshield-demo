@@ -22,7 +22,7 @@ export interface DemoEntry {
 }
 
 export const DEMOS: DemoEntry[] = [
-  { key: 'signup', group: 'Commons', label: 'Sign up', hint: 'One account per human', path: '/signup',
+  { key: 'signup', group: 'Commons', label: 'Human Gate', hint: 'At sign-up \u00b7 one account per human', path: '/signup',
     run: {
       line: 'A feed is only worth reading if the people in it are people.',
       what: 'Name, handle, email, password \u2014 a script can fill all four, and fill them again tomorrow under another name. The Gate is the only field it cannot fill.',
@@ -32,7 +32,7 @@ export const DEMOS: DemoEntry[] = [
         'You land in the feed. Every account in it is one human, including yours.',
       ],
     } },
-  { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: '18+ to enter the store', path: '/vapez', platforms: ['iOS', 'Android'],
+  { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: 'At the door \u00b7 18+ to enter', path: '/vapez', platforms: ['iOS', 'Android'],
     run: {
       line: 'Proof of age without proof of identity.',
       what: 'BotShield reads the age assertion the device already holds. Vapez receives <b>verified</b> or <b>unavailable</b> \u2014 never a birthdate, never a document, nothing to store and nothing to leak.',
@@ -63,7 +63,7 @@ export const DEMOS: DemoEntry[] = [
         'The account carries a notarised link. Change the credential and the link breaks \u2014 by design.',
       ],
     } },
-  { key: 'drop', group: 'Tread', label: 'The drop', hint: 'One pair per person', path: '/drop',
+  { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',
     run: {
       line: 'Bots don\u2019t attack checkout. They attack add to cart.',
       what: '900 pairs, one each. Inventory is held the moment it lands in a cart, so that is where the drop is decided \u2014 and where the bots are. By checkout the pair is already gone.',
