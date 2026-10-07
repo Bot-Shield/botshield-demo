@@ -22,36 +22,6 @@ export interface DemoEntry {
 }
 
 export const DEMOS: DemoEntry[] = [
-  { key: 'ticketz', group: 'Ticketz', label: 'BotShield Gate', hint: 'Human Gate at checkout', path: '/ticketz',
-    run: {
-      line: 'A checkout a bot cannot complete.',
-      what: 'The Gate asks for a human at the moment it matters. No puzzle, no street signs \u2014 the passkey the person already carries.',
-      steps: [
-        'Fill the checkout and tap <b>Verify you\u2019re human</b>.',
-        'Touch ID on this Mac answers it. No account, no sign-up.',
-        'Checkout completes with a signed result. Ticketz learns that a human was there \u2014 never who.',
-      ],
-    } },
-  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent',
-    run: {
-      line: 'An agent buys. A human approves.',
-      what: 'Claude runs the Ticketz tools through the BotShield gateway. Anything that spends money stops and waits for a person.',
-      steps: [
-        'Tap <b>Link</b> and scan the code, or open the web app here.',
-        'Ask the agent to buy tickets.',
-        'Approve it with a passkey. The agent finishes with a signed Proof of Resolution \u2014 never your card.',
-      ],
-    } },
-  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
-    run: {
-      line: 'One account per human.',
-      what: 'An account bound to a person, not a password. The same human cannot quietly hold a hundred of them.',
-      steps: [
-        'Pick a provider and link the account.',
-        'Confirm it with a passkey.',
-        'The account carries a notarised link. Change the credential and the link breaks \u2014 by design.',
-      ],
-    } },
   { key: 'signup', group: 'Commons', label: 'Sign up', hint: 'One account per human', path: '/signup',
     run: {
       line: 'A feed is only worth reading if the people in it are people.',
@@ -73,6 +43,36 @@ export const DEMOS: DemoEntry[] = [
       ],
     } },
   // Via the worker's /salesforce redirect so the click-out is counted (same destination).
+  { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent buys, a human approves', path: '/agent',
+    run: {
+      line: 'An agent buys. A human approves.',
+      what: 'Claude runs the Ticketz tools through the BotShield gateway. Anything that spends money stops and waits for a person.',
+      steps: [
+        'Tap <b>Link</b> and scan the code, or open the web app here.',
+        'Ask the agent to buy tickets.',
+        'Approve it with a passkey. The agent finishes with a signed Proof of Resolution \u2014 never your card.',
+      ],
+    } },
+  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
+    run: {
+      line: 'One account per human.',
+      what: 'An account bound to a person, not a password. The same human cannot quietly hold a hundred of them.',
+      steps: [
+        'Pick a provider and link the account.',
+        'Confirm it with a passkey.',
+        'The account carries a notarised link. Change the credential and the link breaks \u2014 by design.',
+      ],
+    } },
+  { key: 'drop', group: 'Tread', label: 'The drop', hint: 'One pair per person', path: '/drop',
+    run: {
+      line: 'The checkout worth gating is the one with a limit on it.',
+      what: '900 pairs, one each. Bots are the reason real customers never get one \u2014 so here the shop <i>wants</i> the door checked. On an ordinary basket a gate is a tax; on a drop it is the product.',
+      steps: [
+        'Pick a size and tap <b>Claim your pair</b>.',
+        'A passkey answers it. No raffle, no queue, no account needed.',
+        'The pair is held. Come back for a second one and the answer does not change \u2014 same human, same answer.',
+      ],
+    } },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
 ];
 
@@ -397,7 +397,7 @@ export function shellHtml(): string {
     }
     window.addEventListener('resize', syncViewport);
     frame.addEventListener('load', syncViewport);
-    var initial = (new URLSearchParams(window.location.search).get('demo')) || window.location.hash.slice(1) || 'ticketz';
+    var initial = (new URLSearchParams(window.location.search).get('demo')) || window.location.hash.slice(1) || DEMOS[0].key;
     pick(initial, true);
   </script>
 </body>
