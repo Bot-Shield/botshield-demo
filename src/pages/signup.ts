@@ -114,7 +114,7 @@ export const signupHtml = `<!DOCTYPE html>
           <div class="f"><label for="pw">Password</label><input id="pw" type="password" value="correcthorsebattery" autocomplete="off"></div>
 
           <div class="f gate">
-            <label for="bsVerify">Human check <span>the only one a script can’t fill</span></label>
+            <label for="bsVerify">Human check <span>the only field a script can’t fill</span></label>
             <botshield-verify
               site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
               scope="account_signup"
@@ -122,7 +122,7 @@ export const signupHtml = `<!DOCTYPE html>
               theme="dark"
               scan-mode="modal"
               signals="true"
-              checkout-label="Join Commons"
+              checkout-label="Create account with BotShield"
             ></botshield-verify>
           </div>
         </div>
@@ -194,7 +194,6 @@ export const signupHtml = `<!DOCTYPE html>
       function narrate(msg) { try { if (window.parent !== window) window.parent.postMessage(msg, '*'); } catch (e) {} }
 
       bsVerify.addEventListener('click', function () { narrate({ bs: 'step', n: 1 }); });
-      bsVerify.addEventListener('botshield:success', function () { narrate({ bs: 'step', n: 2 }); });
 
       // The component emits checkout only once its server-verified state resolves.
       bsVerify.addEventListener('botshield:checkout', function (e) {
