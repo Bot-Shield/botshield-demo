@@ -75,11 +75,11 @@ export const DEMOS: DemoEntry[] = [
     } },
   { key: 'firm', group: 'Whitlock & Barr', label: 'Human Gate', hint: 'On the form that gets spammed', path: '/firm',
     run: {
-      line: 'Captcha proves it is not a script. It cannot prove a person is there.',
-      what: 'A free case review form \u2014 the most mundane surface there is, and the one spam hits hardest. A solicitor reads every enquiry, so junk is already being paid for in someone\u2019s morning.',
+      line: 'A person reads every enquiry. Now a person sends them too.',
+      what: 'A free case review form \u2014 the most mundane surface there is, and the one junk hits hardest. A solicitor reads every enquiry, so the junk is already being paid for in someone\u2019s morning.',
       steps: [
         'The enquiry is written. Tap <b>Verify you\u2019re human</b>.',
-        'A passkey answers it. No account, no puzzle, no pictures of traffic lights.',
+        'A passkey answers it. One tap \u2014 no account, no password, nothing to work out.',
         'It lands in the firm\u2019s inbox marked as a person \u2014 and the next thousand fakes now cost a human each instead of nothing.',
       ],
     } },

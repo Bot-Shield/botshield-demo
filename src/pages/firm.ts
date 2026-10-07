@@ -1,5 +1,5 @@
 // Whitlock & Barr — a free case review form. The most mundane surface there is,
-// and the one that gets spammed hardest, which is why captcha lives here today.
+// and the one that gets spammed hardest.
 //
 // The argument is the cost curve, not block-bots. A solicitor reads every
 // enquiry, so junk is paid for in a person's time at the firm's end. The Gate
@@ -161,7 +161,7 @@ export const firmHtml = `<!DOCTYPE html>
           <div class="row"><span>Enquiry</span><b id="ref">&mdash;</b></div>
           <div class="row"><span>Sent by a person</span><b style="color:#23cb78">yes</b></div>
           <div class="row"><span>Ceremony</span><b class="mono" id="cer">&mdash;</b></div>
-          <p class="note">A captcha would have said this was not a script. It could not have said a person was here. The difference is who pays: sending a thousand of these used to cost nothing and cost the firm a morning. Now it costs a human each, and the morning goes to Dana.</p>
+          <p class="note">What changed is who pays. Sending a thousand of these used to cost nothing — and cost the firm a morning. Now it costs a human each, and the morning goes to Dana.</p>
         </div>
       </section>
     </div>
