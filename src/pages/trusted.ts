@@ -87,6 +87,12 @@ export const trustedHtml = `<!DOCTYPE html>
     .note.info { background: #0e1520; border: 1px solid #1d2b3d; color: #cfe3f5; }
     .note.info b { color: #5fb6e8; }
     .note ol { margin: 8px 0 0 18px; }
+    /* The handoff out of the close — the site's .btn.ghost, on the note's ground. */
+    .note .go { display: block; width: 100%; margin-top: 14px; font-family: inherit; font-size: 14px;
+                font-weight: 600; color: #fff; background: transparent; border: 1px solid #373a41;
+                border-radius: 10px; padding: 12px 16px; cursor: pointer;
+                transition: border-color .15s, box-shadow .15s; }
+    .note .go:hover, .note .go:active { border-color: #1a9fd6; box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
     .note li { margin: 3px 0; }
 
     /* ── Demo chrome (not part of the Ticketz design) ── */
@@ -125,7 +131,7 @@ export const trustedHtml = `<!DOCTYPE html>
              button (Paul + Devrin, 2026-09-29). One block, two states — the
              moment/panelTitle pair said the same thing twice. -->
         <h2 id="panelH">Secure your account with BotShield</h2>
-        <p id="panelBody">One tap, and Ticketz can confirm a person runs this account. <b>Never your name.</b></p>
+        <p id="panelBody">You&rsquo;re signed in. One tap more, and Ticketz can confirm a person runs this account. <b>Never your name.</b></p>
         <botshield-verify
           site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
           scope="ticketz_account"
@@ -139,9 +145,9 @@ export const trustedHtml = `<!DOCTYPE html>
         <button type="button" class="again" id="signInAgain">Sign in again</button>
       </section>
 
-      <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Open the BotShield app &rarr; <b>Trusted Accounts</b>: Ticketz is there. Ticketz sees it too, in its Console registry &mdash; as a handle, never your name.<br><br>Now try <b>+ Second account</b> above.</div>
+      <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Ticketz trusts it, and BotShield notarized the relationship &mdash; it is in your BotShield app under <b>Trusted Accounts</b>, and in Ticketz&rsquo;s registry as a handle, never your name.<br><br>Now try <b>+ Second account</b> above.</div>
       <div class="note one" id="noteOne"><b>Already secured with BotShield.</b> BotShield secures one Ticketz account &mdash; that&rsquo;s the promise Ticketz relies on. This second account can&rsquo;t be secured by you.<br><br>Switch back to your first account &mdash; it&rsquo;s still secured.</div>
-      <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same human, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.</div>
+      <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same person, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.<br><br><b>That notarized relationship is what lets an agent ask.</b> An agent acting for you can ask Ticketz for something, and Ticketz knows a real person is there to answer it.<button type="button" class="go" id="goAgent">See Agents Ask&trade; &rarr;</button></div>
       <div class="note info" id="noteUnlinked"><b>Unlinked.</b> This Ticketz account is no longer secured with BotShield &mdash; you unlinked it in the BotShield app, or Ticketz revoked it. Link it again any time.</div>
       <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Trusted Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
 
@@ -214,6 +220,12 @@ export const trustedHtml = `<!DOCTYPE html>
 
     var toast = document.getElementById('toast');
     function say(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 3400); }
+    // The shell lives outside this iframe. Same origin; it checks the source.
+    function narrate(msg) { try { if (window.parent !== window) window.parent.postMessage(msg, '*'); } catch (err) {} }
+
+    var goAgent = document.getElementById('goAgent');
+    if (goAgent) goAgent.addEventListener('click', function() { narrate({ bs: 'goto', demo: 'agent' }); });
+
     function note(id) { ['noteSecured', 'noteOne', 'noteBack', 'noteReset', 'noteUnlinked'].forEach(function(n) { document.getElementById(n).classList.toggle('on', n === id); }); }
     function acct() { return state.accounts[state.active] || state.accounts[0]; }
 
@@ -238,7 +250,7 @@ export const trustedHtml = `<!DOCTYPE html>
         : 'Secure your account with BotShield';
       document.getElementById('panelBody').innerHTML = a.secured
         ? 'Ticketz can confirm a real person runs this account &mdash; <b>never your name</b>. Come back any time: your next pass says so.'
-        : 'One tap, and Ticketz can confirm a person runs this account. <b>Never your name.</b>';
+        : 'You&rsquo;re signed in. One tap more, and Ticketz can confirm a person runs this account. <b>Never your name.</b>';
       var showWidget = !a.secured || returning;
       bsVerify.classList.toggle('hide', !showWidget);
       document.getElementById('signInAgain').classList.toggle('on', !showWidget);

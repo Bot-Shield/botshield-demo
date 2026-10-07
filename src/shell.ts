@@ -440,6 +440,9 @@ export function shellHtml(): string {
       if (d.bs === 'step') markStep(d.n);
       else if (d.bs === 'result') showResult(d.result);
       else if (d.bs === 'reset') { markStep(0); showResult(null); }
+      // A demo can hand off to another demo — Trusted Accounts closes by
+      // sending you to Agents Ask, because that is what the notarization buys.
+      else if (d.bs === 'goto' && typeof d.demo === 'string') pick(d.demo, true);
     });
     // Same origin, so set the flag directly. Reloading the iframe would wipe the chat.
     function syncViewport() {
