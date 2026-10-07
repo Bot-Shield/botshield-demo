@@ -83,8 +83,22 @@ export function shellHtml(): string {
     .crumb .right { margin-left: auto; text-transform: none; letter-spacing: 0; font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--muted); }
     /* Desktop: the demo runs in a phone-sized frame, centred — the same
        composition as the app's web rail. Phone: it IS the screen. */
-    .frame { flex: 1; min-height: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 28px 24px; }
-    .frame iframe { width: 430px; max-width: 100%; height: 100%; max-height: 900px; border: 1px solid #23262c; border-radius: 26px; display: block; background: #000; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+    .frame { flex: 1; min-height: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; gap: 28px; padding: 28px 24px; }
+    /* The phone is the iframe. The sell lives beside it, where the real pixels are. */
+    .runpanel { display: none; width: 340px; flex-shrink: 0; flex-direction: column; justify-content: center; gap: 16px;
+                background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 30px 24px; }
+    .rp-mark { width: 128px; height: auto; align-self: center; }
+    .rp-h { font-size: 25px; font-weight: 600; letter-spacing: -.4px; color: #fff; text-align: center; margin: 0; }
+    .rp-s { font-size: 13px; line-height: 19px; color: #94979c; text-align: center; margin: 0; }
+    .rp-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
+    .rp-primary { display: block; text-align: center; text-decoration: none; background: #f7f7f7; color: #0b0e12; border-radius: 11px; padding: 12px 16px; font-size: 14.5px; font-weight: 500; }
+    .rp-primary small { display: block; font-size: 10.5px; font-weight: 400; opacity: .7; margin-top: 2px; }
+    .rp-secondary { display: block; text-align: center; text-decoration: none; background: #17191c; color: #e6e8ea; border: 1px solid #373a41; border-radius: 11px; padding: 11px 16px; font-size: 13.5px; font-weight: 500; }
+    .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
+    @media (min-width: 1100px) { .runpanel { display: flex; } }
+    .bezel { flex-shrink: 0; height: 100%; max-height: 900px; padding: 11px; border-radius: 42px; background: #15181c;
+             border: 1.5px solid #454a52; box-shadow: 0 28px 64px -10px rgba(0,0,0,.7); box-sizing: border-box; display: flex; }
+    .frame iframe { width: 430px; max-width: 100%; height: 100%; border: 1px solid #23262c; border-radius: 32px; display: block; background: #08090b; }
 
     @media (max-width: 767px) {
       .app { grid-template-columns: 1fr; }
@@ -96,6 +110,7 @@ export function shellHtml(): string {
       .top .title small { display: block; font-size: 11.5px; font-weight: 400; color: var(--faint); }
       .crumb { display: none; }
       .frame { padding: 0; }
+      .bezel { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; max-height: none; width: 100%; }
       .frame iframe { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; }
       .rail .close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 14px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: #14161b; color: var(--ink); display: flex; align-items: center; justify-content: center; }
     }
@@ -142,7 +157,24 @@ export function shellHtml(): string {
         <div class="title" id="mtitle">BotShield Demos<small id="msub"></small></div>
       </div>
       <div class="crumb"><span>Demos</span><span class="sep">&middot;</span><b id="crumbGroup"></b><span class="sep">&middot;</span><span id="crumbLabel"></span><span class="right" id="crumbHint"></span></div>
-      <div class="frame"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
+      <div class="frame">
+        <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
+        <aside class="runpanel" aria-label="Run this demo">
+          <svg class="rp-mark" viewBox="0 0 120 116" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M60 4 112 24v34c0 30-21 48-52 54C29 106 8 88 8 58V24L60 4Z" stroke="#1a9fd6" stroke-width="7"/>
+            <rect x="36" y="44" width="48" height="32" rx="12" stroke="#1a9fd6" stroke-width="6"/>
+            <circle cx="50" cy="60" r="4.5" fill="#1a9fd6"/><circle cx="70" cy="60" r="4.5" fill="#1a9fd6"/>
+            <path d="M60 44V33" stroke="#1a9fd6" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="29" r="4.5" fill="#1a9fd6"/>
+          </svg>
+          <h2 class="rp-h">Live Demo is Ready</h2>
+          <p class="rp-s">No phone needed. Open the web app and Touch ID signs the purchase, right in the browser.</p>
+          <div class="rp-actions">
+            <a class="rp-primary" href="https://app.botshield.ai" target="_blank" rel="noopener">Open the web app<small>Works on this Mac</small></a>
+            <a class="rp-secondary" href="https://app.botshield.ai" target="_blank" rel="noopener">Or use your phone instead</a>
+          </div>
+          <p class="rp-trust">Built on passkeys &middot; FIDO Alliance member</p>
+        </aside>
+      </div>
     </div>
   </div>
   <script>

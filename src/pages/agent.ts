@@ -21,6 +21,7 @@ export const agentHtml = `<!DOCTYPE html>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; background: #000; color: #fff; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+
     .page { height: 100dvh; display: flex; flex-direction: column; align-items: center; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
     .header { display: flex; align-items: center; gap: 12px; padding: 18px 0 14px; flex-shrink: 0; }
     .header-mark { width: 36px; height: 36px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; }
@@ -85,10 +86,22 @@ export const agentHtml = `<!DOCTYPE html>
     .link button { background: #147baa; color: #fff; border: 0; border-radius: 9px; font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
     .link button.ghost { background: transparent; border: 1px solid #2a2a2a; color: #c9c9c9; }
     .lk-row { display: flex; gap: 12px; align-items: center; }
+    /* A QR shown ON the phone cannot be scanned BY that phone. Desktop only. */
+    .lk-hint .desktop-only { display: inline; }
+    .lk-hint .mobile-only { display: none; }
+    @media (max-width: 1023px) {
+      .lk-qr { display: none; }
+      .lk-row { gap: 0; }
+      .lk-open { align-self: stretch; text-align: center; font-size: 15px; padding: 13px 18px; }
+      .lk-body { width: 100%; gap: 10px; }
+      .lk-hint .desktop-only { display: none; }
+      .lk-hint .mobile-only { display: inline; }
+      .code { font-size: 18px; letter-spacing: .16em; }
+    }
     .lk-qr { flex: none; width: 88px; height: 88px; border-radius: 8px; background: #fff; padding: 4px; box-sizing: border-box; }
     .lk-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .lk-open { display: inline-block; align-self: flex-start; background: #2b7bd6; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 8px 14px; border-radius: 9px; }
-    .lk-open:hover { background: #3b8be6; }
+    .lk-open { display: inline-block; align-self: flex-start; background: #1a9fd6; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 8px 14px; border-radius: 9px; }
+    .lk-open:hover { background: #7dc0e4; }
     .lk-hint { font-size: 12.5px; line-height: 1.5; color: #a5a8b0; }
     .lk-hint .code { font-size: 15px; padding: 2px 8px 2px 10px; }
     .code { font-family: 'Roboto Mono', monospace; font-size: 22px; letter-spacing: .22em; color: #fff; background: #151517; border: 1px solid #2a2a2a; border-radius: 9px; padding: 4px 10px 4px 14px; }
@@ -125,6 +138,7 @@ export const agentHtml = `<!DOCTYPE html>
         <button type="submit" id="send" disabled>Send</button>
       </form>
     </div>
+
     <p class="foot"><b>What you&rsquo;re watching:</b> Claude runs the Ticketz tools through the BotShield gateway. Any tool that spends is held until a verified human confirms it in the BotShield app &mdash; the agent gets a signed Proof of Resolution, never your card.</p>
   </div>
 
@@ -175,7 +189,7 @@ export const agentHtml = `<!DOCTYPE html>
             '<img class="lk-qr" src="/api/agent/link/qr?code=' + encodeURIComponent(j.code) + '" alt="QR: open BotShield to link" width="88" height="88">' +
             '<div class="lk-body">' +
               (claim ? '<a class="lk-open" data-cta="app" href="' + claim + '" target="_blank" rel="noopener">Open BotShield</a>' : '') +
-              '<div class="lk-hint">Already signed in on your phone? Scan the code. Or in the app open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span></div>' +
+              '<div class="lk-hint"><span class="desktop-only">Already signed in on your phone? Scan the code. Or in</span><span class="mobile-only">Tap above to open BotShield on this phone. Or in</span> the app open <b>Agents Ask \u2192 Link</b> and enter <span class="code">' + j.code + '</span></div>' +
             '</div>' +
           '</div>';
         linkBtn.textContent = 'Waiting\u2026';
