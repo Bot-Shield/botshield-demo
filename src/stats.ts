@@ -11,7 +11,8 @@ export interface StatsEnv {
 const DATASET = 'botshield_demo_events';
 const DEMOS: Array<[string, string]> = [
   ['ticketz', 'Ticketz · BotShield Gate'], ['agent', 'Ticketz · Agents Ask'], ['trusted', 'Ticketz · Trusted Accounts'],
-  ['vapez', 'Vapez · Age Gate'], ['salesforce', 'Salesforce · Coral Cloud (click-out)'],
+  ['vapez', 'Vapez · Age Gate'], ['signup', 'Commons · Sign-up Gate'], ['drop', 'Tread · Add-to-cart Gate'], ['firm', 'Whitlock & Barr · Enquiry Gate'],
+  ['salesforce', 'Salesforce · Coral Cloud (click-out)'],
 ];
 
 type Row = Record<string, string | number>;
@@ -70,7 +71,7 @@ function dailyChart(rows: Row[]): string {
   const days: string[] = [];
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);
   for (let i = 29; i >= 0; i--) days.push(new Date(today.getTime() - i * 86400000).toISOString().slice(0, 10));
-  const colors: Record<string, string> = { ticketz: '#147baa', agent: '#a884fa', trusted: '#00d492', vapez: '#f79009' };
+  const colors: Record<string, string> = { ticketz: '#147baa', agent: '#a884fa', trusted: '#00d492', vapez: '#f79009', signup: '#7dc0e4', drop: '#e879f9', firm: '#fbbf24' };
   const by: Record<string, Record<string, number>> = {};
   for (const r of rows) { const d = String(r.day).slice(0, 10); (by[d] ||= {})[String(r.demo)] = n(r.n); }
   const totals = days.map((d) => Object.values(by[d] || {}).reduce((a, b) => a + b, 0));
@@ -140,7 +141,7 @@ ${DEMOS.map(([k, label]) => `<tr><td>${esc(label)}</td><td>${fmt(v7(k))}</td><td
 
     return page(`<div><h1>Demo usage</h1><div class="sub">demo.botshield.ai · updated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC</div></div>
 ${totals}${dailyChart(daily)}
-<div class="grid">${agent}${gate('ticketz', 'Ticketz · BotShield Gate')}${gate('vapez', 'Vapez · Age Gate')}${gate('trusted', 'Ticketz · Trusted Accounts')}</div>
+<div class="grid">${agent}${gate('ticketz', 'Ticketz · BotShield Gate')}${gate('vapez', 'Vapez · Age Gate')}${gate('signup', 'Commons · Sign-up Gate')}${gate('drop', 'Tread · Add-to-cart Gate')}${gate('firm', 'Whitlock & Barr · Enquiry Gate')}${gate('trusted', 'Ticketz · Trusted Accounts')}</div>
 <div class="grid">${countryCard}${deviceCard}${await clickOuts(env)}</div>`);
   } catch (e) {
     return page(`<h1>Demo usage</h1><div class="card"><p class="err">Could not read the stats: ${esc((e as Error).message)}</p></div>`, 502);
