@@ -190,6 +190,7 @@ export const signupHtml = `<!DOCTYPE html>
 
     <!-- Demo chrome, not part of the Commons design. -->
     <div class="demo-controls">
+      <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — the next check runs as a different human">New visitor</button>
       <button type="button" class="demo-reset" id="demoReset">Reset</button>
     </div>
   </div>
@@ -200,6 +201,25 @@ export const signupHtml = `<!DOCTYPE html>
       var form = document.getElementById('form');
       var feed = document.getElementById('feed');
       var bsVerify = document.getElementById('bsVerify');
+
+      var params = new URLSearchParams(window.location.search);
+      var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+      var SCOPE = params.get('scope') || 'account_signup';
+      var MODE = params.get('mode') || 'private';
+      bsVerify.setAttribute('site-key', SITE_KEY);
+      bsVerify.setAttribute('scope', SCOPE);
+      bsVerify.setAttribute('mode', MODE);
+
+      // A stable stand-in for the platform's own user id — the same pattern the
+      // other demos use. Without it the gate has nothing to link a verification
+      // to, so it never resolves. ?fresh=1 mints a new one; so does New visitor.
+      var REF_KEY = 'cmn_demo_user_ref';
+      var userRef = localStorage.getItem(REF_KEY);
+      if (!userRef || params.get('fresh')) {
+        userRef = 'cmn_' + Array.from(crypto.getRandomValues(new Uint8Array(6))).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+        localStorage.setItem(REF_KEY, userRef);
+      }
+      bsVerify.setAttribute('platform-user-ref', userRef);
 
       // The run panel lives outside this iframe; the demo reports its progress.
       function narrate(msg) { try { if (window.parent !== window) window.parent.postMessage(msg, '*'); } catch (e) {} }
@@ -217,6 +237,16 @@ export const signupHtml = `<!DOCTYPE html>
         narrate({ bs: 'step', n: 3 });
         narrate({ bs: 'result', result: { label: 'What Commons received', value: 'a human was here',
           note: 'Added to a form that otherwise only carries what someone typed. No name, no document \\u2014 and no second account for the same person.' } });
+      });
+
+      // Becoming a different human is the only way to show one-per-person
+      // honestly — a new ref, not a cleared screen.
+      document.getElementById('demoNewVisitor').addEventListener('click', function () {
+        var fresh = 'cmn_' + Array.from(crypto.getRandomValues(new Uint8Array(6))).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+        localStorage.setItem('cmn_demo_user_ref', fresh);
+        bsVerify.setAttribute('platform-user-ref', fresh);
+        if (bsVerify.reset) bsVerify.reset();
+        location.reload();
       });
 
       document.getElementById('demoReset').addEventListener('click', function () {
