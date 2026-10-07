@@ -112,7 +112,7 @@ export const trustedHtml = `<!DOCTYPE html>
     </div>
 
     <div class="wrap">
-      <div class="kicker">Your account</div>
+      <div class="kicker">Signed in to Ticketz</div>
       <div class="acct">
         <div class="avatar" id="avatar">G</div>
         <div class="acct-who">
@@ -179,16 +179,19 @@ export const trustedHtml = `<!DOCTYPE html>
     // The visitor's demo Ticketz accounts: stable per browser, never an email.
     var STORE_KEY = 'tkz_demo_accounts_v1';
     function hex(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(function(b) { return b.toString(16).padStart(2, '0'); }).join(''); }
-    function newAccount() {
-      var num = 1000 + (crypto.getRandomValues(new Uint16Array(1))[0] % 9000);
-      return { ref: 'tkz-demo-' + hex(6), name: 'Guest ' + num, secured: false };
+    // Deliberately one person's alts — the sockpuppet door, shown rather than
+    // described. The index picks the next address.
+    var ALTS = ['jordan.reyes', 'j.reyes91', 'jreyes.tickets', 'reyesj.alt'];
+    function newAccount(i) {
+      var mail = ALTS[Math.min(ALTS.length - 1, i || 0)] + '@example.com';
+      return { ref: 'tkz-demo-' + hex(6), name: mail, secured: false };
     }
     function load() {
       try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); if (s && Array.isArray(s.accounts) && s.accounts.length) return s; } catch (err) { /* fresh */ }
-      return { accounts: [newAccount()], active: 0 };
+      return { accounts: [newAccount(0)], active: 0 };
     }
     function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (err) { /* private mode */ } }
-    var state = params.get('fresh') ? { accounts: [newAccount()], active: 0 } : load();
+    var state = params.get('fresh') ? { accounts: [newAccount(0)], active: 0 } : load();
     save();
 
     // The tab the app returned to (opened by the widget for the hand-off):
@@ -227,8 +230,8 @@ export const trustedHtml = `<!DOCTYPE html>
     function render() {
       var a = acct();
       document.getElementById('acctName').textContent = a.name;
-      document.getElementById('acctId').textContent = 'Account ' + a.ref;
-      document.getElementById('avatar').textContent = a.name.replace('Guest ', '').slice(0, 2);
+      document.getElementById('acctId').textContent = 'Signed in \u00b7 ' + a.ref;
+      document.getElementById('avatar').textContent = a.name.slice(0, 1).toUpperCase();
       document.getElementById('secured').classList.toggle('on', !!a.secured);
       document.getElementById('panelTitle').textContent = a.secured ? 'Secured by BotShield' : '';
       document.getElementById('moment').classList.toggle('on', PAGE_OWNS_MOMENT && !a.secured);
@@ -255,7 +258,7 @@ export const trustedHtml = `<!DOCTYPE html>
         add.className = 'chip add';
         add.textContent = state.accounts.length === 1 ? '+ Second account' : '+ Another account';
         add.addEventListener('click', function() {
-          state.accounts.push(newAccount());
+          state.accounts.push(newAccount(state.accounts.length));
           switchTo(state.accounts.length - 1);
           say('New Ticketz account \\u2014 try to secure it with the same BotShield ID.');
         });
@@ -312,7 +315,7 @@ export const trustedHtml = `<!DOCTYPE html>
 
     document.getElementById('demoHowReset').addEventListener('click', function() { note('noteReset'); });
     document.getElementById('demoStartOver').addEventListener('click', function() {
-      state = { accounts: [newAccount()], active: 0 };
+      state = { accounts: [newAccount(0)], active: 0 };
       save();
       switchTo(0);
       say('Fresh Ticketz account. Unlink the old one in the BotShield app first if you secured it.');
