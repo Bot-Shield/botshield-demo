@@ -25,62 +25,62 @@ export const DEMOS: DemoEntry[] = [
   { key: 'signup', group: 'Commons', label: 'Human Gate', hint: 'At sign-up \u00b7 one account per human', path: '/signup',
     run: {
       line: 'A feed is only worth reading if the people in it are people.',
-      what: 'A script can fill all four fields, and fill them again tomorrow under another name. The Gate is the one it cannot \u2014 so the hundredth account costs what the first did.',
+      what: 'A script fills all four in a second, and again tomorrow under another name. The Gate is the one it cannot.',
       steps: [
-        'The form is already filled in. Tap <b>Verify you\u2019re human</b>.',
-        'A passkey on this device answers it. No new account, no second password.',
-        'You land in the feed. Every account in it is one human.',
+        'Tap <b>Verify you\u2019re human</b>.',
+        'A passkey answers it. No new account, no second password.',
+        'You land in the feed. Every account in it is one person.',
       ],
     } },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: 'At the door \u00b7 18+ to enter', path: '/vapez', platforms: ['iOS', 'Android'],
     run: {
       line: 'Proof of age without proof of identity.',
-      what: 'BotShield reads the age the device already holds. Vapez receives <b>verified</b> or <b>unavailable</b> \u2014 never a birthdate, never a document, nothing to store.',
+      what: 'The device already knows. Vapez receives <b>verified</b> or <b>unavailable</b> \u2014 never a birthdate, never a document.',
       steps: [
         'Tap <b>Verify you\u2019re over 18</b>.',
-        'The device answers from the age it already knows. No upload, no form.',
-        'The store opens. With no age on the device the door stays shut and says why.',
+        'The device answers. No upload, no form.',
+        'The store opens. No age on the device, and the door stays shut.',
       ],
     } },
   // Via the worker's /salesforce redirect so the click-out is counted (same destination).
   { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent asks, a human answers', path: '/agent',
     run: {
-      line: 'The agent has no card. Asking is the whole of what it can do.',
-      what: 'Claude runs the Ticketz tools through the BotShield gateway. Nothing on its side can move money, so a purchase is not something it does and you interrupt \u2014 it is something only your yes can start.',
+      line: 'The agent can ask. It cannot pay.',
+      what: 'Claude runs the Ticketz tools through the BotShield gateway. It has no way to pay, so nothing starts without your yes.',
       steps: [
-        'Tap <b>Link</b> and scan the code, or open the web app here.',
-        'Ask the agent for tickets. It comes back with a request, because that is all it has.',
-        'Say yes with a passkey. Ticketz checks the signed answer in its own code \u2014 never your card.',
+        'Tap <b>Link</b> and scan the code, or open the web app.',
+        'Ask for tickets. It comes back with a request.',
+        'Say yes with a passkey. Ticketz checks the signature, never your card.',
       ],
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
     run: {
       line: 'Signing in proves the password. It never proved the person.',
-      what: 'Ticketz knows the address. It cannot tell whether the four here are four people or one. Securing the account changes that \u2014 staying trusted costs real presence, and that cost will not spread across accounts.',
+      what: 'Ticketz knows the address. It cannot tell whether these four are four people or one.',
       steps: [
-        'You are signed in as jordan.reyes@example.com. Tap <b>Secure your account with BotShield</b>.',
-        'A passkey confirms it. Ticketz gets a yes and a per-platform handle \u2014 no email, no name.',
-        'Try to secure a <b>second account</b>. Ticketz holds one per human, so it is refused.',
+        'Tap <b>Secure your account with BotShield</b>.',
+        'A passkey confirms it. Ticketz gets a handle, not your name.',
+        'Try a <b>second account</b>. One per person, so it is refused.',
       ],
     } },
   { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',
     run: {
       line: 'Bots don\u2019t attack checkout. They attack add to cart.',
-      what: '900 pairs, one each. Inventory is held the moment it lands in a cart \u2014 so that is where the drop is decided, and where the bots are.',
+      what: '900 pairs, one each. Inventory is held at the cart, so that is where the drop is decided.',
       steps: [
         'Pick a size and tap <b>Add to cart</b>.',
-        'A passkey answers it. No raffle, no queue, no account needed.',
-        'The pair is held. Come back for a second with a new account and card \u2014 the cart says no before it asks for either.',
+        'A passkey answers it. No raffle, no queue, no account.',
+        'The pair is held. Come back with a new account and card \u2014 the cart still says no.',
       ],
     } },
   { key: 'firm', group: 'Whitlock & Barr', label: 'Human Gate', hint: 'On the form that gets spammed', path: '/firm',
     run: {
       line: 'A person reads every enquiry. Now a person sends them too.',
-      what: 'The most mundane surface there is, and the one junk hits hardest. A solicitor reads every enquiry \u2014 so the junk is already being paid for, in someone\u2019s morning.',
+      what: 'A solicitor reads every enquiry, so the junk is already being paid for \u2014 in someone\u2019s morning.',
       steps: [
         'The enquiry is written. Tap <b>Verify you\u2019re human</b>.',
-        'A passkey answers it. One tap \u2014 no account, no password, nothing to work out.',
-        'It lands in the inbox marked as a person. The next thousand fakes cost a human each.',
+        'A passkey answers it. No account, no password.',
+        'It lands marked as a person. The next thousand fakes cost a human each.',
       ],
     } },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
@@ -146,7 +146,7 @@ export function shellHtml(): string {
     /* The phone is the iframe. The sell lives beside it, where the real pixels are. */
     .runpanel { display: none; width: 360px; flex-shrink: 0; flex-direction: column; justify-content: center; gap: 18px;
                 background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 34px 30px; }
-    .rp-mark { width: 88px; height: auto; align-self: center; margin-bottom: 4px; }
+    .rp-mark { width: 88px; height: auto; aspect-ratio: 33 / 35.6743; flex: none; align-self: center; margin-bottom: 4px; }
     /* Names the demo you are in, so the panel answers "where am I" before
        it answers "what do I do". */
     .rp-eyebrow { align-self: center; font-family: 'Roboto Mono', monospace; font-size: 9px;
@@ -195,20 +195,47 @@ export function shellHtml(): string {
     .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
     @media (min-width: 1100px) { .runpanel { display: flex; width: 100%; } }
 
-    /* Below the two-column width the instructions stack ABOVE the demo, so
-       they are read before anyone scrolls down to run it. */
+    /* The how-to drawer. On a phone the demo owns the screen and the
+       instructions are raised on a tap, so neither competes with the other. */
+    /* On a phone the crumb is hidden, so this strip does two jobs: it says which
+       demo you are in, and it is the way into the how-to. */
+    .rp-open { display: none; width: 100%; align-items: center; justify-content: space-between; gap: 12px;
+               padding: 0 24px; height: 46px; flex-shrink: 0; background: var(--rail);
+               border: 0; border-bottom: 1px solid var(--line); cursor: pointer;
+               font-family: 'Roboto Mono', monospace; font-size: 10.5px; letter-spacing: .14em;
+               text-transform: uppercase; color: var(--faint); text-align: left; }
+    .rp-open .rpo-where { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rp-open .rpo-cta { display: inline-flex; align-items: center; gap: 7px; flex: none; color: #e6e8ea; }
+    .rp-open .rpo-cta i { width: 6px; height: 6px; border-radius: 50%; background: #1a9fd6; display: block; }
+    .rp-scrim { display: none; position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,.6);
+                opacity: 0; transition: opacity .22s ease; pointer-events: none; }
+    .rp-scrim.show { opacity: 1; pointer-events: auto; }
+    .rp-grab { display: none; }
+
     @media (max-width: 1099px) {
-      .frame { flex-direction: column; align-items: center; justify-content: flex-start;
-               overflow-y: auto; gap: 18px; padding: 18px 16px 28px; }
-      /* the wrapper stops existing, so these three order freely against the demo */
+      .rp-open { display: flex; }
+      .rp-scrim { display: block; }
       .rail-col { display: contents; }
-      .runpanel { display: flex; width: 100%; max-width: 460px; flex-shrink: 0; order: 1;
-                  max-height: calc(100dvh - 210px); overflow-y: auto; }
-      .bezel { height: auto; max-height: none; flex-shrink: 0; order: 2; }
-      .frame iframe { height: 740px; max-height: none; }
-      .rp-mark { width: 80px; }
-      .rp-h { font-size: 25px; line-height: 29px; letter-spacing: -.7px; }
+      /* the demo, full screen */
+      .frame { flex-direction: column; align-items: stretch; justify-content: stretch; gap: 0; padding: 0; }
+      .bezel { height: 100%; max-height: none; padding: 0; border: 0; border-radius: 0;
+               box-shadow: none; background: transparent; width: 100%; }
+      .frame iframe { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; }
+      /* the drawer */
+      .runpanel { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 56;
+                  width: 100%; border-radius: 22px 22px 0 0; border-left: 0; border-right: 0; border-bottom: 0;
+                  max-height: 86dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+                  padding: 14px 24px calc(env(safe-area-inset-bottom, 0px) + 80px);
+                  transform: translateY(101%); transition: transform .26s cubic-bezier(.32,.72,0,1); }
+      .runpanel.open { transform: none; }
+      .rp-grab { display: block; width: 38px; height: 4px; border-radius: 2px; background: #373a41;
+                 margin: 0 auto 10px; flex: none; }
+      .rp-mark { width: 72px; }
+      .rp-h { font-size: 24px; line-height: 28px; letter-spacing: -.6px; }
+      /* the strip above already says which demo this is */
+      .rp-eyebrow { display: none; }
     }
+    @media (prefers-reduced-motion: reduce) { .runpanel, .rp-scrim { transition: none; } }
     .bezel { flex-shrink: 0; height: 100%; max-height: 900px; padding: 11px; border-radius: 42px; background: #15181c;
              border: 1.5px solid #454a52; box-shadow: 0 28px 64px -10px rgba(0,0,0,.7); box-sizing: border-box; display: flex; }
     .frame iframe { width: 430px; max-width: 100%; height: 100%; border: 1px solid #23262c; border-radius: 32px; display: block; background: #08090b; }
@@ -311,10 +338,16 @@ export function shellHtml(): string {
 </defs></svg> BotShield Demos</div>
         <button type="button" class="menu" id="menu" aria-label="Open menu"><span></span><span></span><span></span></button>
       </div>
+      <button type="button" class="rp-open" id="rpOpen" aria-controls="runpanel" aria-expanded="false">
+        <span class="rpo-where" id="rpoWhere"></span>
+        <span class="rpo-cta"><i></i>How this works</span>
+      </button>
       <div class="crumb"><span>Demos</span><span class="sep">&middot;</span><b id="crumbGroup"></b><span class="sep">&middot;</span><span id="crumbLabel"></span><span class="right" id="crumbHint"></span></div>
       <div class="frame">
+        <div class="rp-scrim" id="rpScrim"></div>
         <div class="rail-col">
         <aside class="runpanel" id="runpanel" aria-label="Run this demo">
+          <span class="rp-grab" aria-hidden="true"></span>
           <svg class="rp-mark" aria-hidden="true" viewBox="0 0 33 35.6743" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Group"> <path id="Vector" d="M32.4713 6.64943C32.4499 6.54586 32.4033 6.4492 32.3355 6.36805C32.2677 6.28689 32.1808 6.22378 32.0827 6.18433L16.7357 0.0430144C16.5838 -0.0143381 16.4162 -0.0143381 16.2643 0.0430144L0.91728 6.18433C0.819167 6.22378 0.73234 6.28689 0.664537 6.36805C0.596735 6.4492 0.550064 6.54586 0.528686 6.64943C-2.01959 18.5945 4.86076 31.1638 16.5 35.6743C28.1392 31.1702 35.0196 18.5945 32.4713 6.64943ZM16.5 32.4889C6.93759 28.8385 1.28684 18.4925 3.37002 8.69438C3.39235 8.59122 3.43938 8.49501 3.50706 8.41401C3.57474 8.33301 3.66106 8.26964 3.75862 8.22934L16.2643 3.22839C16.4162 3.17104 16.5838 3.17104 16.7357 3.22839L29.2414 8.22937C29.339 8.26968 29.4253 8.33304 29.493 8.41404C29.5606 8.49504 29.6077 8.59125 29.63 8.69441C31.7132 18.4925 26.0624 28.8385 16.5 32.4889Z" fill="#1A9FD6"/> <path id="Vector_2" d="M13.91 17.2172C14.329 17.2174 14.6691 17.5573 14.6691 17.9764C14.6691 18.3955 14.3291 18.7353 13.91 18.7355C13.4907 18.7355 13.1508 18.3956 13.1508 17.9764C13.1509 17.5571 13.4907 17.2172 13.91 17.2172Z" fill="#1A9FD6"/> <path id="Vector_3" d="M19.0853 17.2172C19.5046 17.2172 19.8445 17.5571 19.8445 17.9764C19.8445 18.3956 19.5046 18.7355 19.0853 18.7355C18.6662 18.7354 18.3262 18.3956 18.3262 17.9764C18.3262 17.5572 18.6662 17.2174 19.0853 17.2172Z" fill="#1A9FD6"/> <path id="Vector_4" fill-rule="evenodd" clip-rule="evenodd" d="M16.4811 8.96938C17.0943 8.96941 17.5912 9.39546 17.5912 9.92102C17.5912 10.3007 17.3316 10.6277 16.9565 10.7804V11.8243H17.7944C18.2807 11.8243 18.6753 12.2189 18.6753 12.7052C18.6753 12.7293 18.6737 12.7532 18.6717 12.7768H19.4945C21.6385 12.7768 23.4703 14.1068 24.2142 15.9863C24.28 15.974 24.348 15.9675 24.4174 15.9675C25.0272 15.9675 25.5221 16.4623 25.5221 17.0722C25.5219 17.6337 25.1023 18.0955 24.5597 18.1653C24.3979 20.8226 22.1925 22.9279 19.4945 22.9279H13.4677C10.7697 22.9279 8.56335 20.8226 8.40158 18.1653C7.85937 18.0952 7.44026 17.6334 7.44009 17.0722C7.44009 16.4625 7.93426 15.9677 8.54392 15.9675C8.6132 15.9675 8.6814 15.9741 8.74714 15.9863C9.49094 14.1066 11.3236 12.7768 13.4677 12.7768H14.3307C14.3288 12.7532 14.3272 12.7293 14.3272 12.7052C14.3272 12.2191 14.7211 11.8245 15.2072 11.8243H16.0048V10.7796C15.6302 10.6267 15.371 10.3004 15.371 9.92102C15.371 9.39544 15.8679 8.96938 16.4811 8.96938ZM13.3093 15.3148C11.8201 15.3148 10.6128 16.5221 10.6128 18.0113C10.6132 19.5001 11.8203 20.7068 13.3093 20.7068H19.6538C21.1426 20.7067 22.3498 19.5 22.3503 18.0113C22.3503 16.5222 21.1429 15.315 19.6538 15.3148H13.3093Z" fill="#1A9FD6"/> </g> </svg>
           <p class="rp-eyebrow" id="rpEyebrow"></p>
           <h2 class="rp-h" id="rpH">Live Demo is Ready</h2>
@@ -347,6 +380,7 @@ export function shellHtml(): string {
       }
       var rpH = document.getElementById('rpH'), rpS = document.getElementById('rpS'), rpSteps = document.getElementById('rpSteps');
       document.getElementById('rpEyebrow').textContent = d.group + ' \u00b7 ' + d.label;
+      document.getElementById('rpoWhere').textContent = d.group + ' \u00b7 ' + d.label;
       if (d.run) {
         rpH.textContent = d.run.line;
         rpS.innerHTML = d.run.what;
@@ -356,6 +390,7 @@ export function shellHtml(): string {
         rpSteps.style.display = '';
         markStep(0);
         showResult(null);
+        setDrawer(false);
       } else {
         rpH.textContent = 'Live Demo is Ready';
         rpS.textContent = 'Open the web app and a passkey answers the check, right in the browser.';
@@ -397,6 +432,20 @@ export function shellHtml(): string {
                      (r.note ? '<div class="n">' + r.note + '</div>' : '');
       el.classList.add('on');
     }
+    // The drawer lives in the shell: only it sees the real viewport and only it
+    // can cover the demo. Closed by default so the demo owns the first screen.
+    var panel = document.getElementById('runpanel');
+    var scrim = document.getElementById('rpScrim');
+    var opener = document.getElementById('rpOpen');
+    function setDrawer(open) {
+      panel.classList.toggle('open', open);
+      scrim.classList.toggle('show', open);
+      opener.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    opener.addEventListener('click', function() { setDrawer(!panel.classList.contains('open')); });
+    scrim.addEventListener('click', function() { setDrawer(false); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') setDrawer(false); });
+
     window.addEventListener('message', function(e) {
       if (e.source !== frame.contentWindow) return;      // only the demo we are showing
       var d = e.data;
