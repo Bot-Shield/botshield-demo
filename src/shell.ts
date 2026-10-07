@@ -188,12 +188,19 @@ export function shellHtml(): string {
     .rp-primary small { display: block; font-size: 10.5px; font-weight: 400; color: #94979c; margin-top: 4px; }
     .d-only { display: inline; } .m-only { display: none; }
     @media (max-width: 1099px) { .d-only { display: none; } .m-only { display: inline; } }
+    /* Panel and invitation share the left column on desktop. On mobile the
+       wrapper dissolves (display: contents) so the invitation can fall AFTER
+       the demo — you watch it work, then you are asked. */
+    .rail-col { display: none; flex-direction: column; gap: 14px; width: 360px; flex-shrink: 0;
+                max-height: 100%; overflow-y: auto; scrollbar-width: none; }
+    .rail-col::-webkit-scrollbar { display: none; }
+    @media (min-width: 1100px) { .rail-col { display: flex; } }
     /* The invitation. They have just watched it work; this is the only thing
        on the page asking them to do something about it. Quiet, and last. */
-    .rp-partner { margin-top: 4px; padding-top: 16px; border-top: 1px solid #22262f; }
+    .rp-partner { background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 18px 22px; }
     .rp-partner .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em;
                         text-transform: uppercase; color: #61656c; margin-bottom: 8px; }
-    .rp-partner p { font-size: 12.5px; line-height: 18px; color: #94979c; margin: 0 0 12px; }
+    .rp-partner p { font-size: 12.5px; line-height: 17.5px; color: #94979c; margin: 0 0 11px; }
     .rp-partner-cta { display: block; text-align: center; text-decoration: none; color: #fff;
                       background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41;
                       border-radius: 10px; padding: 12px 18px; font-size: 13.5px; font-weight: 600; line-height: 1;
@@ -201,15 +208,19 @@ export function shellHtml(): string {
     .rp-partner-cta:hover, .rp-partner-cta:active { border-color: #1a9fd6;
       box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
     .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
-    @media (min-width: 1100px) { .runpanel { display: flex; } }
+    @media (min-width: 1100px) { .runpanel { display: flex; width: 100%; } }
 
     /* Below the two-column width the instructions stack ABOVE the demo, so
        they are read before anyone scrolls down to run it. */
     @media (max-width: 1099px) {
       .frame { flex-direction: column; align-items: center; justify-content: flex-start;
                overflow-y: auto; gap: 18px; padding: 18px 16px 28px; }
-      .runpanel { display: flex; width: 100%; max-width: 460px; flex-shrink: 0; }
-      .bezel { height: auto; max-height: none; flex-shrink: 0; }
+      /* the wrapper stops existing, so these three order freely against the demo */
+      .rail-col { display: contents; }
+      .runpanel { display: flex; width: 100%; max-width: 460px; flex-shrink: 0; order: 1;
+                  max-height: calc(100dvh - 210px); overflow-y: auto; }
+      .bezel { height: auto; max-height: none; flex-shrink: 0; order: 2; }
+      .rp-partner { width: 100%; max-width: 460px; order: 3; }
       .frame iframe { height: 740px; max-height: none; }
       .rp-mark { width: 80px; }
       .rp-h { font-size: 25px; line-height: 29px; letter-spacing: -.7px; }
@@ -318,6 +329,7 @@ export function shellHtml(): string {
       </div>
       <div class="crumb"><span>Demos</span><span class="sep">&middot;</span><b id="crumbGroup"></b><span class="sep">&middot;</span><span id="crumbLabel"></span><span class="right" id="crumbHint"></span></div>
       <div class="frame">
+        <div class="rail-col">
         <aside class="runpanel" id="runpanel" aria-label="Run this demo">
           <svg class="rp-mark" aria-hidden="true" viewBox="0 0 33 35.6743" fill="none" xmlns="http://www.w3.org/2000/svg"> <g id="Group"> <path id="Vector" d="M32.4713 6.64943C32.4499 6.54586 32.4033 6.4492 32.3355 6.36805C32.2677 6.28689 32.1808 6.22378 32.0827 6.18433L16.7357 0.0430144C16.5838 -0.0143381 16.4162 -0.0143381 16.2643 0.0430144L0.91728 6.18433C0.819167 6.22378 0.73234 6.28689 0.664537 6.36805C0.596735 6.4492 0.550064 6.54586 0.528686 6.64943C-2.01959 18.5945 4.86076 31.1638 16.5 35.6743C28.1392 31.1702 35.0196 18.5945 32.4713 6.64943ZM16.5 32.4889C6.93759 28.8385 1.28684 18.4925 3.37002 8.69438C3.39235 8.59122 3.43938 8.49501 3.50706 8.41401C3.57474 8.33301 3.66106 8.26964 3.75862 8.22934L16.2643 3.22839C16.4162 3.17104 16.5838 3.17104 16.7357 3.22839L29.2414 8.22937C29.339 8.26968 29.4253 8.33304 29.493 8.41404C29.5606 8.49504 29.6077 8.59125 29.63 8.69441C31.7132 18.4925 26.0624 28.8385 16.5 32.4889Z" fill="#1A9FD6"/> <path id="Vector_2" d="M13.91 17.2172C14.329 17.2174 14.6691 17.5573 14.6691 17.9764C14.6691 18.3955 14.3291 18.7353 13.91 18.7355C13.4907 18.7355 13.1508 18.3956 13.1508 17.9764C13.1509 17.5571 13.4907 17.2172 13.91 17.2172Z" fill="#1A9FD6"/> <path id="Vector_3" d="M19.0853 17.2172C19.5046 17.2172 19.8445 17.5571 19.8445 17.9764C19.8445 18.3956 19.5046 18.7355 19.0853 18.7355C18.6662 18.7354 18.3262 18.3956 18.3262 17.9764C18.3262 17.5572 18.6662 17.2174 19.0853 17.2172Z" fill="#1A9FD6"/> <path id="Vector_4" fill-rule="evenodd" clip-rule="evenodd" d="M16.4811 8.96938C17.0943 8.96941 17.5912 9.39546 17.5912 9.92102C17.5912 10.3007 17.3316 10.6277 16.9565 10.7804V11.8243H17.7944C18.2807 11.8243 18.6753 12.2189 18.6753 12.7052C18.6753 12.7293 18.6737 12.7532 18.6717 12.7768H19.4945C21.6385 12.7768 23.4703 14.1068 24.2142 15.9863C24.28 15.974 24.348 15.9675 24.4174 15.9675C25.0272 15.9675 25.5221 16.4623 25.5221 17.0722C25.5219 17.6337 25.1023 18.0955 24.5597 18.1653C24.3979 20.8226 22.1925 22.9279 19.4945 22.9279H13.4677C10.7697 22.9279 8.56335 20.8226 8.40158 18.1653C7.85937 18.0952 7.44026 17.6334 7.44009 17.0722C7.44009 16.4625 7.93426 15.9677 8.54392 15.9675C8.6132 15.9675 8.6814 15.9741 8.74714 15.9863C9.49094 14.1066 11.3236 12.7768 13.4677 12.7768H14.3307C14.3288 12.7532 14.3272 12.7293 14.3272 12.7052C14.3272 12.2191 14.7211 11.8245 15.2072 11.8243H16.0048V10.7796C15.6302 10.6267 15.371 10.3004 15.371 9.92102C15.371 9.39544 15.8679 8.96938 16.4811 8.96938ZM13.3093 15.3148C11.8201 15.3148 10.6128 16.5221 10.6128 18.0113C10.6132 19.5001 11.8203 20.7068 13.3093 20.7068H19.6538C21.1426 20.7067 22.3498 19.5 22.3503 18.0113C22.3503 16.5222 21.1429 15.315 19.6538 15.3148H13.3093Z" fill="#1A9FD6"/> </g> </svg>
           <p class="rp-eyebrow" id="rpEyebrow"></p>
@@ -330,12 +342,13 @@ export function shellHtml(): string {
             <a class="rp-secondary" href="https://app.botshield.ai" target="_blank" rel="noopener">Or use your phone instead</a>
           </div>
           <p class="rp-trust">Built on passkeys &middot; FIDO Alliance member</p>
-          <div class="rp-partner">
-            <div class="rp-k">Design partners</div>
-            <p>We are taking on a small number of companies to put a gate on a real surface and tell us what breaks. You keep your stack; we add the one check.</p>
-            <a class="rp-partner-cta" href="mailto:hello@botshield.ai?subject=Design%20partner%20%E2%80%94%20from%20the%20demo" target="_blank" rel="noopener">Put this on your own door &rarr;</a>
-          </div>
         </aside>
+        <div class="rp-partner">
+        <div class="rp-k">Design partners</div>
+        <p>We are taking on a small number of companies to put a gate on a real surface and tell us what breaks. You keep your stack; we add the one check.</p>
+        <a class="rp-partner-cta" href="mailto:hello@botshield.ai?subject=Design%20partner%20%E2%80%94%20from%20the%20demo" target="_blank" rel="noopener">Put this on your own door &rarr;</a>
+        </div>
+        </div>
         <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
       </div>
     </div>
