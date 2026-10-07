@@ -205,15 +205,35 @@ export function shellHtml(): string {
 
     @media (max-width: 767px) {
       .app { grid-template-columns: 1fr; }
-      .rail { position: fixed; inset: 0; z-index: 50; transform: translateX(-100%); transition: transform .22s ease; padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
+      /* Open, this is the site's own menu (botshield.ai .menu/.grp): big items,
+         mono group labels, air. The cramped desktop rail stays on desktop. */
+      .rail { position: fixed; inset: 0; z-index: 50; transform: translateX(-100%); transition: transform .22s ease;
+              background: var(--bg); border-right: 0; gap: 0;
+              padding: calc(env(safe-area-inset-top, 0px) + 78px) 28px calc(env(safe-area-inset-bottom, 0px) + 40px); }
       .rail.open { transform: none; }
+      .rail .brand { display: none; }
+      .rail .grp { padding-top: 0; margin-bottom: 22px; }
+      .rail .grp-h { font-size: 10px; letter-spacing: .18em; color: var(--faint); padding: 0 0 10px; }
+      .rail .it { display: block; padding: 8px 0; border: 0; background: none; border-radius: 0; }
+      .rail .it:hover { background: none; }
+      .rail .it.on { background: none; }
+      .rail .it-l { font-size: 20px; font-weight: 600; color: var(--muted); }
+      .rail .it.on .it-l { color: var(--ink); }
+      /* The hints crowd the menu at this size — they belong to the desktop rail. */
+      .rail .it-h { display: none; }
+      .rail .spacer { display: none; }
+      .rail .foot { margin-top: 10px; padding-top: 22px; }
+      .rail .foot a { font-size: 15px; padding: 7px 0; }
+      .rail .pill { margin: 10px 0 0; }
+      /* The run-panel pill must not sit on top of the open menu. */
+      body.menu-open .rp-trigger { display: none; }
       /* The site's own header, to the letter (botshield.ai .topbar/.mlogo/.burger).
          The only change: the word is Demo, and the mark carries BotShield. */
       .top { display: flex; align-items: center; justify-content: space-between; gap: 16px;
              height: calc(env(safe-area-inset-top, 0px) + 64px); padding: env(safe-area-inset-top, 0px) 24px 0;
              background: rgba(10, 11, 13, .82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
              border-bottom: 1px solid rgba(255, 255, 255, .07); }
-      .top .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; color: #f4f5f7; }
+      .top .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; color: #f4f5f7; white-space: nowrap; }
       .tb-mark { width: 26px; height: auto; flex: none; }
       .top .menu { display: flex; flex-direction: column; gap: 4px; padding: 8px; background: none; border: 0; cursor: pointer; }
       .top .menu span { width: 22px; height: 2px; background: #f4f5f7; border-radius: 2px; display: block; }
@@ -279,7 +299,7 @@ export function shellHtml(): string {
 <stop offset="0.509615" stop-color="#147BAA"/>
 <stop offset="1" stop-color="#147BAA"/>
 </linearGradient>
-</defs></svg> Demo</div>
+</defs></svg> BotShield Demos</div>
         <button type="button" class="menu" id="menu" aria-label="Open menu"><span></span><span></span><span></span></button>
       </div>
       <div class="crumb"><span>Demos</span><span class="sep">&middot;</span><b id="crumbGroup"></b><span class="sep">&middot;</span><span id="crumbLabel"></span><span class="right" id="crumbHint"></span></div>
@@ -342,13 +362,17 @@ export function shellHtml(): string {
       document.getElementById('crumbHint').textContent = d.hint;
       document.title = d.group + ' \\u00b7 ' + d.label + ' \\u2014 BotShield Demos';
       if (push && window.location.hash !== '#' + d.key) history.replaceState(null, '', '#' + d.key);
-      rail.classList.remove('open');
+      setMenu(false);
     }
     Array.prototype.forEach.call(document.querySelectorAll('.it[href^="#"]'), function(a) {
       a.addEventListener('click', function(e) { e.preventDefault(); pick(a.getAttribute('data-key'), true); });
     });
-    document.getElementById('menu').addEventListener('click', function() { rail.classList.add('open'); });
-    document.getElementById('close').addEventListener('click', function() { rail.classList.remove('open'); });
+    function setMenu(open) {
+      rail.classList.toggle('open', open);
+      document.body.classList.toggle('menu-open', open);
+    }
+    document.getElementById('menu').addEventListener('click', function() { setMenu(true); });
+    document.getElementById('close').addEventListener('click', function() { setMenu(false); });
     window.addEventListener('hashchange', function() { pick(window.location.hash.slice(1), false); });
 
     // The demo inside the iframe reports where it has got to, so the panel
