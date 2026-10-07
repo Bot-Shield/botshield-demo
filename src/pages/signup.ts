@@ -122,7 +122,7 @@ export const signupHtml = `<!DOCTYPE html>
               theme="dark"
               scan-mode="modal"
               signals="true"
-              checkout-label="Create account with BotShield"
+              checkout-label="Create account"
             ></botshield-verify>
           </div>
         </div>
