@@ -46,11 +46,11 @@ export const DEMOS: DemoEntry[] = [
   { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent asks, a human answers', path: '/agent',
     run: {
       line: 'The agent has no card. Asking is the whole of what it can do.',
-      what: 'Claude runs the Ticketz tools through the BotShield gateway. Nothing on its side can move money \u2014 so a purchase is not something it does and you interrupt. It is something only your yes can start.',
+      what: 'Claude runs the Ticketz tools through the BotShield gateway. Nothing on its side can move money \u2014 so a purchase is not something it does and you interrupt. It is something only your yes can start, and the answer is checked by Ticketz, not asserted to it.',
       steps: [
         'Tap <b>Link</b> and scan the code, or open the web app here.',
         'Ask the agent for tickets. It comes back with a request, because that is all it has.',
-        'Say yes with a passkey. Ticketz receives a signed answer that you meant this charge \u2014 never your card.',
+        'Say yes with a passkey. Ticketz receives a signed answer bound to this checkout, and checks it in its own code \u2014 never your card.',
       ],
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
