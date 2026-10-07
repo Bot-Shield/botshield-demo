@@ -105,7 +105,20 @@ export function shellHtml(): string {
   <meta name="theme-color" content="#0b0c0e">
   <title>BotShield Demos</title>
   <link rel="icon" href="/favicon.ico">
-  <meta name="description" content="Live demos of BotShield: Human Gate at checkout, Age Gate at the door, Agents Ask for AI agents, and the Salesforce Agentforce integration.">
+  <meta name="description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="BotShield">
+  <meta property="og:url" content="https://demo.botshield.ai/">
+  <meta property="og:title" content="A script can fill every field. It can’t be a person.">
+  <meta property="og:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
+  <meta property="og:image" content="https://demo.botshield.ai/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A script can fill every field. It can’t be a person.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="A script can fill every field. It can’t be a person.">
+  <meta name="twitter:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
+  <meta name="twitter:image" content="https://demo.botshield.ai/og.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>

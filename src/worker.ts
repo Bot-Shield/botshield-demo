@@ -24,6 +24,7 @@ import { dropHtml } from './pages/drop';
 import { firmHtml } from './pages/firm';
 import { shellHtml } from './shell';
 import { FAVICON_ICO_B64 } from './favicon';
+import { OG_PNG_B64 } from './og';
 import qrcode from 'qrcode-generator';
 import { record, beacon, withAnalytics, type AnalyticsEnv } from './analytics';
 import { statsPage, type StatsEnv } from './stats';
@@ -189,6 +190,11 @@ export default {
     if (path === '/favicon.ico') {
       const bytes = Uint8Array.from(atob(FAVICON_ICO_B64), (c) => c.charCodeAt(0));
       return new Response(bytes, { headers: { 'Content-Type': 'image/x-icon', 'Cache-Control': 'public, max-age=86400' } });
+    }
+    // The social card. Crawlers fetch it cold and cache hard, so it gets a long max-age.
+    if (path === '/og.png') {
+      const bytes = Uint8Array.from(atob(OG_PNG_B64), (c) => c.charCodeAt(0));
+      return new Response(bytes, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
     }
     // Pages: count the view (cookieless, layer 1), then serve with the consent banner + GTM loader (layer 2).
     const PAGES: Record<string, [string, () => string]> = {
