@@ -110,9 +110,9 @@ export const trustedHtml = `<!DOCTYPE html>
     <div class="wrap">
       <div class="kicker">Account</div>
       <div class="acct">
-        <div class="avatar" id="avatar">G</div>
+        <div class="avatar" id="avatar"></div>
         <div class="acct-who">
-          <div class="acct-name" id="acctName">Guest</div>
+          <div class="acct-name" id="acctName"></div>
           <div class="acct-id" id="acctId"></div>
         </div>
         <span class="secured" id="secured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9.3-8 11-4.5-1.7-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4"/></svg>Secured</span>
@@ -178,7 +178,18 @@ export const trustedHtml = `<!DOCTYPE html>
       return { ref: 'tkz-demo-' + hex(6), name: mail, secured: false };
     }
     function load() {
-      try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); if (s && Array.isArray(s.accounts) && s.accounts.length) return s; } catch (err) { /* fresh */ }
+      try {
+        var s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+        if (s && Array.isArray(s.accounts) && s.accounts.length) {
+          // The active index was never validated. One that is missing or past
+          // the end of the array handed acct() undefined, which threw on the
+          // first line of render() — so the card kept its placeholder and read
+          // as a real account called Guest, with no switcher and no way out.
+          var i = Number(s.active);
+          s.active = (isFinite(i) && i >= 0 && i < s.accounts.length) ? i : 0;
+          return s;
+        }
+      } catch (err) { /* fresh */ }
       return { accounts: [newAccount(0)], active: 0 };
     }
     function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (err) { /* private mode */ } }
@@ -204,7 +215,7 @@ export const trustedHtml = `<!DOCTYPE html>
     var toast = document.getElementById('toast');
     function say(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 3400); }
     function note(id) { ['noteSecured', 'noteOne', 'noteBack', 'noteReset', 'noteUnlinked'].forEach(function(n) { document.getElementById(n).classList.toggle('on', n === id); }); }
-    function acct() { return state.accounts[state.active]; }
+    function acct() { return state.accounts[state.active] || state.accounts[0]; }
 
     /** A secured account shows the finished state; "Sign in again" brings the widget back for a returning pass. */
     var returning = false;
