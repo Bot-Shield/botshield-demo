@@ -83,6 +83,10 @@ export const agentHtml = `<!DOCTYPE html>
        (section 3249:3932, in-chat state 3253:3889). At rest it is a one-line
        strip; the ceremony turns it into the card that frame specifies. */
     .link { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #22262f; background: #0b0e12; font-size: 13px; }
+    /* The agent mark — blue robot, orange waves: our own colour language for
+       agent + ask, and the same icon you tap top right in the app to enter the
+       code, so the row points at where it sends you. */
+    .link .lk-mark { width: 26px; height: auto; aspect-ratio: 45 / 39; flex: none; }
     .link .l { color: #94979c; }
     .link .l b { color: #fff; font-weight: 600; }
     .link.bound .l b { color: #23cb78; }
@@ -95,6 +99,7 @@ export const agentHtml = `<!DOCTYPE html>
 
     .link.linking { display: block; position: relative; margin: 12px; padding: 18px; background: #111418; border: 1px solid #22262f; border-bottom-color: #22262f; border-radius: 14px; }
     .link.linking .l { display: block; }
+    .link.linking .lk-mark { display: none; }
     .link.linking > button { position: absolute; top: 15px; right: 15px; }
     .lk-wrap { position: relative; }
 
@@ -160,6 +165,7 @@ export const agentHtml = `<!DOCTYPE html>
     <div class="chat">
       <div class="status" id="status"><span class="dot"></span><span id="statusText">Connecting&hellip;</span></div>
       <div class="link" id="link">
+        <svg class="lk-mark" viewBox="0 0 45 39" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19.2725 10.0244C20.4521 10.0247 21.4085 10.8443 21.4087 11.8555C21.4087 12.5855 20.909 13.2129 20.188 13.5072V15.5188H21.7994C22.735 15.5188 23.4936 16.2774 23.4936 17.2132C23.4936 17.2593 23.49 17.3048 23.4864 17.3499H25.0707C29.197 17.35 32.7232 19.9104 34.154 23.5279C34.2805 23.5044 34.4114 23.4913 34.5446 23.4913C35.718 23.4915 36.6687 24.4432 36.6687 25.6165C36.6685 26.6973 35.8614 27.587 34.8169 27.721C34.5049 32.8335 30.2617 36.8833 25.0707 36.8835H13.4729C8.28137 36.8834 4.03691 32.833 3.72559 27.7198C2.68198 27.585 1.8752 26.6968 1.875 25.6165C1.875 24.443 2.82673 23.4913 4.00025 23.4913C4.13331 23.4913 4.26336 23.5044 4.38965 23.5279C5.82039 19.9104 9.34662 17.35 13.4729 17.3499H15.1342C15.1306 17.3048 15.127 17.2593 15.127 17.2132C15.127 16.2775 15.8856 15.5189 16.8212 15.5188H18.3569V13.5083C17.6354 13.2143 17.1362 12.5859 17.1362 11.8555C17.1364 10.8443 18.0926 10.0244 19.2725 10.0244ZM13.1677 22.2327C10.3026 22.233 7.98012 24.5557 7.97975 27.4207C7.97975 30.2862 10.3024 32.6097 13.1677 32.6099H25.3772C28.2426 32.6097 30.5651 30.2862 30.5651 27.4207C30.5647 24.5557 28.2422 22.2329 25.3772 22.2327H13.1677ZM14.3237 25.896C15.1305 25.8962 15.7849 26.5504 15.7849 27.3572C15.7847 28.1638 15.1304 28.8172 14.3237 28.8172C13.5171 28.8172 12.8627 28.1638 12.8625 27.3572C12.8625 26.5504 13.5169 25.896 14.3237 25.896ZM24.2835 25.896C25.0901 25.896 25.7445 26.5494 25.7446 27.356C25.7446 28.1628 25.0902 28.8172 24.2835 28.8172C23.4767 28.817 22.8235 28.1627 22.8235 27.356C22.8236 26.5494 23.4769 25.8962 24.2835 25.896Z" fill="#1A9FD6"/><path opacity="0.7" d="M38.2941 6.61377C39.0544 7.37543 39.4815 8.40769 39.4815 9.48394C39.4815 10.5602 39.0544 11.5924 38.2941 12.3541" stroke="#FF5D25" stroke-width="1.69" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.7" d="M32.543 12.3541C31.7826 11.5924 31.3556 10.5602 31.3556 9.48394C31.3556 8.40769 31.7826 7.37543 32.543 6.61377" stroke="#FF5D25" stroke-width="1.69" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.7" d="M40.2087 4.69922C41.4769 5.96878 42.1891 7.68982 42.1891 9.48419C42.1891 11.2786 41.4769 12.9996 40.2087 14.2691" stroke="#FF5D25" stroke-width="1.69" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.7" d="M30.6285 14.2691C29.3604 12.9996 28.6481 11.2786 28.6481 9.48419C28.6481 7.68982 29.3604 5.96878 30.6285 4.69922" stroke="#FF5D25" stroke-width="1.69" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.623184" d="M35.4185 10.8381C36.1664 10.8381 36.7726 10.2319 36.7726 9.48401C36.7726 8.73614 36.1664 8.12988 35.4185 8.12988C34.6706 8.12988 34.0644 8.73614 34.0644 9.48401C34.0644 10.2319 34.6706 10.8381 35.4185 10.8381Z" stroke="#FF5D25" stroke-width="1.69"/></svg>
         <span class="l" id="linkText"><b>Link with BotShield</b> &mdash; so only the agents you allow can ask.</span>
         <button type="button" id="linkBtn">Link</button>
       </div>
