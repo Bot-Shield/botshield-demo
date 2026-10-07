@@ -188,6 +188,18 @@ export function shellHtml(): string {
     .rp-primary small { display: block; font-size: 10.5px; font-weight: 400; color: #94979c; margin-top: 4px; }
     .d-only { display: inline; } .m-only { display: none; }
     @media (max-width: 1099px) { .d-only { display: none; } .m-only { display: inline; } }
+    /* The invitation. They have just watched it work; this is the only thing
+       on the page asking them to do something about it. Quiet, and last. */
+    .rp-partner { margin-top: 4px; padding-top: 16px; border-top: 1px solid #22262f; }
+    .rp-partner .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em;
+                        text-transform: uppercase; color: #61656c; margin-bottom: 8px; }
+    .rp-partner p { font-size: 12.5px; line-height: 18px; color: #94979c; margin: 0 0 12px; }
+    .rp-partner-cta { display: block; text-align: center; text-decoration: none; color: #fff;
+                      background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41;
+                      border-radius: 10px; padding: 12px 18px; font-size: 13.5px; font-weight: 600; line-height: 1;
+                      transition: border-color .15s, box-shadow .15s; }
+    .rp-partner-cta:hover, .rp-partner-cta:active { border-color: #1a9fd6;
+      box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
     .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
     @media (min-width: 1100px) { .runpanel { display: flex; } }
 
@@ -318,6 +330,11 @@ export function shellHtml(): string {
             <a class="rp-secondary" href="https://app.botshield.ai" target="_blank" rel="noopener">Or use your phone instead</a>
           </div>
           <p class="rp-trust">Built on passkeys &middot; FIDO Alliance member</p>
+          <div class="rp-partner">
+            <div class="rp-k">Design partners</div>
+            <p>We are taking on a small number of companies to put a gate on a real surface and tell us what breaks. You keep your stack; we add the one check.</p>
+            <a class="rp-partner-cta" href="mailto:hello@botshield.ai?subject=Design%20partner%20%E2%80%94%20from%20the%20demo" target="_blank" rel="noopener">Put this on your own door &rarr;</a>
+          </div>
         </aside>
         <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
       </div>
