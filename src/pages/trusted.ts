@@ -178,7 +178,8 @@ export const trustedHtml = `<!DOCTYPE html>
     function hex(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(function(b) { return b.toString(16).padStart(2, '0'); }).join(''); }
     // Deliberately one person's alts. Ticketz cannot tell them apart today; what
     // changes after securing is the cost of keeping them all trusted at once.
-    var ALTS = ['jordan.reyes', 'j.reyes91', 'jreyes.tickets', 'reyesj.alt'];
+    // Two accounts make the whole point. A third is just more email to read.
+    var ALTS = ['jordan.reyes', 'j.reyes91'];
     function newAccount(i) {
       var mail = ALTS[Math.min(ALTS.length - 1, i || 0)] + '@example.com';
       return { ref: 'tkz-demo-' + hex(6), name: mail, secured: false };
@@ -264,11 +265,11 @@ export const trustedHtml = `<!DOCTYPE html>
         b.addEventListener('click', function() { switchTo(i); });
         sw.appendChild(b);
       });
-      if (state.accounts.length < 3) {
+      if (state.accounts.length < 2) {
         var add = document.createElement('button');
         add.type = 'button';
         add.className = 'chip add';
-        add.textContent = state.accounts.length === 1 ? '+ Second account' : '+ Another account';
+        add.textContent = '+ Second account';
         add.addEventListener('click', function() {
           state.accounts.push(newAccount(state.accounts.length));
           switchTo(state.accounts.length - 1);
