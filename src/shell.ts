@@ -160,10 +160,16 @@ export function shellHtml(): string {
       .app { grid-template-columns: 1fr; }
       .rail { position: fixed; inset: 0; z-index: 50; transform: translateX(-100%); transition: transform .22s ease; padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
       .rail.open { transform: none; }
-      .top { display: flex; align-items: center; gap: 10px; height: calc(env(safe-area-inset-top, 0px) + 52px); padding: env(safe-area-inset-top, 0px) 12px 0; border-bottom: 1px solid var(--line); background: var(--rail); }
-      .top .menu { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: #14161b; color: var(--ink); display: flex; align-items: center; justify-content: center; }
-      .top .title { font-size: 15px; font-weight: 600; }
-      .top .title small { display: block; font-size: 11.5px; font-weight: 400; color: var(--faint); }
+      /* The site's own header, to the letter (botshield.ai .topbar/.mlogo/.burger).
+         The only change: the word is Demo, and the mark carries BotShield. */
+      .top { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+             height: calc(env(safe-area-inset-top, 0px) + 64px); padding: env(safe-area-inset-top, 0px) 24px 0;
+             background: rgba(10, 11, 13, .82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+             border-bottom: 1px solid rgba(255, 255, 255, .07); }
+      .top .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; color: #f4f5f7; }
+      .tb-mark { width: 26px; height: auto; flex: none; }
+      .top .menu { display: flex; flex-direction: column; gap: 4px; padding: 8px; background: none; border: 0; cursor: pointer; }
+      .top .menu span { width: 22px; height: 2px; background: #f4f5f7; border-radius: 2px; display: block; }
       .crumb { display: none; }
       .frame { padding: 0; gap: 0; }
       .bezel { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; max-height: none; width: 100%; }
@@ -211,8 +217,24 @@ export function shellHtml(): string {
     </nav>
     <div class="main">
       <div class="top">
-        <button type="button" class="menu" id="menu" aria-label="Open menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-        <div class="title" id="mtitle">BotShield Demos<small id="msub"></small></div>
+        <div class="logo"><svg class="tb-mark" viewBox="0 0 150 163" fill="none" aria-hidden="true"><path d="M147.597 30.2247C147.5 29.7539 147.288 29.3145 146.979 28.9457C146.671 28.5768 146.277 28.2899 145.831 28.1106L76.0714 0.19552C75.3809 -0.0651734 74.6191 -0.0651734 73.9286 0.19552L4.16945 28.1106C3.72348 28.2899 3.32881 28.5768 3.02062 28.9457C2.71243 29.3145 2.50029 29.7539 2.40311 30.2247C-9.17993 84.5204 22.0944 141.654 75 162.156C127.906 141.683 159.18 84.5204 147.597 30.2247ZM75 147.677C31.5345 131.084 5.84927 84.0569 15.3183 39.5199C15.4198 39.051 15.6335 38.6137 15.9412 38.2455C16.2488 37.8773 16.6412 37.5893 17.0846 37.4061L73.9286 14.6745C74.6191 14.4138 75.3809 14.4138 76.0714 14.6745L132.915 37.4062C133.359 37.5894 133.751 37.8775 134.059 38.2456C134.367 38.6138 134.58 39.0511 134.682 39.5201C144.151 84.0569 118.466 131.084 75 147.677Z" fill="url(#paint0_linear_113_1711)"/>
+<path d="M74.915 40.7707C77.7023 40.7707 79.9619 42.7078 79.9619 45.0969C79.9618 46.8223 78.783 48.3108 77.0781 49.0051V53.7482H80.8857C83.0961 53.7482 84.8877 55.5408 84.8877 57.7512C84.8877 57.8603 84.8826 57.9684 84.874 58.0754H88.6143C98.361 58.0755 106.695 64.1205 110.075 72.6652C110.372 72.6104 110.678 72.5803 110.991 72.5803C113.763 72.5803 116.011 74.8278 116.011 77.5998C116.011 80.1522 114.105 82.2574 111.64 82.5754C110.902 94.6517 100.876 104.218 88.6143 104.218H61.2168C48.9548 104.218 38.9282 94.6518 38.1904 82.5754C35.7252 82.2569 33.8203 80.1518 33.8203 77.5998C33.8204 74.8278 36.0678 72.5803 38.8398 72.5803C39.1524 72.5803 39.4581 72.6105 39.7549 72.6652C43.1346 64.1202 51.4698 58.0755 61.2168 58.0754H65.1387C65.1301 57.9684 65.125 57.8603 65.125 57.7512C65.125 55.5408 66.9166 53.7482 69.127 53.7482H72.752V49.0051C71.0475 48.3107 69.8693 46.8221 69.8691 45.0969C69.8691 42.7079 72.128 40.7709 74.915 40.7707ZM60.4961 69.6096C53.7273 69.6099 48.2404 75.0976 48.2402 81.8664C48.2403 88.6353 53.7272 94.1229 60.4961 94.1232H89.3359C96.1048 94.123 101.592 88.6353 101.592 81.8664C101.592 75.0975 96.1048 69.6098 89.3359 69.6096H60.4961ZM63.2266 78.2609C65.1324 78.2609 66.6777 79.8063 66.6777 81.7121C66.6776 83.6178 65.1323 85.1623 63.2266 85.1623C61.321 85.1621 59.7765 83.6177 59.7764 81.7121C59.7764 79.8064 61.3209 78.2611 63.2266 78.2609ZM86.7549 78.2609C88.6605 78.2611 90.2051 79.8064 90.2051 81.7121C90.205 83.6177 88.6605 85.1621 86.7549 85.1623C84.8491 85.1623 83.3038 83.6178 83.3037 81.7121C83.3037 79.8063 84.8491 78.2609 86.7549 78.2609Z" fill="url(#paint1_linear_113_1711)"/>
+<defs>
+<linearGradient id="paint0_linear_113_1711" x1="137.232" y1="162.811" x2="129.859" y2="-28.35" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0F5E82"/>
+<stop offset="0.163462" stop-color="#0F5E82"/>
+<stop offset="0.509615" stop-color="#147BAA"/>
+<stop offset="1" stop-color="#147BAA"/>
+</linearGradient>
+<linearGradient id="paint1_linear_113_1711" x1="109.015" y1="104.474" x2="106.953" y2="29.6236" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0F5E82"/>
+<stop offset="0.163462" stop-color="#0F5E82"/>
+<stop offset="0.509615" stop-color="#147BAA"/>
+<stop offset="1" stop-color="#147BAA"/>
+</linearGradient>
+</defs></svg> Demo</div>
+        <button type="button" class="menu" id="menu" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
       </div>
       <div class="crumb"><span>Demos</span><span class="sep">&middot;</span><b id="crumbGroup"></b><span class="sep">&middot;</span><span id="crumbLabel"></span><span class="right" id="crumbHint"></span></div>
       <div class="frame">
@@ -260,7 +282,6 @@ export function shellHtml(): string {
       document.getElementById('crumbGroup').textContent = d.group;
       document.getElementById('crumbLabel').textContent = d.label;
       document.getElementById('crumbHint').textContent = d.hint;
-      document.getElementById('msub').textContent = d.group + ' \\u00b7 ' + d.label;
       document.title = d.group + ' \\u00b7 ' + d.label + ' \\u2014 BotShield Demos';
       if (push && window.location.hash !== '#' + d.key) history.replaceState(null, '', '#' + d.key);
       rail.classList.remove('open');
