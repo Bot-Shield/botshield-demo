@@ -86,8 +86,12 @@ export const agentHtml = `<!DOCTYPE html>
     .link .l { color: #c9c9c9; }
     .link .l b { color: #fff; font-weight: 600; }
     .link.bound .l b { color: #23cb78; }
-    .link button { background: #1a9fd6; color: #fff; border: 0; border-radius: 10px; font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
-    .link button.ghost { background: transparent; border: 1px solid #373a41; color: #c9c9c9; }
+    /* .btn.sm from the site — the ghost is the same button, no ground. */
+    .link button { background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41; color: #fff;
+                   border-radius: 10px; font-family: inherit; font-size: 13.5px; font-weight: 600; padding: 10px 16px;
+                   cursor: pointer; white-space: nowrap; line-height: 1; transition: border-color .15s, box-shadow .15s; }
+    .link button:hover, .link button:active { border-color: #1a9fd6; box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
+    .link button.ghost { background: transparent; }
 
     .link.linking { display: block; position: relative; margin: 12px; padding: 18px; background: #111418; border: 1px solid #22262f; border-bottom-color: #22262f; border-radius: 14px; }
     .link.linking .l { display: block; }
@@ -96,8 +100,13 @@ export const agentHtml = `<!DOCTYPE html>
 
     .lk-h { font-size: 19px; line-height: 24px; letter-spacing: -0.4px; font-weight: 600; color: #f7f7f7; padding-right: 72px; }
     .lk-sub { margin-top: 7px; font-size: 13px; line-height: 20px; color: #94979c; }
-    .lk-open { display: block; margin-top: 14px; background: #1a9fd6; color: #fff; text-decoration: none; text-align: center; font-weight: 600; font-size: 15px; padding: 13px 18px; border-radius: 10px; }
-    .lk-open:hover { background: #7dc0e4; }
+    /* The site's .btn, verbatim: a dark gradient with a hairline edge and a
+       white label. Blue is the hover/pressed state, never the resting fill. */
+    .lk-open { display: block; margin-top: 14px; background: linear-gradient(180deg, #16181b, #0e1013);
+               border: 1px solid #373a41; color: #fff; text-decoration: none; text-align: center;
+               font-weight: 600; font-size: 15px; padding: 14px 22px; border-radius: 10px; line-height: 1;
+               transition: border-color .15s, box-shadow .15s; }
+    .lk-open:hover, .lk-open:active { border-color: #1a9fd6; box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
 
     .lk-row { display: flex; gap: 14px; align-items: center; margin-top: 14px; }
     .lk-qr { flex: none; width: 128px; height: 128px; border-radius: 12px; background: #fff; padding: 10px; box-sizing: border-box; }
