@@ -325,6 +325,17 @@ export const ticketzHtml = `<!DOCTYPE html>
 
     .demo-ref.show { display: block; }
     .demo-ref:active { color: #9ca3af; }
+    /* The widget's checkout button ships #7f56d9. It declares that on the button
+       itself, so a custom property set out here cannot win — but the SDK exposes
+       part="checkout" for partner restyling, which can. Calm and high contrast,
+       the way a shop's own add-to-cart reads. */
+    botshield-verify::part(checkout) {
+      background: #f7f7f7;
+      color: #0b0e12;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>

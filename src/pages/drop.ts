@@ -1,10 +1,11 @@
-// Tread — a limited release. The checkout worth gating: a drop where the whole
-// promise is ONE PAIR PER PERSON, and where bots are the reason real customers
-// never get one. Gating an ordinary basket reads as slowing the funnel; gating
-// a drop is the thing the shop is actually selling.
+// Tread — a limited release, gated at ADD TO CART.
+//
+// That placement is the point. Inventory is held the moment it lands in a cart,
+// so a drop is decided there, not at the till — which is why drop bots are ATC
+// bots. Gating checkout gates a door after the room is already full.
 //
 // Tread is a MOCK brand (the roster rule: no real brand on a customer surface).
-// Same widget and site key as the other demos; the scope is `limited_release`.
+// Same widget and site key as the other demos; the scope is `add_to_cart`.
 // Served at /drop; framed by the Demos shell.
 export const dropHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -60,9 +61,20 @@ export const dropHtml = `<!DOCTYPE html>
     .sz.out { color: #3c4046; text-decoration: line-through; cursor: not-allowed; }
 
     botshield-verify { display: block; width: 100%; }
+    /* The widget's checkout button ships #7f56d9. It declares that on the button
+       itself, so a custom property set out here cannot win — but the SDK exposes
+       part="checkout" for partner restyling, which can. Calm and high contrast,
+       the way a shop's own add-to-cart reads. */
+    botshield-verify::part(checkout) {
+      background: #f7f7f7;
+      color: #0b0e12;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: none;
+    }
     .legal { font-size: 11.5px; line-height: 17px; color: #61656c; text-align: center; }
 
-    /* ── Claimed ── */
+    /* ── Held in your cart ── */
     .done { display: none; flex-direction: column; gap: 14px; }
     .done.open { display: flex; }
     .banner { background: rgba(35, 203, 120, .08); border: 1px solid rgba(35, 203, 120, .35);
@@ -129,32 +141,32 @@ export const dropHtml = `<!DOCTYPE html>
 
         <botshield-verify
           site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
-          scope="limited_release"
+          scope="add_to_cart"
           id="bsVerify"
           theme="dark"
           scan-mode="modal"
           signals="true"
-          checkout-label="Claim your pair"
+          checkout-label="Add to cart"
         ></botshield-verify>
 
-        <p class="legal">One pair per person, checked at the door. No queue, no raffle, no resale army.</p>
+        <p class="legal">Checked at the cart, not the till. By checkout the pair is already gone.</p>
       </section>
 
       <section class="done" id="done">
-        <div class="banner"><b>Pair claimed.</b> Size 10, held for you. Tread knows a person claimed it &mdash; never which person.</div>
+        <div class="banner"><b>In your cart.</b> Size 10, held for you. Tread knows a person took it &mdash; never which person.</div>
 
         <div class="rows">
           <div class="k">What Tread received</div>
-          <div class="row"><span>Claim</span><b id="claim">&mdash;</b></div>
+          <div class="row"><span>Cart</span><b id="claim">&mdash;</b></div>
           <div class="row"><span>One per person</span><b style="color:#23cb78">held</b></div>
           <div class="row"><span>Ceremony</span><b class="mono" id="cer">&mdash;</b></div>
           <p class="note">Never a name, never a card, never a device. Just that this pair went to a person who does not already have one.</p>
         </div>
 
         <div class="again">
-          <div class="hd">Try to claim a second pair</div>
-          <p>This is the part a drop actually needs. The same human comes back for another pair &mdash; a second account, a second card, a different browser. The answer does not change.</p>
-          <span class="refused">Already claimed by this human</span>
+          <div class="hd">Try to add a second pair</div>
+          <p>This is the part a drop actually needs. The same human comes back for another pair &mdash; a second account, a second card, a different browser. The cart says no before the card is ever asked for.</p>
+          <span class="refused">Already in a cart for this human</span>
         </div>
       </section>
     </div>
@@ -188,14 +200,14 @@ export const dropHtml = `<!DOCTYPE html>
 
       bsVerify.addEventListener('botshield:checkout', function (e) {
         var d = (e && e.detail) || {};
-        document.getElementById('claim').textContent = 'ARC-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+        document.getElementById('claim').textContent = 'CART-' + Math.random().toString(36).slice(2, 7).toUpperCase();
         document.getElementById('cer').textContent = d.ceremony_id || d.ceremonyId || 'issued';
         form.style.display = 'none';
         done.classList.add('open');
         window.scrollTo(0, 0);
         narrate({ bs: 'step', n: 3 });
-        narrate({ bs: 'result', result: { label: 'What Tread received', value: 'one pair, one person',
-          note: 'Not a name, not a card, not a device. Just that this pair went to someone who does not already have one.' } });
+        narrate({ bs: 'result', result: { label: 'What Tread received', value: 'one cart, one person',
+          note: 'Not a name, not a card, not a device. Just that the inventory went to someone who does not already have a pair held.' } });
       });
 
       document.getElementById('demoReset').addEventListener('click', function () {

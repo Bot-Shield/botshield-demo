@@ -53,6 +53,17 @@ export const signupHtml = `<!DOCTYPE html>
                          text-transform: none; color: #7dc0e4; }
     botshield-verify { display: block; width: 100%; }
 
+    /* The widget's checkout button ships #7f56d9. It declares that on the button
+       itself, so a custom property set out here cannot win — but the SDK exposes
+       part="checkout" for partner restyling, which can. Calm and high contrast,
+       the way a shop's own add-to-cart reads. */
+    botshield-verify::part(checkout) {
+      background: #f7f7f7;
+      color: #0b0e12;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: none;
+    }
     .legal { font-size: 11.5px; line-height: 17px; color: #61656c; text-align: center; }
     .alt { font-size: 13px; color: #94979c; text-align: center; }
     .alt a { color: #e6e8ea; text-decoration: none; border-bottom: 1px solid #373a41; }

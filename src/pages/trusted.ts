@@ -65,6 +65,17 @@ export const trustedHtml = `<!DOCTYPE html>
     .panel p { font-size: 14px; line-height: 1.55; color: #a3a3a3; padding: 0 2px; }
     .panel p b { color: #e5e5e5; font-weight: 600; }
     botshield-verify { display: block; width: 100%; }
+    /* The widget's checkout button ships #7f56d9. It declares that on the button
+       itself, so a custom property set out here cannot win — but the SDK exposes
+       part="checkout" for partner restyling, which can. Calm and high contrast,
+       the way a shop's own add-to-cart reads. */
+    botshield-verify::part(checkout) {
+      background: #f7f7f7;
+      color: #0b0e12;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: none;
+    }
     botshield-verify.hide { display: none; }
     .again { display: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #fff; background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41; border-radius: 12px; padding: 13px 16px; cursor: pointer; }
     .again.on { display: block; }

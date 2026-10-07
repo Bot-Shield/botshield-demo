@@ -65,12 +65,12 @@ export const DEMOS: DemoEntry[] = [
     } },
   { key: 'drop', group: 'Tread', label: 'The drop', hint: 'One pair per person', path: '/drop',
     run: {
-      line: 'The checkout worth gating is the one with a limit on it.',
-      what: '900 pairs, one each. Bots are the reason real customers never get one \u2014 so here the shop <i>wants</i> the door checked. On an ordinary basket a gate is a tax; on a drop it is the product.',
+      line: 'Bots don\u2019t attack checkout. They attack add to cart.',
+      what: '900 pairs, one each. Inventory is held the moment it lands in a cart, so that is where the drop is decided \u2014 and where the bots are. By checkout the pair is already gone.',
       steps: [
-        'Pick a size and tap <b>Claim your pair</b>.',
+        'Pick a size and tap <b>Add to cart</b>.',
         'A passkey answers it. No raffle, no queue, no account needed.',
-        'The pair is held. Come back for a second one and the answer does not change \u2014 same human, same answer.',
+        'The pair is held for you. Come back for a second \u2014 new account, new card, new browser \u2014 and the cart says no before the card is ever asked for.',
       ],
     } },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
