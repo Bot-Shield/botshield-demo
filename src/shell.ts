@@ -25,62 +25,62 @@ export const DEMOS: DemoEntry[] = [
   { key: 'signup', group: 'Commons', label: 'Human Gate', hint: 'At sign-up \u00b7 one account per human', path: '/signup',
     run: {
       line: 'A feed is only worth reading if the people in it are people.',
-      what: 'Name, handle, email, password \u2014 a script can fill all four, and fill them again tomorrow under another name. The Gate is the only field it cannot fill, which is what makes the hundredth account cost as much as the first.',
+      what: 'A script can fill all four fields, and fill them again tomorrow under another name. The Gate is the one it cannot \u2014 so the hundredth account costs what the first did.',
       steps: [
         'The form is already filled in. Tap <b>Verify you\u2019re human</b>.',
         'A passkey on this device answers it. No new account, no second password.',
-        'You land in the feed. Every account in it is one human, including yours.',
+        'You land in the feed. Every account in it is one human.',
       ],
     } },
   { key: 'vapez', group: 'Vapez', label: 'Age Gate', hint: 'At the door \u00b7 18+ to enter', path: '/vapez', platforms: ['iOS', 'Android'],
     run: {
       line: 'Proof of age without proof of identity.',
-      what: 'BotShield reads the age assertion the device already holds. Vapez receives <b>verified</b> or <b>unavailable</b> \u2014 never a birthdate, never a document, nothing to store and nothing to leak.',
+      what: 'BotShield reads the age the device already holds. Vapez receives <b>verified</b> or <b>unavailable</b> \u2014 never a birthdate, never a document, nothing to store.',
       steps: [
         'Tap <b>Verify you\u2019re over 18</b>.',
         'The device answers from the age it already knows. No upload, no form.',
-        'The store opens. With no age assertion the door stays shut and says why \u2014 that is the honest state, not a failure.',
+        'The store opens. With no age on the device the door stays shut and says why.',
       ],
     } },
   // Via the worker's /salesforce redirect so the click-out is counted (same destination).
   { key: 'agent', group: 'Ticketz', label: 'Agents Ask', hint: 'An agent asks, a human answers', path: '/agent',
     run: {
       line: 'The agent has no card. Asking is the whole of what it can do.',
-      what: 'Claude runs the Ticketz tools through the BotShield gateway. Nothing on its side can move money \u2014 so a purchase is not something it does and you interrupt. It is something only your yes can start, and the answer is checked by Ticketz, not asserted to it.',
+      what: 'Claude runs the Ticketz tools through the BotShield gateway. Nothing on its side can move money, so a purchase is not something it does and you interrupt \u2014 it is something only your yes can start.',
       steps: [
         'Tap <b>Link</b> and scan the code, or open the web app here.',
         'Ask the agent for tickets. It comes back with a request, because that is all it has.',
-        'Say yes with a passkey. Ticketz receives a signed answer bound to this checkout, and checks it in its own code \u2014 never your card.',
+        'Say yes with a passkey. Ticketz checks the signed answer in its own code \u2014 never your card.',
       ],
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account per BotShield ID', path: '/trusted',
     run: {
       line: 'Signing in proves the password. It never proved the person.',
-      what: 'You are already signed in \u2014 Ticketz knows the address. What it cannot tell is whether the four addresses here are four people or one. Securing the account inverts the economics: an account that stays trusted costs real presence, continuously, and that cost will not spread across accounts.',
+      what: 'Ticketz knows the address. It cannot tell whether the four here are four people or one. Securing the account changes that \u2014 staying trusted costs real presence, and that cost will not spread across accounts.',
       steps: [
         'You are signed in as jordan.reyes@example.com. Tap <b>Secure your account with BotShield</b>.',
-        'A passkey confirms it. Ticketz gets a yes and a per-platform handle \u2014 no email, no name, no device.',
-        'Now take a <b>second account</b> and try to secure it too. Ticketz holds one per human, so it is refused \u2014 and holding both would have cost two people\u2019s time, not one script.',
+        'A passkey confirms it. Ticketz gets a yes and a per-platform handle \u2014 no email, no name.',
+        'Try to secure a <b>second account</b>. Ticketz holds one per human, so it is refused.',
       ],
     } },
   { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',
     run: {
       line: 'Bots don\u2019t attack checkout. They attack add to cart.',
-      what: '900 pairs, one each. Inventory is held the moment it lands in a cart, so that is where the drop is decided \u2014 and where the bots are. By checkout the pair is already gone.',
+      what: '900 pairs, one each. Inventory is held the moment it lands in a cart \u2014 so that is where the drop is decided, and where the bots are.',
       steps: [
         'Pick a size and tap <b>Add to cart</b>.',
         'A passkey answers it. No raffle, no queue, no account needed.',
-        'The pair is held for you. Come back for a second \u2014 new account, new card, new browser \u2014 and the cart says no before the card is ever asked for.',
+        'The pair is held. Come back for a second with a new account and card \u2014 the cart says no before it asks for either.',
       ],
     } },
   { key: 'firm', group: 'Whitlock & Barr', label: 'Human Gate', hint: 'On the form that gets spammed', path: '/firm',
     run: {
       line: 'A person reads every enquiry. Now a person sends them too.',
-      what: 'A free case review form \u2014 the most mundane surface there is, and the one junk hits hardest. A solicitor reads every enquiry, so the junk is already being paid for in someone\u2019s morning.',
+      what: 'The most mundane surface there is, and the one junk hits hardest. A solicitor reads every enquiry \u2014 so the junk is already being paid for, in someone\u2019s morning.',
       steps: [
         'The enquiry is written. Tap <b>Verify you\u2019re human</b>.',
         'A passkey answers it. One tap \u2014 no account, no password, nothing to work out.',
-        'It lands in the firm\u2019s inbox marked as a person \u2014 and the next thousand fakes now cost a human each instead of nothing.',
+        'It lands in the inbox marked as a person. The next thousand fakes cost a human each.',
       ],
     } },
   { key: 'salesforce', group: 'Salesforce', label: 'Coral Cloud', hint: 'Agentforce + Flow on AppExchange', href: '/salesforce' },
@@ -144,22 +144,22 @@ export function shellHtml(): string {
        composition as the app's web rail. Phone: it IS the screen. */
     .frame { flex: 1; min-height: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; gap: 28px; padding: 28px 24px; }
     /* The phone is the iframe. The sell lives beside it, where the real pixels are. */
-    .runpanel { display: none; width: 360px; flex-shrink: 0; flex-direction: column; justify-content: center; gap: 13px;
-                background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 30px 24px; }
-    .rp-mark { width: 96px; height: auto; align-self: center; margin-bottom: 2px; }
+    .runpanel { display: none; width: 360px; flex-shrink: 0; flex-direction: column; justify-content: center; gap: 18px;
+                background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 34px 30px; }
+    .rp-mark { width: 88px; height: auto; align-self: center; margin-bottom: 4px; }
     /* Names the demo you are in, so the panel answers "where am I" before
        it answers "what do I do". */
     .rp-eyebrow { align-self: center; font-family: 'Roboto Mono', monospace; font-size: 9px;
                   letter-spacing: .18em; text-transform: uppercase; color: var(--faint);
-                  border: 1px solid #22262f; border-radius: 999px; padding: 5px 11px; margin: 0; }
+                  border: 1px solid #22262f; border-radius: 999px; padding: 6px 13px; margin: 0; }
     .rp-h { font-size: 29px; line-height: 33px; font-weight: 600; letter-spacing: -.9px; color: #fff;
             text-align: center; margin: 0; text-wrap: balance; }
     /* A measure, so the sell never runs the full width of the column. */
-    .rp-s { font-size: 13.5px; line-height: 20px; color: #94979c; text-align: center; margin: 0 auto;
-            max-width: 34ch; text-wrap: pretty; }
-    .rp-steps { display: flex; flex-direction: column; gap: 10px; margin: 2px 0; padding-top: 14px; border-top: 1px solid #22262f; }
-    .rp-steps .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #61656c; }
-    .rp-step { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 18px; color: #94979c; }
+    .rp-s { font-size: 13.5px; line-height: 21px; color: #94979c; text-align: center; margin: 0 auto;
+            max-width: 36ch; text-wrap: pretty; }
+    .rp-steps { display: flex; flex-direction: column; gap: 15px; margin: 4px 0; padding-top: 22px; border-top: 1px solid #22262f; }
+    .rp-steps .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #61656c; margin-bottom: 3px; }
+    .rp-step { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 20px; color: #94979c; }
     .rp-step i { flex: none; width: 18px; height: 18px; border-radius: 50%; background: #1c2027; color: #e6e8ea;
                  font-family: 'Roboto Mono', monospace; font-size: 10px; font-style: normal; display: flex;
                  align-items: center; justify-content: center; margin-top: 1px; }
@@ -169,14 +169,14 @@ export function shellHtml(): string {
     .rp-step.done b { color: #61656c; font-weight: 400; }
     .rp-step.done i { background: #16302a; color: #23cb78; }
     .rp-step.now i { background: #1a9fd6; color: #fff; }
-    .rp-result { display: none; margin-top: 2px; padding: 12px 14px; border-radius: 11px;
+    .rp-result { display: none; margin-top: 2px; padding: 15px 16px; border-radius: 12px;
                  background: rgba(35,203,120,.08); border: 1px solid rgba(35,203,120,.35); }
     .rp-result.on { display: block; }
     .rp-result .k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em;
                     text-transform: uppercase; color: #61656c; }
     .rp-result .v { font-family: 'Roboto Mono', monospace; font-size: 14px; color: #23cb78; margin-top: 5px; }
     .rp-result .n { font-size: 11.5px; line-height: 16px; color: #61656c; margin-top: 7px; }
-    .rp-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
+    .rp-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
     /* The site's .btn and .btn.ghost — one button, the ghost just drops the ground. */
     .rp-primary, .rp-secondary { display: block; text-align: center; text-decoration: none; color: #fff;
                                  border: 1px solid #373a41; border-radius: 10px; padding: 14px 22px; font-size: 15px;
@@ -188,25 +188,10 @@ export function shellHtml(): string {
     .rp-primary small { display: block; font-size: 10.5px; font-weight: 400; color: #94979c; margin-top: 4px; }
     .d-only { display: inline; } .m-only { display: none; }
     @media (max-width: 1099px) { .d-only { display: none; } .m-only { display: inline; } }
-    /* Panel and invitation share the left column on desktop. On mobile the
-       wrapper dissolves (display: contents) so the invitation can fall AFTER
-       the demo — you watch it work, then you are asked. */
-    .rail-col { display: none; flex-direction: column; gap: 14px; width: 360px; flex-shrink: 0;
+    .rail-col { display: none; flex-direction: column; width: 360px; flex-shrink: 0;
                 max-height: 100%; overflow-y: auto; scrollbar-width: none; }
     .rail-col::-webkit-scrollbar { display: none; }
     @media (min-width: 1100px) { .rail-col { display: flex; } }
-    /* The invitation. They have just watched it work; this is the only thing
-       on the page asking them to do something about it. Quiet, and last. */
-    .rp-partner { background: #0b0e12; border: 1px solid #373a41; border-radius: 20px; padding: 18px 22px; }
-    .rp-partner .rp-k { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .14em;
-                        text-transform: uppercase; color: #61656c; margin-bottom: 8px; }
-    .rp-partner p { font-size: 12.5px; line-height: 17.5px; color: #94979c; margin: 0 0 11px; }
-    .rp-partner-cta { display: block; text-align: center; text-decoration: none; color: #fff;
-                      background: linear-gradient(180deg, #16181b, #0e1013); border: 1px solid #373a41;
-                      border-radius: 10px; padding: 12px 18px; font-size: 13.5px; font-weight: 600; line-height: 1;
-                      transition: border-color .15s, box-shadow .15s; }
-    .rp-partner-cta:hover, .rp-partner-cta:active { border-color: #1a9fd6;
-      box-shadow: 0 0 0 1px rgba(26,159,214,.12), 0 0 22px -4px rgba(26,159,214,.5); }
     .rp-trust { font-family: 'Roboto Mono', monospace; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: #61656c; text-align: center; margin: 0; }
     @media (min-width: 1100px) { .runpanel { display: flex; width: 100%; } }
 
@@ -220,7 +205,6 @@ export function shellHtml(): string {
       .runpanel { display: flex; width: 100%; max-width: 460px; flex-shrink: 0; order: 1;
                   max-height: calc(100dvh - 210px); overflow-y: auto; }
       .bezel { height: auto; max-height: none; flex-shrink: 0; order: 2; }
-      .rp-partner { width: 100%; max-width: 460px; order: 3; }
       .frame iframe { height: 740px; max-height: none; }
       .rp-mark { width: 80px; }
       .rp-h { font-size: 25px; line-height: 29px; letter-spacing: -.7px; }
@@ -343,11 +327,6 @@ export function shellHtml(): string {
           </div>
           <p class="rp-trust">Built on passkeys &middot; FIDO Alliance member</p>
         </aside>
-        <div class="rp-partner">
-        <div class="rp-k">Design partners</div>
-        <p>We are taking on a small number of companies to put a gate on a real surface and tell us what breaks. You keep your stack; we add the one check.</p>
-        <a class="rp-partner-cta" href="mailto:hello@botshield.ai?subject=Design%20partner%20%E2%80%94%20from%20the%20demo" target="_blank" rel="noopener">Put this on your own door &rarr;</a>
-        </div>
         </div>
         <div class="bezel"><iframe id="frame" title="Selected demo" allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-write"></iframe></div>
       </div>
