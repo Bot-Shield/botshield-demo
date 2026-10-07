@@ -140,7 +140,7 @@ export const dropHtml = `<!DOCTYPE html>
         </div>
 
         <botshield-verify
-          site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
+          site-key="pk_live_e5ad13b9791d524987f991eefdb7f6de"
           scope="add_to_cart"
           id="bsVerify"
           theme="dark"
@@ -186,7 +186,7 @@ export const dropHtml = `<!DOCTYPE html>
       var bsVerify = document.getElementById('bsVerify');
 
       var params = new URLSearchParams(window.location.search);
-      var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+      var SITE_KEY = params.get('site_key') || 'pk_live_e5ad13b9791d524987f991eefdb7f6de';
       var SCOPE = params.get('scope') || 'add_to_cart';
       var MODE = params.get('mode') || 'private';
       bsVerify.setAttribute('site-key', SITE_KEY);

@@ -127,7 +127,7 @@ export const signupHtml = `<!DOCTYPE html>
           <div class="f gate">
             <label for="bsVerify">The fifth field <span>the only one a script can’t fill</span></label>
             <botshield-verify
-              site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
+              site-key="pk_live_f39ae04df36ad5b8334ea0c21e478bfd"
               scope="account_signup"
               id="bsVerify"
               theme="dark"
@@ -203,7 +203,7 @@ export const signupHtml = `<!DOCTYPE html>
       var bsVerify = document.getElementById('bsVerify');
 
       var params = new URLSearchParams(window.location.search);
-      var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+      var SITE_KEY = params.get('site_key') || 'pk_live_f39ae04df36ad5b8334ea0c21e478bfd';
       var SCOPE = params.get('scope') || 'account_signup';
       var MODE = params.get('mode') || 'private';
       bsVerify.setAttribute('site-key', SITE_KEY);

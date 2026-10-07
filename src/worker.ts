@@ -237,7 +237,8 @@ export default {
       return agentChat(env, request, Array.isArray(body?.messages) ? body.messages : [], bind);
     }
 
-    // Old deep links (?event=21 etc.) and anything else → the shell.
-    return Response.redirect(`${url.origin}/#ticketz`, 302);
+    // Old deep links (?event=21 etc.) and anything else → the shell (its default demo;
+    // `#ticketz` left the rail on 2026-10-07 and matched nothing).
+    return Response.redirect(`${url.origin}/`, 302);
   },
 };

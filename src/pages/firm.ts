@@ -181,7 +181,7 @@ export const firmHtml = `<!DOCTYPE html>
       var bsVerify = document.getElementById('bsVerify');
 
       var params = new URLSearchParams(window.location.search);
-      var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+      var SITE_KEY = params.get('site_key') || 'pk_live_9256abfa9b30aa3257a97f00aca06253';
       var SCOPE = params.get('scope') || 'contact_form';
       var MODE = params.get('mode') || 'private';
       bsVerify.setAttribute('site-key', SITE_KEY);

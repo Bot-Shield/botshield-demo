@@ -91,7 +91,7 @@ export const vapezHtml = `<!DOCTYPE html>
         <h1>You must be 18 or older to enter.</h1>
         <p>Vapez sells nicotine products. <b>Verify you&rsquo;re over 18 to continue.</b> BotShield checks the age your device already knows &mdash; no ID upload, no birthdate, nothing stored by Vapez.</p>
         <botshield-verify
-          site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
+          site-key="pk_live_5bfe8110685f07d8474a5ea9bf83e9a7"
           scope="enter_site_age_check"
           id="bsVerify"
           theme="dark"
@@ -130,7 +130,7 @@ export const vapezHtml = `<!DOCTYPE html>
   <script>
     var params = new URLSearchParams(window.location.search);
     // Same prod partner + key as Ticketz: the Vepez gate lives on that org.
-    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+    var SITE_KEY = params.get('site_key') || 'pk_live_5bfe8110685f07d8474a5ea9bf83e9a7';
     var SCOPE = params.get('scope') || 'enter_site_age_check';
     var MODE = params.get('mode') || 'private';
 
