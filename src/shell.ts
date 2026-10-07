@@ -109,14 +109,14 @@ export function shellHtml(): string {
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="BotShield">
   <meta property="og:url" content="https://demo.botshield.ai/">
-  <meta property="og:title" content="A script can fill every field. It can’t be a person.">
+  <meta property="og:title" content="A script can fill every field. It can’t be a person. Never who.">
   <meta property="og:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
   <meta property="og:image" content="https://demo.botshield.ai/og.png">
   <meta property="og:image:width" content="2400">
   <meta property="og:image:height" content="1260">
-  <meta property="og:image:alt" content="A script can fill every field. It can’t be a person.">
+  <meta property="og:image:alt" content="A script can fill every field. It can’t be a person. Never who.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="A script can fill every field. It can’t be a person.">
+  <meta name="twitter:title" content="A script can fill every field. It can’t be a person. Never who.">
   <meta name="twitter:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
   <meta name="twitter:image" content="https://demo.botshield.ai/og.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
