@@ -167,6 +167,10 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // confirmed → the order) so the page can render real cards, not JSON.
   const events: Array<Record<string, unknown>> = [];
   const parts: string[] = [];
+  // Only text turns are replayed to the model, so the facts it will need next
+  // turn (offer ids, the held order, the approval id) are distilled here and
+  // the page carries them inside the assistant turn as notes.
+  const notes: string[] = [];
   // Set while a checkout is waiting on the human; the page uses it to keep
   // checking on the person's behalf (up to the card's TTL) instead of
   // relying on the model's patience.
@@ -184,6 +188,12 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       if (last) { last.result = body.slice(0, 600); last.summary = summarizeToolResult(body); last.error = !!block.is_error; }
       let j: any = null; try { j = JSON.parse(body); } catch { /* not JSON */ }
       const demo = profile.demo;
+      if (Array.isArray(j?.offers) && j.offers.length) {
+        notes.push(`search ${j.date ?? ''}: ` + j.offers.slice(0, 5).map((o: any) => `${o.flight ?? o.airline ?? '?'} ${o.total ?? ''} offer_id=${o.offer_id}`).join('; '));
+      }
+      if (j?.status === 'approval_sent' && j.order_id) notes.push(`held order_id=${j.order_id} (${j.booking_reference ?? ''}, ${j.total ?? ''}) approval_request_id=${j.approval_request_id}`);
+      if (j?.status === 'approved_card_issued' && j.approval_id) notes.push(`card issued approval_id=${j.approval_id} for order_id=${j.order_id}`);
+      if (j?.error === 'hold_failed') notes.push(`hold failed for offer ${(() => { try { return JSON.stringify((events.find((e) => e.type === 'tool' && !e.result) ?? {}).args ?? '').slice(0, 80); } catch { return ''; } })()} — use the next offer`);
       if (j?.status === 'approval_sent') {
         awaiting = j.approval_request_id ?? awaiting;
         if (j.expires_at) awaitingExpiresAt = j.expires_at;
@@ -224,7 +234,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   const awaitingPrompt = !awaiting ? null : profile.demo === 'flights'
     ? `Check approval ${awaiting} again: call book_flight with approval_request_id="${awaiting}"${awaitingOrder ? ` and order_id="${awaitingOrder}"` : ''} and the same offer and passenger as before. If it returns approved_card_issued, immediately call pay_hold with that order_id and approval_id, then confirm in one line. If still pending, say only "still pending". If declined or expired, say so.`
     : `Check approval ${awaiting} again. If approved, finish the purchase; if still pending, say only "still pending"; if declined or expired, say so.`;
-  return json({ reply: parts.join('\n').trim(), events, awaiting, awaiting_order: awaitingOrder, awaiting_expires_at: awaitingExpiresAt, awaiting_prompt: awaitingPrompt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
+  return json({ reply: parts.join('\n').trim(), memory: notes.length ? notes.join('\n') : null, events, awaiting, awaiting_order: awaitingOrder, awaiting_expires_at: awaitingExpiresAt, awaiting_prompt: awaitingPrompt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
 }
 
 /** One line for the chat timeline, computed from the FULL tool result before truncation. */
