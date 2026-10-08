@@ -53,6 +53,16 @@ export const DEMOS: DemoEntry[] = [
         'Say yes with a passkey. Ticketz checks the signature, never your card.',
       ],
     } },
+  { key: 'flights', group: 'Meridian Airlines', label: 'Agents Ask\u2122 Pay', hint: 'The card issuer asks BotShield before the charge', path: '/flights',
+    run: {
+      line: 'BotShield isn\u2019t the payment rail. It\u2019s the authorization step.',
+      what: 'The agent holds a fare and sends the exact amount to your phone. Your yes issues a single-use card for that amount. When the card is charged, the <b>issuer asks BotShield</b> first \u2014 same card, same merchant, that amount, once.',
+      steps: [
+        'Tap <b>Link</b> and scan the code, or open the web app.',
+        'Ask for a flight. The fare is held and the amount lands on your phone.',
+        'Say yes with a passkey. The issuer checks with BotShield, then the charge goes through \u2014 ask it to charge twice and watch it refuse.',
+      ],
+    } },
   { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
     run: {
       line: 'A notary doesn\u2019t read the document. They confirm you signed it.',
