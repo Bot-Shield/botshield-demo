@@ -22,13 +22,13 @@ export interface AnalyticsEnv {
 
 /** Path → demo key. '/' is the shell. */
 export const PATH_DEMO: Record<string, string> = {
-  '/': 'shell', '/ticketz': 'ticketz', '/vapez': 'vapez', '/agent': 'agent', '/trusted': 'trusted', '/salesforce': 'salesforce',
+  '/': 'shell', '/ticketz': 'ticketz', '/vapez': 'vapez', '/agent': 'agent', '/flights': 'flights', '/trusted': 'trusted', '/salesforce': 'salesforce',
   '/signup': 'signup', '/drop': 'drop', '/firm': 'firm',
 };
 
 /** Events the browser may report through POST /api/e (everything else is recorded server-side). */
 const BEACON_EVENTS = new Set(['verify_start', 'verify_complete', 'verify_unavailable', 'verify_checkout', 'cta_click']);
-const BEACON_DEMOS = new Set(['shell', 'ticketz', 'vapez', 'trusted', 'agent', 'signup', 'drop', 'firm']);
+const BEACON_DEMOS = new Set(['shell', 'ticketz', 'vapez', 'trusted', 'agent', 'flights', 'signup', 'drop', 'firm']);
 
 function deviceClass(ua: string): string {
   if (!ua || /bot|crawl|spider|slurp|preview|monitor|headless|lighthouse|curl|wget|python|httpclient/i.test(ua)) return 'bot';
@@ -84,7 +84,7 @@ var j=d.createElement('script');j.async=true;j.src='https://www.googletagmanager
 if(c==='granted'){gtag('consent','update',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});w.__bsLoadGtm()}
 }
 var host=w.location.hostname;var env=(/staging/.test(host)||host==='localhost'||host==='127.0.0.1')?'staging':'production';
-var demo=({'/':'shell','/ticketz':'ticketz','/vapez':'vapez','/agent':'agent','/trusted':'trusted','/signup':'signup','/drop':'drop','/firm':'firm'})[w.location.pathname.replace(/\/+$/,'')||'/']||'shell';
+var demo=({'/':'shell','/ticketz':'ticketz','/vapez':'vapez','/agent':'agent','/flights':'flights','/trusted':'trusted','/signup':'signup','/drop':'drop','/firm':'firm'})[w.location.pathname.replace(/\/+$/,'')||'/']||'shell';
 w.__bsDemo=demo;
 w.bsTrack=function(event,params,toServer){
 try{var p={event:event,surface:'demo',env:env,demo:demo};if(params)for(var k in params)p[k]=params[k];

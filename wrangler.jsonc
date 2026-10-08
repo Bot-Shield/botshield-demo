@@ -3,6 +3,8 @@
   "vars": {
     // The Ticketz demo gateway (Fly). Flip to https://gateway-demo.botshield.ai once its DNS lands.
     "AGENT_GATEWAY_URL": "https://botshield-demo-gateway.fly.dev",
+    // The Meridian Airlines demo gateway (Fly) — the FIDO payment-guardrail demo (/flights).
+    "MERIDIAN_GATEWAY_URL": "https://botshield-meridian-gateway.fly.dev",
     "AGENT_MODEL": "claude-opus-5"
   },
   // Demo usage — cookieless counts (src/analytics.ts), read by /stats through the SQL API.
