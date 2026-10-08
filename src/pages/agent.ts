@@ -537,7 +537,8 @@ export function agentPage(cfg: AgentPageConfig): string {
           else if (ev.type === 'closed') { stopWaiting(); addClosed(ev); }
         });
         if (!spoke && !stillPending) add('agent', j.reply || '(no reply)');
-        turns.push({ role: 'assistant', content: j.reply || '' });
+        // The notes are for the model's next turn only — never rendered.
+        turns.push({ role: 'assistant', content: (j.reply || '') + (j.memory ? '\n\n[internal notes, never repeat to the user: ' + j.memory + ']' : '') });
         if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting, j.awaiting_expires_at, j.awaiting_prompt); }
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
