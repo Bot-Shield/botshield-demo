@@ -169,6 +169,9 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // relying on the model's patience.
   let awaiting: string | null = null;
   let awaitingExpiresAt: string | null = null;
+  // Meridian: resuming needs the order too. The model only sees text turns on
+  // the next call (tool results are not replayed), so the page carries it.
+  let awaitingOrder: string | null = null;
   for (const block of data.content ?? []) {
     if (block.type === 'text' && block.text?.trim()) { parts.push(block.text); events.push({ type: 'text', text: block.text }); }
     else if (block.type === 'mcp_tool_use') events.push({ type: 'tool', name: block.name, args: JSON.stringify(block.input ?? {}).slice(0, 220) });
@@ -181,6 +184,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       if (j?.status === 'approval_sent') {
         awaiting = j.approval_request_id ?? awaiting;
         if (j.expires_at) awaitingExpiresAt = j.expires_at;
+        if (j.order_id) awaitingOrder = j.order_id;
         events.push({ type: 'ask', request_id: j.approval_request_id ?? null, expires_at: j.expires_at ?? null, text: demo === 'flights' ? 'The booking is waiting for your confirmation.' : 'The purchase is waiting for your confirmation.' });
         record(env, request, 'ask_sent', demo);
       }
@@ -211,7 +215,13 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       else if (/^(denied|declined|expired|cancelled|canceled)$/.test(String(j?.status ?? ''))) { awaiting = null; record(env, request, /^(denied|declined)$/.test(String(j.status)) ? 'ask_denied' : 'ask_expired', demo); events.push({ type: 'closed', status: j.status, text: j.message ?? null }); }
     }
   }
-  return json({ reply: parts.join('\n').trim(), events, awaiting, awaiting_expires_at: awaitingExpiresAt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
+  // The exact words the page sends on each re-check — brand-specific, and it
+  // carries every id the resume call needs. Must start with "Check approval "
+  // (the analytics classifier keys on that).
+  const awaitingPrompt = !awaiting ? null : profile.demo === 'flights'
+    ? `Check approval ${awaiting} again: call book_flight with approval_request_id="${awaiting}"${awaitingOrder ? ` and order_id="${awaitingOrder}"` : ''} and the same offer and passenger as before. If it returns approved_card_issued, immediately call pay_hold with that order_id and approval_id, then confirm in one line. If still pending, say only "still pending". If declined or expired, say so.`
+    : `Check approval ${awaiting} again. If approved, finish the purchase; if still pending, say only "still pending"; if declined or expired, say so.`;
+  return json({ reply: parts.join('\n').trim(), events, awaiting, awaiting_order: awaitingOrder, awaiting_expires_at: awaitingExpiresAt, awaiting_prompt: awaitingPrompt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
 }
 
 /** One line for the chat timeline, computed from the FULL tool result before truncation. */

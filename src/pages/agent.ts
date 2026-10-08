@@ -416,7 +416,7 @@ export function agentPage(cfg: AgentPageConfig): string {
     // confirmed, declined or expired — up to the card's 10-minute TTL.
     // The card's expiry comes from the server (the partner's TTL policy) — the
     // page never assumes a number. Countdown + re-checks run until it passes.
-    var waitTimer = null, waitChecks = 0, waitExpiresAt = 0, waitTick = null;
+    var waitTimer = null, waitChecks = 0, waitExpiresAt = 0, waitTick = null, waitPrompt = null;
     function fmtLeft(ms) { var m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000); return m + ':' + (s < 10 ? '0' : '') + s; }
     function stopWaiting() {
       if (waitTimer) clearTimeout(waitTimer); waitTimer = null;
@@ -429,7 +429,8 @@ export function agentPage(cfg: AgentPageConfig): string {
       if (waitExpiresAt && left <= 0) { w.textContent = 'The card expired before you confirmed. Ask me again to send a new one.'; return; }
       w.textContent = (waitChecks ? 'Still waiting \\u2014 checked ' + waitChecks + '\\u00d7 \\u00b7 ' : 'Waiting for you \\u2014 ') + (waitExpiresAt ? fmtLeft(left) + ' left on the card' : 'take your time') + '.';
     }
-    function scheduleCheck(reqId, expiresAt) {
+    function scheduleCheck(reqId, expiresAt, prompt) {
+      if (prompt) waitPrompt = prompt;
       if (expiresAt) waitExpiresAt = Date.parse(expiresAt) || waitExpiresAt;
       if (!waitTick) waitTick = setInterval(paintWait, 1000);
       paintWait();
@@ -437,8 +438,8 @@ export function agentPage(cfg: AgentPageConfig): string {
       if (waitExpiresAt && waitExpiresAt - Date.now() <= 0) { stopWaiting(); paintWait(); return; }
       waitTimer = setTimeout(function() {
         waitTimer = null; waitChecks++;
-        ask('Check approval ' + reqId + ' again. If approved, finish it; if still pending, say only "still pending"; if declined or expired, say so.', true);
-      }, 20000);
+        ask(waitPrompt || ('Check approval ' + reqId + ' again. If approved, finish it; if still pending, say only "still pending"; if declined or expired, say so.'), true);
+      }, 10000);
     }
     function addOrder(ev) {
       var d = document.createElement('div');
@@ -506,7 +507,7 @@ export function agentPage(cfg: AgentPageConfig): string {
 
     async function ask(q, hidden) {
       if (!q || !live) return;
-      if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; if (window.bsTrack) bsTrack('agent_chat_turn'); }
+      if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; waitPrompt = null; if (window.bsTrack) bsTrack('agent_chat_turn'); }
       turns.push({ role: 'user', content: q });
       input.value = '';
       send.disabled = true;
@@ -537,7 +538,7 @@ export function agentPage(cfg: AgentPageConfig): string {
         });
         if (!spoke && !stillPending) add('agent', j.reply || '(no reply)');
         turns.push({ role: 'assistant', content: j.reply || '' });
-        if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting, j.awaiting_expires_at); }
+        if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting, j.awaiting_expires_at, j.awaiting_prompt); }
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
         clearTimeout(tick); clearTimeout(tick2);
