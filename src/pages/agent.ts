@@ -515,17 +515,24 @@ export function agentPage(cfg: AgentPageConfig): string {
       live = on;
       statusEl.className = 'status ' + (on ? 'live' : 'off');
       statusText.textContent = text;
-      send.disabled = !on;
+      syncSend();
     }
+    // Send follows the text box, never a stale health flag — a missed health
+    // answer at load used to leave the button dead while the agent was fine.
+    function syncSend() { send.disabled = !input.value.trim(); }
 
     // Health: is the worker wired to a gateway?
-    fetch(API + '/health').then(function(r) { return r.json(); }).then(function(h) {
-      if (h && h.ok) setLive(true, 'Live \\u00b7 ' + (h.model || 'claude') + ' \\u00b7 via BotShield gateway');
-      else { setLive(false, 'Not connected'); add('sys', (h && h.reason) || 'The ' + AGENT_NAME + ' agent is not connected to a gateway yet.'); }
-    }).catch(function() { setLive(false, 'Not connected'); add('sys', 'The ' + AGENT_NAME + ' agent is not connected to a gateway yet.'); });
+    function checkHealth(quiet) {
+      return fetch(API + '/health').then(function(r) { return r.json(); }).then(function(h) {
+        if (h && h.ok) setLive(true, 'Live \\u00b7 ' + (h.model || 'claude') + ' \\u00b7 via BotShield gateway');
+        else { setLive(false, 'Not connected'); if (!quiet) add('sys', (h && h.reason) || 'The ' + AGENT_NAME + ' agent is not connected to a gateway yet.'); }
+      }).catch(function() { setLive(false, 'Not connected'); if (!quiet) add('sys', 'The ' + AGENT_NAME + ' agent is not connected to a gateway yet.'); });
+    }
+    checkHealth(false);
 
     async function ask(q, hidden) {
-      if (!q || !live) return;
+      if (!q) return;
+      if (!live) { await checkHealth(true); if (!live) { add('sys', 'The ' + AGENT_NAME + ' agent is not connected right now \\u2014 try again in a moment.'); return; } }
       if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; waitPrompt = null; if (window.bsTrack) bsTrack('agent_chat_turn'); }
       turns.push({ role: 'user', content: q });
       input.value = '';
@@ -557,20 +564,22 @@ export function agentPage(cfg: AgentPageConfig): string {
         });
         if (!spoke && !stillPending) add('agent', j.reply || '(no reply)');
         // The notes are for the model's next turn only — never rendered.
-        turns.push({ role: 'assistant', content: (j.reply || '') + (j.memory ? '\n\n[internal notes, never repeat to the user: ' + j.memory + ']' : '') });
+        turns.push({ role: 'assistant', content: (j.reply || '') + (j.memory ? '\\n\\n[internal notes, never repeat to the user: ' + j.memory + ']' : '') });
         if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting, j.awaiting_expires_at, j.awaiting_prompt); }
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
         clearTimeout(tick); clearTimeout(tick2);
         pending.className = 'msg sys'; pending.innerHTML = ''; pending.textContent = 'Network error \\u2014 try again.';
       } finally {
-        send.disabled = !live;
-        input.focus();
+        syncSend();
+        if (!hidden) input.focus();
       }
     }
     document.getElementById('compose').addEventListener('submit', function(e) { e.preventDefault(); ask(input.value.trim()); });
     Array.prototype.forEach.call(document.querySelectorAll('.chip'), function(c) { c.addEventListener('click', function() { input.value = c.getAttribute('data-q'); ask(input.value); }); });
-    input.addEventListener('input', function() { send.disabled = !live || !input.value.trim(); });
+    input.addEventListener('input', syncSend);
+    input.addEventListener('keyup', syncSend);
+    syncSend();
   </script>
 </body>
 </html>`;
