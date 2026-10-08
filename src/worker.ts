@@ -137,6 +137,9 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // The page's own re-checks while a purchase waits ("Check approval … again") aren't the visitor talking.
   record(env, request, /^Check approval /.test(clean[clean.length - 1].content) ? 'chat_recheck' : 'chat_turn', profile.demo);
 
+  // The model does not know the date; without this it searches last year's flights (Duffel 422) before guessing again.
+  const today = new Date().toISOString().slice(0, 10);
+  const system = `${profile.system}\n\nToday is ${today}. Every travel date you send must be after today.`;
   const mcp: Record<string, unknown> = { type: 'url', url: `${gatewayUrl.replace(/\/$/, '')}/mcp`, name: profile.connector };
   if (bindToken) mcp.authorization_token = bindToken;
 
@@ -148,7 +151,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       'anthropic-version': '2023-06-01',
       'anthropic-beta': 'mcp-client-2025-04-04',
     },
-    body: JSON.stringify({ model: env.AGENT_MODEL || 'claude-opus-5', max_tokens: 700, system: profile.system, messages: clean, mcp_servers: [mcp] }),
+    body: JSON.stringify({ model: env.AGENT_MODEL || 'claude-opus-5', max_tokens: 700, system, messages: clean, mcp_servers: [mcp] }),
   });
   const text = await upstream.text();
   if (!upstream.ok) {
