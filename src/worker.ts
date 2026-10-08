@@ -214,7 +214,8 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       // Meridian: the issuer asked BotShield and approved → the hold is paid.
       else if ((j?.status === 'paid' || j?.status === 'authorized') && j?.authorization?.result === 'APPROVED') {
         awaiting = null; record(env, request, j.status === 'paid' ? 'paid' : 'authorized', demo);
-        events.push({ type: 'order', step: 4, track: 'agent_paid', title: j.status === 'paid' ? 'Paid — approved by you, then by the issuer' : 'Authorized by the issuer', airline: j.airline ?? null,
+        const airline = j.airline?.code ? { ...j.airline, lockup: j.airline.lockup ?? `https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/${j.airline.code}.svg` } : null;
+        events.push({ type: 'order', step: 4, track: 'agent_paid', title: j.status === 'paid' ? 'Paid — approved by you, then by the issuer' : 'Authorized by the issuer', airline,
           rows: [['Flight', j.flight ?? null], ['Booking ref', j.booking_reference ?? null], ['Order', j.order_id ?? null], ['Total', j.total ?? null], ['Card', j.card?.last_four ? `${j.card.network ? j.card.network + ' ' : ''}•••• ${j.card.last_four}${j.card.exp ? ' · exp ' + j.card.exp : ''} · single-use` : null], ['Issuer decision', `APPROVED${j.authorization?.responder_ms != null ? ` · BotShield answered in ${j.authorization.responder_ms} ms` : ''}`]],
           att: j.authorization?.ceremony_id ? `ceremony ${j.authorization.ceremony_id}` : null });
       }

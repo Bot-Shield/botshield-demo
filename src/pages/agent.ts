@@ -93,9 +93,12 @@ export function agentPage(cfg: AgentPageConfig): string {
     .msg.order .row span:last-child { color: #fff; font-weight: 600; text-align: right; }
     .msg.order .att { margin-top: 8px; font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: #7fd9b9; word-break: break-all; }
     /* The airline mark, the way Duffel's Orders table shows it: logo on a white chip + IATA code. */
-    .msg.order .air { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: #fff; }
-    .msg.order .air .chip { width: 28px; height: 28px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
-    .msg.order .air .chip img { width: 22px; height: 22px; object-fit: contain; display: block; }
+    .msg.order .air { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13.5px; font-weight: 600; color: #fff; flex-wrap: wrap; }
+    /* Duffel's lockup (mark + wordmark) on a white pill, like their Orders table; falls back to the square mark, then to text. */
+    .msg.order .air .chip { height: 28px; max-width: 150px; padding: 4px 8px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; box-sizing: border-box; }
+    .msg.order .air .chip img { height: 20px; max-width: 134px; width: auto; object-fit: contain; display: block; }
+    .msg.order .air .chip.sq { width: 28px; padding: 3px; }
+    .msg.order .air .chip.sq img { width: 22px; height: 22px; }
     .msg.order .air small { font-weight: 400; color: #94979c; }
     /* The single-use card — Lithic's card tile: network, masked PAN, expiry, CVV hidden. */
     .vcard { margin: 10px 0 6px; max-width: 300px; aspect-ratio: 1.586; border-radius: 14px; padding: 16px 18px; box-sizing: border-box; position: relative; color: #fff;
@@ -449,9 +452,25 @@ export function agentPage(cfg: AgentPageConfig): string {
       // The point of the whole demo: a signature (or an issuer's yes), not a card number.
       narrate({ bs: 'result', result: RESULT });
       var rows = (ev.rows || []).filter(function(r) { return r[1] != null; });
-      d.innerHTML = '<b></b>' + (ev.airline ? '<div class="row"><span>Airline</span><span class="air"><span class="chip"><img alt=""></span><span></span></span></div>' : '') + rows.map(function() { return '<div class="row"><span></span><span></span></div>'; }).join('') + (ev.att ? '<div class="att"></div>' : '');
+      d.innerHTML = '<b></b>' + rows.map(function() { return '<div class="row"><span></span><span></span></div>'; }).join('') + (ev.att ? '<div class="att"></div>' : '');
       d.querySelector('b').textContent = ev.title || 'Order confirmed \u2014 approved by you';
-      if (ev.airline) { var a = d.querySelector('.air'); a.querySelector('img').src = ev.airline.logo || ''; a.querySelector('img').onerror = function() { this.parentNode.style.display = 'none'; }; a.querySelector('span:last-child').innerHTML = '<span></span> <small></small>'; a.querySelector('span:last-child > span').textContent = ev.airline.code || ''; a.querySelector('small').textContent = ev.airline.name || ''; }
+      if (ev.airline) {
+        var row = document.createElement('div'); row.className = 'row';
+        var k = document.createElement('span'); k.textContent = 'Airline';
+        var air = document.createElement('span'); air.className = 'air';
+        var chip = document.createElement('span'); chip.className = 'chip';
+        var img = document.createElement('img'); img.alt = ''; img.width = 134; img.height = 20;
+        var code = document.createElement('span'); code.textContent = ev.airline.code || '';
+        var name = document.createElement('small'); name.textContent = ev.airline.name || '';
+        // lockup (mark + wordmark) → square mark → no chip, just the text
+        var tries = [ev.airline.lockup, ev.airline.logo].filter(Boolean);
+        img.onerror = function() { if (tries.length) { if (tries.length === 1) chip.className = 'chip sq'; img.src = tries.shift(); } else { chip.remove(); } };
+        if (tries.length) { if (tries.length === 1) chip.className = 'chip sq'; img.src = tries.shift(); } else { chip = null; }
+        if (chip) { chip.appendChild(img); air.appendChild(chip); }
+        air.appendChild(code); air.appendChild(name);
+        row.appendChild(k); row.appendChild(air);
+        d.insertBefore(row, d.querySelector('.row'));
+      }
       var rs = Array.prototype.filter.call(d.querySelectorAll('.row'), function(el) { return !el.querySelector('.air'); });
       rows.forEach(function(r, i) { rs[i].children[0].textContent = String(r[0]); rs[i].children[1].textContent = String(r[1]); });
       if (ev.att) d.querySelector('.att').textContent = ev.att;
