@@ -193,6 +193,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       }
       if (j?.status === 'approval_sent' && j.order_id) notes.push(`held order_id=${j.order_id} (${j.booking_reference ?? ''}, ${j.total ?? ''}) approval_request_id=${j.approval_request_id}`);
       if (j?.status === 'approved_card_issued' && j.approval_id) notes.push(`card issued approval_id=${j.approval_id} for order_id=${j.order_id}`);
+      if ((j?.status === 'paid' || j?.status === 'authorized' || j?.status === 'declined') && j.order_id) notes.push(`${j.status}: order_id=${j.order_id}${j.approval_id ? ` approval_id=${j.approval_id}` : ''} (${j.booking_reference ?? ''}, ${j.total ?? ''}) — for a repeat-charge demo call pay_hold with this order_id and demo="reuse"`);
       if (j?.error === 'hold_failed') notes.push(`hold failed for offer ${(() => { try { return JSON.stringify((events.find((e) => e.type === 'tool' && !e.result) ?? {}).args ?? '').slice(0, 80); } catch { return ''; } })()} — use the next offer`);
       if (j?.status === 'approval_sent') {
         awaiting = j.approval_request_id ?? awaiting;
