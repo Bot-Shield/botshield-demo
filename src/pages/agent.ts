@@ -92,6 +92,21 @@ export function agentPage(cfg: AgentPageConfig): string {
     .msg.order .row { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; padding: 3px 0; border-top: 1px solid rgba(0,212,146,.12); }
     .msg.order .row span:last-child { color: #fff; font-weight: 600; text-align: right; }
     .msg.order .att { margin-top: 8px; font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: #7fd9b9; word-break: break-all; }
+    /* The airline mark, the way Duffel's Orders table shows it: logo on a white chip + IATA code. */
+    .msg.order .air { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: #fff; }
+    .msg.order .air .chip { width: 28px; height: 28px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
+    .msg.order .air .chip img { width: 22px; height: 22px; object-fit: contain; display: block; }
+    .msg.order .air small { font-weight: 400; color: #94979c; }
+    /* The single-use card — Lithic's card tile: network, masked PAN, expiry, CVV hidden. */
+    .vcard { margin: 10px 0 6px; max-width: 300px; aspect-ratio: 1.586; border-radius: 14px; padding: 16px 18px; box-sizing: border-box; position: relative; color: #fff;
+             background: linear-gradient(135deg, #1b2a3a 0%, #0e1620 55%, #111a24 100%); border: 1px solid #2a3a4c; box-shadow: 0 12px 30px -14px rgba(26,159,214,.55), inset 0 1px 0 rgba(255,255,255,.06); display: flex; flex-direction: column; justify-content: space-between; }
+    .vcard .net { position: absolute; top: 14px; right: 18px; font-weight: 800; font-style: italic; letter-spacing: -.5px; font-size: 18px; }
+    .vcard .tag { font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8fb6cc; }
+    .vcard .pan { font-family: 'Roboto Mono', monospace; font-size: 17px; letter-spacing: .12em; color: #e6e8ea; word-spacing: .6em; margin-top: 6px; }
+    .vcard .pan b { color: #fff; }
+    .vcard .ft { display: flex; justify-content: space-between; font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: #94979c; }
+    .vcard .ft b { color: #fff; margin-left: 5px; }
+    .vcard .lim { font-size: 11px; color: #7fd9b9; }
     .msg.typing { align-self: flex-start; background: #111418; border: 1px solid #22262f; border-bottom-left-radius: 4px; padding: 12px 14px; display: flex; gap: 5px; align-items: center; }
     .msg.typing i { width: 7px; height: 7px; border-radius: 50%; background: #8a8a8a; animation: bsdot 1.2s infinite ease-in-out; }
     .msg.typing i:nth-child(2) { animation-delay: .18s; } .msg.typing i:nth-child(3) { animation-delay: .36s; }
@@ -433,9 +448,10 @@ export function agentPage(cfg: AgentPageConfig): string {
       // The point of the whole demo: a signature (or an issuer's yes), not a card number.
       narrate({ bs: 'result', result: RESULT });
       var rows = (ev.rows || []).filter(function(r) { return r[1] != null; });
-      d.innerHTML = '<b></b>' + rows.map(function() { return '<div class="row"><span></span><span></span></div>'; }).join('') + (ev.att ? '<div class="att"></div>' : '');
+      d.innerHTML = '<b></b>' + (ev.airline ? '<div class="row"><span>Airline</span><span class="air"><span class="chip"><img alt=""></span><span></span></span></div>' : '') + rows.map(function() { return '<div class="row"><span></span><span></span></div>'; }).join('') + (ev.att ? '<div class="att"></div>' : '');
       d.querySelector('b').textContent = ev.title || 'Order confirmed \u2014 approved by you';
-      var rs = d.querySelectorAll('.row');
+      if (ev.airline) { var a = d.querySelector('.air'); a.querySelector('img').src = ev.airline.logo || ''; a.querySelector('img').onerror = function() { this.parentNode.style.display = 'none'; }; a.querySelector('span:last-child').innerHTML = '<span></span> <small></small>'; a.querySelector('span:last-child > span').textContent = ev.airline.code || ''; a.querySelector('small').textContent = ev.airline.name || ''; }
+      var rs = Array.prototype.filter.call(d.querySelectorAll('.row'), function(el) { return !el.querySelector('.air'); });
       rows.forEach(function(r, i) { rs[i].children[0].textContent = String(r[0]); rs[i].children[1].textContent = String(r[1]); });
       if (ev.att) d.querySelector('.att').textContent = ev.att;
       log.appendChild(d); log.scrollTop = log.scrollHeight;
@@ -446,10 +462,16 @@ export function agentPage(cfg: AgentPageConfig): string {
       d.className = 'msg order';
       if (window.bsTrack) bsTrack('agent_ask_approved');
       narrate({ bs: 'step', n: 3 });
-      d.innerHTML = '<b>Approved \u2014 single-use card issued</b><div class="row"><span>Card</span><span></span></div><div class="row"><span>Spend limit</span><span></span></div><div class="row"><span>Valid at</span><span></span></div><div class="att"></div>';
-      var v = d.querySelectorAll('.row span:last-child');
-      v[0].textContent = '\u2022\u2022\u2022\u2022 ' + (ev.last_four || '????'); v[1].textContent = ev.spend_limit || ''; v[2].textContent = ev.merchant || '';
-      d.querySelector('.att').textContent = 'one use \u00b7 ' + (ev.ceremony_id ? 'ceremony ' + ev.ceremony_id : 'bound to this booking');
+      d.innerHTML = '<b>Approved \u2014 single-use card issued</b>'
+        + '<div class="vcard"><div class="net"></div><div><div class="tag">Single-use \u00b7 issued on your yes</div><div class="pan">\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 <b></b></div></div>'
+        + '<div><div class="lim"></div><div class="ft"><span>Exp<b class="exp"></b></span><span>CVV<b>\u2022\u2022\u2022</b></span></div></div></div>'
+        + '<div class="row"><span>Valid at</span><span></span></div><div class="att"></div>';
+      d.querySelector('.net').textContent = ev.network === 'MASTERCARD' ? 'mastercard' : (ev.network || 'VISA');
+      d.querySelector('.pan b').textContent = ev.last_four || '\u2022\u2022\u2022\u2022';
+      d.querySelector('.exp').textContent = ev.exp || '\u2014';
+      d.querySelector('.lim').textContent = 'Spend limit ' + (ev.spend_limit || '') + ' \u00b7 one authorization';
+      d.querySelector('.row span:last-child').textContent = ev.merchant || '';
+      d.querySelector('.att').textContent = 'The number stays with the issuer. ' + (ev.ceremony_id ? 'ceremony ' + ev.ceremony_id : 'bound to this booking');
       log.appendChild(d); log.scrollTop = log.scrollHeight;
     }
     // Meridian: the issuer asked BotShield and the answer was no.

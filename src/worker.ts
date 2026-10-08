@@ -192,13 +192,13 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       // Meridian: the yes became a single-use card; the page keeps the turn going so the agent pays.
       else if (j?.status === 'approved_card_issued') {
         awaiting = null; record(env, request, 'ask_approved', demo);
-        events.push({ type: 'card', last_four: j.card?.last_four ?? null, spend_limit: j.card?.spend_limit ?? null, merchant: j.card?.merchant ?? null, ceremony_id: j.attested?.ceremony_id ?? null });
+        events.push({ type: 'card', last_four: j.card?.last_four ?? null, exp: j.card?.exp ?? null, network: j.card?.network ?? null, spend_limit: j.card?.spend_limit ?? null, merchant: j.card?.merchant ?? null, ceremony_id: j.attested?.ceremony_id ?? null, airline: j.airline ?? null, flight: j.flight ?? null });
       }
       // Meridian: the issuer asked BotShield and approved → the hold is paid.
       else if ((j?.status === 'paid' || j?.status === 'authorized') && j?.authorization?.result === 'APPROVED') {
         awaiting = null; record(env, request, j.status === 'paid' ? 'paid' : 'authorized', demo);
-        events.push({ type: 'order', step: 4, track: 'agent_paid', title: j.status === 'paid' ? 'Paid — approved by you, then by the issuer' : 'Authorized by the issuer',
-          rows: [['Booking ref', j.booking_reference ?? null], ['Order', j.order_id ?? null], ['Total', j.total ?? null], ['Card', j.card?.last_four ? `•••• ${j.card.last_four} · single-use` : null], ['Issuer decision', `APPROVED${j.authorization?.responder_ms != null ? ` · BotShield answered in ${j.authorization.responder_ms} ms` : ''}`]],
+        events.push({ type: 'order', step: 4, track: 'agent_paid', title: j.status === 'paid' ? 'Paid — approved by you, then by the issuer' : 'Authorized by the issuer', airline: j.airline ?? null,
+          rows: [['Flight', j.flight ?? null], ['Booking ref', j.booking_reference ?? null], ['Order', j.order_id ?? null], ['Total', j.total ?? null], ['Card', j.card?.last_four ? `${j.card.network ? j.card.network + ' ' : ''}•••• ${j.card.last_four}${j.card.exp ? ' · exp ' + j.card.exp : ''} · single-use` : null], ['Issuer decision', `APPROVED${j.authorization?.responder_ms != null ? ` · BotShield answered in ${j.authorization.responder_ms} ms` : ''}`]],
           att: j.authorization?.ceremony_id ? `ceremony ${j.authorization.ceremony_id}` : null });
       }
       // Meridian: the issuer asked BotShield and the answer was no.
