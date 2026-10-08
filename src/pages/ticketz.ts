@@ -6,6 +6,7 @@ export const ticketzHtml = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Ticketz - Checkout</title>
   <link rel="icon" href="/favicon.ico">
@@ -215,7 +216,7 @@ export const ticketzHtml = `<!DOCTYPE html>
       width: 100%;
     }
 
-    /* The verify button, checkout button, and footer (Census attribution +
+    /* The verify button, checkout button, and footer (BotShield Gate attribution +
        BotShield ID CTA) are all rendered inside <botshield-verify>. The demo only
        relabels the checkout button (checkout-label) and could restyle it via
        the component's --bs-checkout-* custom properties. */
@@ -393,7 +394,7 @@ export const ticketzHtml = `<!DOCTYPE html>
 
     <!-- BotShield Verify — ONE component renders the verify button, the
          checkout button (verified-gated, component-owned), and the footer
-         (Census attribution + BotShield ID CTA). The demo only restyles/relabels
+         (BotShield Gate attribution + BotShield ID CTA). The demo only restyles/relabels
          the checkout button and listens for botshield:checkout. -->
     <botshield-verify
       site-key="pk_live_e398598c7f5af741b540abffd49ae74e"

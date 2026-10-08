@@ -18,6 +18,7 @@ export const trustedHtml = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
   <meta name="robots" content="noindex">
@@ -34,7 +35,7 @@ export const trustedHtml = `<!DOCTYPE html>
     .header-logo { width: 31px; height: 31px; border-radius: 50%; background: #15c39a; display: flex; align-items: center; justify-content: center; }
     .header-logo svg { width: 16px; height: 16px; fill: #fff; }
     .header-brand { font-size: 19px; font-weight: 600; line-height: 28.7px; }
-    .wrap { width: 100%; max-width: 430px; display: flex; flex-direction: column; gap: 16px; }
+    .wrap { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 16px; }
 
     /* ── Account card ── */
     .kicker { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6b6b6b; }
@@ -97,16 +98,56 @@ export const trustedHtml = `<!DOCTYPE html>
     .note li { margin: 3px 0; }
 
     /* ── Demo chrome (not part of the Ticketz design) ── */
-    .demo-controls { width: 100%; max-width: 430px; display: flex; justify-content: center; gap: 8px; padding: 4px 16px 0; }
+    .demo-controls { width: 100%; max-width: 560px; display: flex; justify-content: center; gap: 8px; padding: 4px 16px 0; }
     .demo-reset { background: transparent; border: 1px solid #262a30; border-radius: 999px; color: #61656c;
                   font-family: 'Roboto Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
                   padding: 7px 13px; cursor: pointer; }
     .demo-reset:hover { color: #94979c; border-color: #373a41; }
     .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%) translateY(20px); background: #0f2a20; border: 1px solid rgba(0, 212, 146, 0.4); color: #e6fff5; padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 92vw; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 30001; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Phone column. Desktop keeps the wider panel above — this demo is a
+       Ticketz ACCOUNT page, so on a laptop it should read as a web app,
+       not a 430px strip floating in the middle of the screen. */
+    html.is-narrow .wrap,
+    html.is-narrow .demo-controls { max-width: 430px; }
+
+    /* The ceremony differs by device, so the offer has to. On a laptop the
+       customer is signed in HERE but their BotShield passkey is on their
+       PHONE, so the ceremony is a scan. On the phone it is one tap. Spans,
+       not two blocks, because the shell flips .is-mobile on resize live. */
+    /* HOW LINKING WORKS — the 3.2 explainer beats. Same rhythm as the app:
+       heading, then one line under it. */
+    .how { margin-top: 20px; padding-top: 18px; border-top: 1px solid #22262f; display: flex; flex-direction: column; gap: 14px; }
+    /* Same tokens the page already uses: .kicker for the eyebrow, .panel p /
+       .panel p b for the beats. Two beats at one size, split by weight and
+       colour — the rhythm the app's onboarding beats use. */
+    .how-k { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6b6b6b; }
+    .how-b { display: flex; flex-direction: column; gap: 2px; }
+    .how-b b { font-size: 14px; line-height: 1.55; font-weight: 600; color: #e5e5e5; }
+    .how-b span { font-size: 14px; line-height: 1.55; color: #a3a3a3; }
+
+    .desktop-only { display: inline; }
+    .mobile-only { display: none; }
+    html.is-narrow .desktop-only { display: none; }
+    html.is-narrow .mobile-only { display: inline; }
   </style>
 </head>
 <body>
+  <script>(function(){try{
+    /* NOT the shell's ?m=. That flag answers "what device is the viewer on",
+       which is what agent.ts needs for its QR. This page needs a different
+       answer: "am I being rendered as a phone, or as a web page?" — because
+       it is a Ticketz ACCOUNT page and the offer reads differently in each.
+       In the shell this frame is a 430px phone bezel; standalone on a laptop
+       it is a real browser window. So key off our OWN width, and use our own
+       class — the shell toggles .is-mobile from the outer browser width and
+       would otherwise overwrite us. */
+    var el = document.documentElement;
+    function narrow() { el.classList.toggle('is-narrow', window.innerWidth < 560); }
+    narrow();
+    window.addEventListener('resize', narrow);
+  }catch(e){}})();</script>
   <div class="page">
     <div class="top-spacer"></div>
     <div class="header">
@@ -132,7 +173,7 @@ export const trustedHtml = `<!DOCTYPE html>
              button (Paul + Devrin, 2026-09-29). One block, two states — the
              moment/panelTitle pair said the same thing twice. -->
         <h2 id="panelH">Secure your account with BotShield</h2>
-        <p id="panelBody">You&rsquo;re signed in. One tap more, and Ticketz can confirm a person runs this account. <b>Never your name.</b></p>
+        <p id="panelBody"><span class="desktop-only">You&rsquo;re signed in. Scan with your phone, and Ticketz can confirm a live human runs this account.</span><span class="mobile-only">You&rsquo;re signed in. One tap more, and Ticketz can confirm a live human runs this account.</span></p>
         <botshield-verify
           site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
           scope="ticketz_account"
@@ -144,11 +185,20 @@ export const trustedHtml = `<!DOCTYPE html>
           checkout="false"
         ></botshield-verify>
         <button type="button" class="again" id="signInAgain">Sign in again</button>
+
+        <!-- Canon: Figma 3.2 "Link ceremony · 3.2 · deep link + scan" — the two
+             beats every Link Account screen carries. This is how a company
+             offers it to its customers: the ask, then why it is safe to say yes. -->
+        <div class="how">
+          <div class="how-k">HOW LINKING WORKS</div>
+          <div class="how-b"><b>We only check that a human runs it</b><span>We notarize that one fact. Never your name, never what you do here.</span></div>
+          <div class="how-b"><b>Agents ask, you decide</b><span>Only agents you allow can ask. Every request waits in Agents Ask for your answer.</span></div>
+        </div>
       </section>
 
-      <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Ticketz trusts it, and BotShield notarized the relationship &mdash; it is in your BotShield app under <b>Trusted Accounts</b>, and in Ticketz&rsquo;s registry as a handle, never your name.<br><br>Now try <b>+ Second account</b> above.</div>
+      <div class="note ok" id="noteSecured"><b>Your account is secured.</b> Agents and this site can now trust this account &mdash; a live human runs it. It&rsquo;s in your BotShield app under <b>Trusted Accounts</b>.<br><br>Now try <b>+ Second account</b> above.</div>
       <div class="note one" id="noteOne"><b>Already secured with BotShield.</b> BotShield secures one Ticketz account &mdash; that&rsquo;s the promise Ticketz relies on. This second account can&rsquo;t be secured by you.<br><br>Switch back to your first account &mdash; it&rsquo;s still secured.</div>
-      <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same person, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.<br><br><b>That notarized relationship is what lets an agent ask.</b> An agent acting for you can ask Ticketz for something, and Ticketz knows a real person is there to answer it.<button type="button" class="go" id="goAgent">See Agents Ask&trade; &rarr;</button></div>
+      <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same person, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.<br><br><b>That trusted account is what lets an agent ask.</b> An agent acting for you can ask Ticketz for something, and Ticketz knows a live human is there to answer it.<button type="button" class="go" id="goAgent">See Agents Ask&trade; &rarr;</button></div>
       <div class="note info" id="noteUnlinked"><b>Unlinked.</b> This Ticketz account is no longer secured with BotShield &mdash; you unlinked it in the BotShield app, or Ticketz revoked it. Link it again any time.</div>
       <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Trusted Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
 
@@ -256,8 +306,9 @@ export const trustedHtml = `<!DOCTYPE html>
         ? 'Secured with BotShield'
         : 'Secure your account with BotShield';
       document.getElementById('panelBody').innerHTML = a.secured
-        ? 'Ticketz can confirm a real person runs this account &mdash; <b>never your name</b>. Come back any time: your next pass says so.'
-        : 'You&rsquo;re signed in. One tap more, and Ticketz can confirm a person runs this account. <b>Never your name.</b>';
+        ? 'Ticketz can confirm a live human runs this account &mdash; <b>never your name</b>. Come back any time: your next pass says so.'
+        : '<span class="desktop-only">You&rsquo;re signed in. Scan with your phone, and Ticketz can confirm a live human runs this account.</span>'
+          + '<span class="mobile-only">You&rsquo;re signed in. One tap more, and Ticketz can confirm a live human runs this account.</span>';
       var showWidget = !a.secured || returning;
       bsVerify.classList.toggle('hide', !showWidget);
       document.getElementById('signInAgain').classList.toggle('on', !showWidget);

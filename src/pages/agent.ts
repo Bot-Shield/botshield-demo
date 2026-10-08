@@ -289,8 +289,8 @@ export function agentPage(cfg: AgentPageConfig): string {
             '<div class="lk-sub">' +
               /* The chip below already says "Secured with Passkey", so this line
                  names the consequence instead: where the agent's asks land. */
-              '<span class="desktop-only">Scan to link it. Its requests then land in your Agents Ask inbox, and wait for your yes.</span>' +
-              '<span class="mobile-only">Link this agent. Its requests then land in your Agents Ask inbox, and wait for your yes.</span>' +
+              '<span class="desktop-only">Scan to link it. Its requests then land in your Agents Ask inbox, and wait for your answer.</span>' +
+              '<span class="mobile-only">Link this agent. Its requests then land in your Agents Ask inbox, and wait for your answer.</span>' +
             '</div>' +
             (claim ? '<a class="lk-open" data-cta="app" href="' + claim + '" target="_blank" rel="noopener">' +
                        '<span class="desktop-only">Open the web app</span>' +
