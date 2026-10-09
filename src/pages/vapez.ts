@@ -100,6 +100,7 @@ export const vapezHtml = `<!DOCTYPE html>
           signals="true"
           age-threshold="18"
           checkout-label="Enter site"
+          betas="inline-passkey"
         ></botshield-verify>
         <p class="wall-note">What Vapez receives: <em>verified</em> or <em>unavailable</em>. On a phone without an age assertion the check is <em>unavailable</em> &mdash; the door stays closed, and you are told why.</p>
       </section>

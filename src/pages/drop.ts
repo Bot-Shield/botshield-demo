@@ -147,6 +147,7 @@ export const dropHtml = `<!DOCTYPE html>
           scan-mode="modal"
           signals="true"
           checkout-label="Add to cart"
+          betas="inline-passkey"
         ></botshield-verify>
 
         <p class="legal">Checked at the cart, not the till. By checkout the pair is already gone.</p>
