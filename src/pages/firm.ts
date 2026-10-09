@@ -126,6 +126,7 @@ export const firmHtml = `<!DOCTYPE html>
               scan-mode="modal"
               signals="true"
               checkout-label="Send enquiry"
+              betas="inline-passkey"
             ></botshield-verify>
           </div>
         </div>

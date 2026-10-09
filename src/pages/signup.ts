@@ -134,6 +134,7 @@ export const signupHtml = `<!DOCTYPE html>
               scan-mode="modal"
               signals="true"
               checkout-label="Create account"
+              betas="inline-passkey"
             ></botshield-verify>
           </div>
         </div>
