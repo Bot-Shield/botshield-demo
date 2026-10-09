@@ -140,7 +140,11 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // The model does not know the date; without this it searches last year's flights (Duffel 422) before guessing again.
   const today = new Date().toISOString().slice(0, 10);
   const system = `${profile.system}\n\nToday is ${today}. Every travel date you send must be after today.`;
-  const mcp: Record<string, unknown> = { type: 'url', url: `${gatewayUrl.replace(/\/$/, '')}/mcp`, name: profile.connector };
+  // A linked visitor rides /mcp with their bind JWT. A guest uses /mcp/guest: the gateway's
+  // /mcp answers 401 without a bearer (so Claude / ChatGPT detect sign-in), and /mcp/guest
+  // is the anonymous door — the gateway still allows only the open tools there.
+  const base = gatewayUrl.replace(/\/$/, '');
+  const mcp: Record<string, unknown> = { type: 'url', url: bindToken ? `${base}/mcp` : `${base}/mcp/guest`, name: profile.connector };
   if (bindToken) mcp.authorization_token = bindToken;
 
   const upstream = await fetch('https://api.anthropic.com/v1/messages', {
