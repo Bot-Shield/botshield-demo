@@ -63,12 +63,22 @@ export const DEMOS: DemoEntry[] = [
         'Say yes with a passkey. The issuer checks with BotShield, then the charge goes through \u2014 ask it to charge twice and watch it refuse.',
       ],
     } },
-  { key: 'trusted', group: 'Ticketz', label: 'Trusted Accounts', hint: 'One account, secured with BotShield', path: '/trusted',
+  { key: 'ticketz', group: 'Ticketz', label: 'Human Gate', hint: 'At checkout \u00b7 a person completes the order', path: '/ticketz',
+    run: {
+      line: 'The last step before money moves is the one worth checking.',
+      what: 'A Human Gate sits on the checkout. One tap proves a person is finishing the order \u2014 never a name, never a card, never a device.',
+      steps: [
+        'Fill the checkout the way a buyer would.',
+        'Tap <b>Verify you\u2019re human</b>. The passkey answers inline \u2014 no redirect.',
+        'The order completes. Ticketz gets one fact: a person was there.',
+      ],
+    } },
+  { key: 'trusted', group: 'Ticketz', label: 'Link with BotShield', hint: 'One tap \u00b7 the company joins your linked accounts', path: '/trusted',
     run: {
       line: 'A notary doesn\u2019t read the document. They confirm you signed it.',
       what: 'Same here. You secure the account, Ticketz trusts it, and BotShield notarizes what it witnessed \u2014 this account, a live human, this date. Never your name, never what you do there.',
       steps: [
-        'Tap <b>Secure your account with BotShield</b>.',
+        'Tap <b>Link with BotShield</b>.',
         'A passkey confirms it. Ticketz gets a handle, not your name.',
         'Tap <b>+ Second account</b>, then secure that one too \u2014 Ticketz trusts one per person, so it is refused.',
       ],
