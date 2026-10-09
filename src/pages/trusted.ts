@@ -172,7 +172,7 @@ export const trustedHtml = `<!DOCTYPE html>
         <!-- The page owns the copy; the SDK renders only the Link BotShield ID
              button (Paul + Devrin, 2026-09-29). One block, two states — the
              moment/panelTitle pair said the same thing twice. -->
-        <h2 id="panelH">Secure your account with BotShield</h2>
+        <h2 id="panelH">Link with BotShield</h2>
         <p id="panelBody"><span class="desktop-only">You&rsquo;re signed in. Scan with your phone, and Ticketz can confirm a live human runs this account.</span><span class="mobile-only">You&rsquo;re signed in. One tap more, and Ticketz can confirm a live human runs this account.</span></p>
         <botshield-verify
           site-key="pk_live_e398598c7f5af741b540abffd49ae74e"
@@ -200,7 +200,7 @@ export const trustedHtml = `<!DOCTYPE html>
       <div class="note one" id="noteOne"><b>Already secured with BotShield.</b> BotShield secures one Ticketz account &mdash; that&rsquo;s the promise Ticketz relies on. This second account can&rsquo;t be secured by you.<br><br>Switch back to your first account &mdash; it&rsquo;s still secured.</div>
       <div class="note ok" id="noteBack"><b>Welcome back &mdash; trusted.</b> Same person, same account: Ticketz gets <b>trusted: true</b> on this pass, no new setup.<br><br><b>That trusted account is what lets an agent ask.</b> An agent acting for you can ask Ticketz for something, and Ticketz knows a live human is there to answer it.<button type="button" class="go" id="goAgent">See Agents Ask&trade; &rarr;</button></div>
       <div class="note info" id="noteUnlinked"><b>Unlinked.</b> This Ticketz account is no longer secured with BotShield &mdash; you unlinked it in the BotShield app, or Ticketz revoked it. Link it again any time.</div>
-      <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Trusted Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
+      <div class="note info" id="noteReset"><b>Start over</b><ol><li>In the BotShield app: Linked Accounts &rarr; Ticketz &rarr; <b>Unlink</b>.</li><li>Tap <b>Start over</b> (top right) for fresh Ticketz accounts.</li></ol></div>
 
     </div>
     <div class="demo-controls">
@@ -304,7 +304,7 @@ export const trustedHtml = `<!DOCTYPE html>
       document.getElementById('secured').classList.toggle('on', !!a.secured);
       document.getElementById('panelH').textContent = a.secured
         ? 'Secured with BotShield'
-        : 'Secure your account with BotShield';
+        : 'Link with BotShield';
       document.getElementById('panelBody').innerHTML = a.secured
         ? 'Ticketz can confirm a live human runs this account &mdash; <b>never your name</b>. Come back any time: your next pass says so.'
         : '<span class="desktop-only">You&rsquo;re signed in. Scan with your phone, and Ticketz can confirm a live human runs this account.</span>'
