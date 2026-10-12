@@ -4,7 +4,7 @@
 //   /ticketz     Ticketz · BotShield Gate at checkout (Human Gate, inline passkey beta)
 //   /agent       Ticketz · Agents Ask (chat with the Ticketz agent; purchases wait for the human)
 //   /flights     Meridian Airlines · Agents Ask Pay (the card issuer asks BotShield before the charge)
-//   /trusted     Ticketz · Trusted Accounts (secure the account with a BotShield ID; ticketz_account gate, notarize)
+//   /trusted     Ticketz · Secured Accounts (secure the account with a BotShield ID; ticketz_account gate, `notarize` attr)
 //   /vapez       Vapez · Age Gate at the door (enter_site_age_check, 18+)
 //   /salesforce  → Coral Cloud on salesforce-demo.botshield.ai (counted as a click-out)
 //   /api/e       same-origin analytics beacon (allowlisted browser steps; src/analytics.ts)

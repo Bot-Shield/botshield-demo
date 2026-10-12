@@ -10,7 +10,7 @@ export interface StatsEnv {
 
 const DATASET = 'botshield_demo_events';
 const DEMOS: Array<[string, string]> = [
-  ['ticketz', 'Ticketz · BotShield Gate'], ['agent', 'Ticketz · Agents Ask'], ['flights', 'Meridian Airlines · Agents Ask Pay'], ['trusted', 'Ticketz · Trusted Accounts'],
+  ['ticketz', 'Ticketz · BotShield Gate'], ['agent', 'Ticketz · Agents Ask'], ['flights', 'Meridian Airlines · Agents Ask Pay'], ['trusted', 'Ticketz · Secured Accounts'],
   ['vapez', 'Vapez · Age Gate'], ['signup', 'Commons · Sign-up Gate'], ['drop', 'Tread · Add-to-cart Gate'], ['firm', 'Whitlock & Barr · Enquiry Gate'],
   ['salesforce', 'Salesforce · Coral Cloud (click-out)'],
 ];
@@ -152,7 +152,7 @@ ${DEMOS.map(([k, label]) => `<tr><td>${esc(label)}</td><td>${fmt(v7(k))}</td><td
 
     return page(`<div><h1>Demo usage</h1><div class="sub">demo.botshield.ai · updated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC</div></div>
 ${totals}${dailyChart(daily)}
-<div class="grid">${agent}${flights}${gate('ticketz', 'Ticketz · BotShield Gate')}${gate('vapez', 'Vapez · Age Gate')}${gate('signup', 'Commons · Sign-up Gate')}${gate('drop', 'Tread · Add-to-cart Gate')}${gate('firm', 'Whitlock & Barr · Enquiry Gate')}${gate('trusted', 'Ticketz · Trusted Accounts')}</div>
+<div class="grid">${agent}${flights}${gate('ticketz', 'Ticketz · BotShield Gate')}${gate('vapez', 'Vapez · Age Gate')}${gate('signup', 'Commons · Sign-up Gate')}${gate('drop', 'Tread · Add-to-cart Gate')}${gate('firm', 'Whitlock & Barr · Enquiry Gate')}${gate('trusted', 'Ticketz · Secured Accounts')}</div>
 <div class="grid">${countryCard}${deviceCard}${await clickOuts(env)}</div>`);
   } catch (e) {
     return page(`<h1>Demo usage</h1><div class="card"><p class="err">Could not read the stats: ${esc((e as Error).message)}</p></div>`, 502);

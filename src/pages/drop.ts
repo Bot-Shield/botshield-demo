@@ -159,7 +159,7 @@ export const dropHtml = `<!DOCTYPE html>
         <div class="rows">
           <div class="k">What Tread received</div>
           <div class="row"><span>Cart</span><b id="claim">&mdash;</b></div>
-          <div class="row"><span>One per person</span><b style="color:#23cb78">held</b></div>
+          <div class="row"><span>Pair limit</span><b style="color:#23cb78">held</b></div>
           <div class="row"><span>Ceremony</span><b class="mono" id="cer">&mdash;</b></div>
           <p class="note">Never a name, never a card, never a device. Just that this pair went to a person who does not already have one.</p>
         </div>

@@ -142,8 +142,9 @@ export const vapezHtml = `<!DOCTYPE html>
     bsVerify.setAttribute('mode', MODE);
 
     // Stable stand-in for the store's own user id (see the Ticketz page for
-    // the full note): the first verification links it, later visits resolve
-    // instantly. ?fresh=1 mints a new one.
+    // the full note). 3.3: every visit asks again (a fresh passkey tap, the
+    // device answers the age band); there is no instant pass on return.
+    // ?fresh=1 mints a new one.
     var REF_KEY = 'vpz_demo_user_ref';
     var userRef = localStorage.getItem(REF_KEY);
     if (!userRef || params.get('fresh')) {

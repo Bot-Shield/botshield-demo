@@ -71,19 +71,21 @@ export const DEMOS: DemoEntry[] = [
         'Fill the checkout the way a buyer would.',
         'Tap <b>Verify you\u2019re human</b>. The passkey answers inline \u2014 no redirect.',
         'The order completes. Ticketz gets one fact: a person was there.',
+        'Tap <b>Reset</b> and buy again. It asks again \u2014 a fresh passkey tap, every time. That is the point: a password or a stolen session can\u2019t pass.',
       ],
     } },
   { key: 'trusted', group: 'Ticketz', label: 'Link with BotShield', hint: 'One tap \u00b7 the company joins your linked accounts', path: '/trusted',
     run: {
       line: 'A notary doesn\u2019t read the document. They confirm you signed it.',
-      what: 'Same here. You secure the account, Ticketz trusts it, and BotShield notarizes what it witnessed \u2014 this account, a live human, this date. Never your name, never what you do there.',
+      what: 'Same here. You secure the account, and BotShield confirms what it witnessed \u2014 this account, a live human, this date. Never your name, never what you do there.',
       steps: [
         'Tap <b>Link with BotShield</b>.',
         'A passkey confirms it. Ticketz gets a handle, not your name.',
-        'Tap <b>+ Second account</b>, then secure that one too \u2014 Ticketz trusts one per person, so it is refused.',
+        'Tap <b>+ Second account</b>, then secure that one too \u2014 your BotShield ID already secures a Ticketz account, so it is refused.',
+        'Switch back and sign in again. It asks again \u2014 a fresh passkey tap \u2014 and the pass says this account is secured.',
       ],
     } },
-  { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair per person', path: '/drop',
+  { key: 'drop', group: 'Tread', label: 'Human Gate', hint: 'At add to cart \u00b7 one pair each', path: '/drop',
     run: {
       line: 'Bots don\u2019t attack checkout. They attack add to cart.',
       what: '900 pairs, one each. Inventory is held at the cart, so that is where the drop is decided.',
@@ -125,19 +127,19 @@ export function shellHtml(): string {
   <meta name="theme-color" content="#0b0c0e">
   <title>BotShield Demos</title>
   <link rel="icon" href="/favicon.ico">
-  <meta name="description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
+  <meta name="description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Secured Accounts, running against production.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="BotShield">
   <meta property="og:url" content="https://demo.botshield.ai/">
   <meta property="og:title" content="A script can fill every field. It can’t be a person. Never who.">
-  <meta property="og:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
+  <meta property="og:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Secured Accounts, running against production.">
   <meta property="og:image" content="https://demo.botshield.ai/og.png">
   <meta property="og:image:width" content="2400">
   <meta property="og:image:height" content="1260">
   <meta property="og:image:alt" content="A script can fill every field. It can’t be a person. Never who.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="A script can fill every field. It can’t be a person. Never who.">
-  <meta name="twitter:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Trusted Accounts, running against production.">
+  <meta name="twitter:description" content="One more field on your sign-up, answered by a passkey on a real person’s phone. Live demos of the Human Gate, the Age Gate, Agents Ask™ and Secured Accounts, running against production.">
   <meta name="twitter:image" content="https://demo.botshield.ai/og.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -473,8 +475,8 @@ export function shellHtml(): string {
       if (d.bs === 'step') markStep(d.n);
       else if (d.bs === 'result') showResult(d.result);
       else if (d.bs === 'reset') { markStep(0); showResult(null); }
-      // A demo can hand off to another demo — Trusted Accounts closes by
-      // sending you to Agents Ask, because that is what the notarization buys.
+      // A demo can hand off to another demo — Secured Accounts closes by
+      // sending you to Agents Ask, because that is what securing the account buys.
       else if (d.bs === 'goto' && typeof d.demo === 'string') pick(d.demo, true);
     });
     // Same origin, so set the flag directly. Reloading the iframe would wipe the chat.
