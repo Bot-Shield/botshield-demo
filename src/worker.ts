@@ -14,8 +14,10 @@
 //                the visitor's bind JWT as the connector bearer). Unset → 503, and the
 //                page says the agent is not connected. No fake replies.
 //
-// Every demo page runs against PRODUCTION (cdn.botshield.ai + the prod Ticketz
-// site key); the gates are the ones in the Ticketz org's Console.
+// Gate pages pick their backend from the host (src/backend.ts): demo.botshield.ai
+// → PRODUCTION (cdn.botshield.ai + prod site keys); demo-staging.botshield.ai
+// (wrangler env.staging) and localhost → cdn-staging + staging keys. Agents Ask
+// and Meridian always use the production Fly gateways.
 import { ticketzHtml } from './pages/ticketz';
 import { vapezHtml } from './pages/vapez';
 import { agentHtml, flightsHtml } from './pages/agent';

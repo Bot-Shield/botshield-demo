@@ -8,6 +8,13 @@
 // surface). Same widget and site key as the other demos; the scope is
 // `account_signup` so the Console sees signups apart from purchases.
 // Served at /signup; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// PLACEHOLDER — no staging site key for the Commons gate exists in this repo or its history.
+// Paste the staging org's publishable key here; until then the staging host shows a note
+// and falls back to the production key (which the staging engine will refuse).
+const STAGING_SITE_KEY_SIGNUP = '';
+
 export const signupHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,7 +203,7 @@ export const signupHtml = `<!DOCTYPE html>
     </div>
   </div>
 
-  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
+  <script>document.write('<scr' + 'ipt src="' + ${SDK_SRC_JS} + '"></scr' + 'ipt>');</script>
   <script>
     (function () {
       var form = document.getElementById('form');
@@ -204,7 +211,8 @@ export const signupHtml = `<!DOCTYPE html>
       var bsVerify = document.getElementById('bsVerify');
 
       var params = new URLSearchParams(window.location.search);
-      var SITE_KEY = params.get('site_key') || 'pk_live_f39ae04df36ad5b8334ea0c21e478bfd';
+      ${stagingGateJs(STAGING_SITE_KEY_SIGNUP, 'Commons')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_f39ae04df36ad5b8334ea0c21e478bfd');
       var SCOPE = params.get('scope') || 'account_signup';
       var MODE = params.get('mode') || 'private';
       bsVerify.setAttribute('site-key', SITE_KEY);

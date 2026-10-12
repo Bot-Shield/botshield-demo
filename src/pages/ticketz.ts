@@ -1,5 +1,10 @@
 // Ticketz — Human Gate at checkout (all-ages). Inline passkey beta on desktop,
 // QR / phone hand-off otherwise. Served at /ticketz; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// Staging Ticketz key — the same one the page comment above has always named for cdn-staging.
+const STAGING_SITE_KEY_TICKETZ = 'pk_live_c71c420add027025b9e42c1ba9ff00ce';
+
 export const ticketzHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -438,9 +443,11 @@ export const ticketzHtml = `<!DOCTYPE html>
        PRODUCTION since 2026-09-13: prod DB carries the Ticketz partner with the
        seeded "Demo (Ticketz)" site key below and an active production
        ticket_purchase gate. The scanning phone must run the prod app build.
-       To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
-  <!-- ?sdk=next loads the prerelease widget (/next) for testing; default stays the stable /sdk.js. -->
-  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
+       Since demo/3-3 the HOST picks the backend (src/backend.ts): demo.botshield.ai
+       = prod CDN + prod key; demo-staging.botshield.ai / localhost = cdn-staging
+       /next + STAGING_SITE_KEY_TICKETZ. The scanning phone must match. -->
+  <!-- ?sdk=next (prod host only) loads the prerelease widget (/next); default stays the stable /sdk.js. -->
+  <script>document.write('<scr' + 'ipt src="' + ${SDK_SRC_JS} + '"></scr' + 'ipt>');</script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
@@ -459,7 +466,8 @@ export const ticketzHtml = `<!DOCTYPE html>
     })();
 
     var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+    ${stagingGateJs(STAGING_SITE_KEY_TICKETZ, 'Ticketz')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_e398598c7f5af741b540abffd49ae74e');
     var SCOPE = params.get('scope') || 'ticket_purchase';
     var MODE = params.get('mode') || 'private';
 

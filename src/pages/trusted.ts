@@ -15,6 +15,11 @@
 // Demo accounts are stable per browser (localStorage), never an email — the
 // widget refuses an email-shaped ref (notarize_ref_must_be_stable).
 // Served at /trusted; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// Staging Ticketz key (same org as /ticketz). The staging org needs a `ticketz_account` gate with Secured Accounts on.
+const STAGING_SITE_KEY_TRUSTED = 'pk_live_c71c420add027025b9e42c1ba9ff00ce';
+
 export const trustedHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -215,7 +220,7 @@ export const trustedHtml = `<!DOCTYPE html>
   <div class="toast" id="toast"></div>
 
   <!-- ?sdk=next loads the prerelease widget (the /next channel) for testing. -->
-  <script>(function () { var n = /[?&]sdk=next\\b/.test(window.location.search); var s = document.createElement('script'); s.src = n ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17'; document.head.appendChild(s); })();</script>
+  <script>(function () { var n = /[?&]sdk=next\\b/.test(window.location.search); var s = document.createElement('script'); s.src = ${SDK_SRC_JS}; document.head.appendChild(s); })();</script>
   <script>
     var params = new URLSearchParams(window.location.search);
     // Coming back from the BotShield app (phone hand-off): the app returns to
@@ -224,7 +229,8 @@ export const trustedHtml = `<!DOCTYPE html>
     // this frame.
     var returnTopLevel = window.top === window.self && !!params.get('token');
     // Production Ticketz org + key; the gate is "Ticketz Account" in its Console.
-    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+    ${stagingGateJs(STAGING_SITE_KEY_TRUSTED, 'Secured Accounts')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_e398598c7f5af741b540abffd49ae74e');
     var SCOPE = params.get('scope') || 'ticketz_account';
     var MODE = params.get('mode') || 'private';
 

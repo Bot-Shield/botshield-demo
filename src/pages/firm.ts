@@ -9,6 +9,13 @@
 // Whitlock & Barr is a MOCK firm (the roster rule: no real brand on a customer
 // surface). Same widget and site key as the other demos; scope `contact_form`.
 // Served at /firm; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// PLACEHOLDER — no staging site key for the Whitlock and Barr gate exists in this repo or its history.
+// Paste the staging org's publishable key here; until then the staging host shows a note
+// and falls back to the production key (which the staging engine will refuse).
+const STAGING_SITE_KEY_FIRM = '';
+
 export const firmHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,7 +181,7 @@ export const firmHtml = `<!DOCTYPE html>
     </div>
   </div>
 
-  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
+  <script>document.write('<scr' + 'ipt src="' + ${SDK_SRC_JS} + '"></scr' + 'ipt>');</script>
   <script>
     (function () {
       var form = document.getElementById('form');
@@ -182,7 +189,8 @@ export const firmHtml = `<!DOCTYPE html>
       var bsVerify = document.getElementById('bsVerify');
 
       var params = new URLSearchParams(window.location.search);
-      var SITE_KEY = params.get('site_key') || 'pk_live_9256abfa9b30aa3257a97f00aca06253';
+      ${stagingGateJs(STAGING_SITE_KEY_FIRM, 'Whitlock and Barr')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_9256abfa9b30aa3257a97f00aca06253');
       var SCOPE = params.get('scope') || 'contact_form';
       var MODE = params.get('mode') || 'private';
       bsVerify.setAttribute('site-key', SITE_KEY);
