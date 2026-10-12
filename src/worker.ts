@@ -295,7 +295,13 @@ export default {
     };
     if (PAGES[path] && request.method === 'GET') {
       record(env, request, 'view', PAGES[path][0]);
-      return html(withAnalytics(PAGES[path][1]()));
+      let page = PAGES[path][1]();
+      // demo-staging runs the 3.3 staging engine — the link preview must not say production.
+      if (url.hostname === 'demo-staging.botshield.ai') {
+        page = page.split('running against production.').join('running against the BotShield staging engine.')
+                   .replace('<title>BotShield Demos</title>', '<title>BotShield Demos · Staging</title>');
+      }
+      return html(withAnalytics(page));
     }
     if (path === '/salesforce') { record(env, request, 'salesforce_click', 'salesforce'); return Response.redirect(SALESFORCE_DEMO, 302); }
     if (path === '/api/e' && request.method === 'POST') return beacon(env, request);
