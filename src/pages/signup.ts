@@ -13,7 +13,7 @@ import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
 // PLACEHOLDER — no staging site key for the Commons gate exists in this repo or its history.
 // Paste the staging org's publishable key here; until then the staging host shows a note
 // and falls back to the production key (which the staging engine will refuse).
-const STAGING_SITE_KEY_SIGNUP = '';
+const STAGING_SITE_KEY_SIGNUP = 'pk_live_6569029bdc53c7107bddd2dbe0dfb67e';
 
 export const signupHtml = `<!DOCTYPE html>
 <html lang="en">

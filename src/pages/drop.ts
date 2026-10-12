@@ -12,7 +12,7 @@ import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
 // PLACEHOLDER — no staging site key for the Tread gate exists in this repo or its history.
 // Paste the staging org's publishable key here; until then the staging host shows a note
 // and falls back to the production key (which the staging engine will refuse).
-const STAGING_SITE_KEY_DROP = '';
+const STAGING_SITE_KEY_DROP = 'pk_live_6a5d1057b1137db6f49b7d896fe8d2f7';
 
 export const dropHtml = `<!DOCTYPE html>
 <html lang="en">

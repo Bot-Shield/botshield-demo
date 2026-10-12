@@ -14,7 +14,7 @@ import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
 // PLACEHOLDER — no staging site key for the Whitlock and Barr gate exists in this repo or its history.
 // Paste the staging org's publishable key here; until then the staging host shows a note
 // and falls back to the production key (which the staging engine will refuse).
-const STAGING_SITE_KEY_FIRM = '';
+const STAGING_SITE_KEY_FIRM = 'pk_live_869e07aae0614a948bddc50392ab0e21';
 
 export const firmHtml = `<!DOCTYPE html>
 <html lang="en">
