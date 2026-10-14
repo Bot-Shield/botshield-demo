@@ -242,6 +242,10 @@ export const trustedHtml = `<!DOCTYPE html>
     // Two accounts make the whole point. A third is just more email to read.
     var MAX_ACCOUNTS = 2;
     var ALTS = ['jordan.reyes', 'j.reyes91'];
+    // The card shows the person's name, not the email: the email ran under the
+    // Secured pill. Keyed on the stored email, so browsers with saved accounts follow.
+    var NAMES = { 'jordan.reyes@example.com': 'Jordan Reyes', 'j.reyes91@example.com': 'J. Reyes' };
+    function shown(a) { return NAMES[a.name] || a.name; }
     function newAccount(i) {
       var mail = ALTS[Math.min(ALTS.length - 1, i || 0)] + '@example.com';
       return { ref: 'tkz-demo-' + hex(6), name: mail, secured: false };
@@ -308,9 +312,9 @@ export const trustedHtml = `<!DOCTYPE html>
     /** The button-only widget (3.0.2+) renders no card: the page owns the moment. */
     function render() {
       var a = acct();
-      document.getElementById('acctName').textContent = a.name;
+      document.getElementById('acctName').textContent = shown(a);
       document.getElementById('acctId').textContent = 'Signed in \u00b7 ' + a.ref;
-      document.getElementById('avatar').textContent = a.name.slice(0, 1).toUpperCase();
+      document.getElementById('avatar').textContent = shown(a).slice(0, 1).toUpperCase();
       document.getElementById('secured').classList.toggle('on', !!a.secured);
       document.getElementById('panelH').textContent = a.secured
         ? 'Secured with BotShield'
@@ -331,7 +335,7 @@ export const trustedHtml = `<!DOCTYPE html>
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'chip';
-        b.textContent = 'Switch to ' + x.name + (x.secured ? ' \\u2713' : '');
+        b.textContent = 'Switch to ' + shown(x) + (x.secured ? ' \\u2713' : '');
         b.addEventListener('click', function() { switchTo(i); });
         sw.appendChild(b);
       });
