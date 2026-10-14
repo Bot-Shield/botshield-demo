@@ -4,7 +4,7 @@
 //   /ticketz     Ticketz · BotShield Gate at checkout (Human Gate, inline passkey beta)
 //   /agent       Ticketz · Agents Ask (chat with the Ticketz agent; purchases wait for the human)
 //   /flights     Meridian Airlines · Agents Ask Pay (the card issuer asks BotShield before the charge)
-//   /trusted     Ticketz · Trusted Accounts (secure the account with a BotShield ID; ticketz_account gate, notarize)
+//   /trusted     Ticketz · Secured Accounts (secure the account with a BotShield ID; ticketz_account gate, `notarize` attr)
 //   /vapez       Vapez · Age Gate at the door (enter_site_age_check, 18+)
 //   /salesforce  → Coral Cloud on salesforce-demo.botshield.ai (counted as a click-out)
 //   /api/e       same-origin analytics beacon (allowlisted browser steps; src/analytics.ts)
@@ -14,8 +14,10 @@
 //                the visitor's bind JWT as the connector bearer). Unset → 503, and the
 //                page says the agent is not connected. No fake replies.
 //
-// Every demo page runs against PRODUCTION (cdn.botshield.ai + the prod Ticketz
-// site key); the gates are the ones in the Ticketz org's Console.
+// Gate pages pick their backend from the host (src/backend.ts): demo.botshield.ai
+// → PRODUCTION (cdn.botshield.ai + prod site keys); demo-staging.botshield.ai
+// (wrangler env.staging) and localhost → cdn-staging + staging keys. Agents Ask
+// and Meridian always use the production Fly gateways.
 import { ticketzHtml } from './pages/ticketz';
 import { vapezHtml } from './pages/vapez';
 import { agentHtml, flightsHtml } from './pages/agent';
@@ -293,7 +295,13 @@ export default {
     };
     if (PAGES[path] && request.method === 'GET') {
       record(env, request, 'view', PAGES[path][0]);
-      return html(withAnalytics(PAGES[path][1]()));
+      let page = PAGES[path][1]();
+      // demo-staging runs the 3.3 staging engine — the link preview must not say production.
+      if (url.hostname === 'demo-staging.botshield.ai') {
+        page = page.split('running against production.').join('running against the BotShield staging engine.')
+                   .replace('<title>BotShield Demos</title>', '<title>BotShield Demos · Staging</title>');
+      }
+      return html(withAnalytics(page));
     }
     if (path === '/salesforce') { record(env, request, 'salesforce_click', 'salesforce'); return Response.redirect(SALESFORCE_DEMO, 302); }
     if (path === '/api/e' && request.method === 'POST') return beacon(env, request);

@@ -4,6 +4,13 @@
 // type "age" (threshold set in the Console — 18 for tobacco), so the ceremony
 // returns age_verdict verified | unavailable, never a birthdate, never an ID.
 // Served at /vapez; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// PLACEHOLDER — no staging site key for the Vapez gate exists in this repo or its history.
+// Paste the staging org's publishable key here; until then the staging host shows a note
+// and falls back to the production key (which the staging engine will refuse).
+const STAGING_SITE_KEY_VAPEZ = 'pk_live_b5817f9927158fae5687b5de0561b3ea';
+
 export const vapezHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,11 +135,12 @@ export const vapezHtml = `<!DOCTYPE html>
   <div class="toast" id="toast"></div>
 
   <!-- ?sdk=next loads the prerelease widget (/next) for testing; default stays the stable /sdk.js. -->
-  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
+  <script>document.write('<scr' + 'ipt src="' + ${SDK_SRC_JS} + '"></scr' + 'ipt>');</script>
   <script>
     var params = new URLSearchParams(window.location.search);
     // Same prod partner + key as Ticketz: the Vepez gate lives on that org.
-    var SITE_KEY = params.get('site_key') || 'pk_live_5bfe8110685f07d8474a5ea9bf83e9a7';
+    ${stagingGateJs(STAGING_SITE_KEY_VAPEZ, 'Vapez')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_5bfe8110685f07d8474a5ea9bf83e9a7');
     var SCOPE = params.get('scope') || 'enter_site_age_check';
     var MODE = params.get('mode') || 'private';
 
@@ -142,8 +150,9 @@ export const vapezHtml = `<!DOCTYPE html>
     bsVerify.setAttribute('mode', MODE);
 
     // Stable stand-in for the store's own user id (see the Ticketz page for
-    // the full note): the first verification links it, later visits resolve
-    // instantly. ?fresh=1 mints a new one.
+    // the full note). 3.3: every visit asks again (a fresh passkey tap, the
+    // device answers the age band); there is no instant pass on return.
+    // ?fresh=1 mints a new one.
     var REF_KEY = 'vpz_demo_user_ref';
     var userRef = localStorage.getItem(REF_KEY);
     if (!userRef || params.get('fresh')) {

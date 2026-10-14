@@ -19,5 +19,31 @@
       "pattern": "demo.botshield.ai",
       "custom_domain": true
     }
-  ]
+  ],
+  // Staging worker — `npm run deploy:staging`. Same code; the pages see the
+  // demo-staging host and load cdn-staging (→ wg-staging) + staging site keys
+  // (src/backend.ts). Vars and bindings are NOT inherited by an env, so they
+  // are repeated here. Agents Ask (/agent) and Meridian (/flights) still talk
+  // to the production Fly gateways. Secrets (ANTHROPIC_API_KEY, STATS_KEY,
+  // CF_ACCOUNT_ID, CF_ANALYTICS_TOKEN) must be set with --env staging.
+  "env": {
+    "staging": {
+      "name": "botshield-demo-staging",
+      "vars": {
+        "AGENT_GATEWAY_URL": "https://botshield-demo-gateway.fly.dev",
+        "MERIDIAN_GATEWAY_URL": "https://botshield-meridian-gateway.fly.dev",
+        "AGENT_MODEL": "claude-opus-5",
+        "DEMO_DATASET": "botshield_demo_events_staging"
+      },
+      "analytics_engine_datasets": [
+        { "binding": "DEMO_EVENTS", "dataset": "botshield_demo_events_staging" }
+      ],
+      "routes": [
+        {
+          "pattern": "demo-staging.botshield.ai",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }

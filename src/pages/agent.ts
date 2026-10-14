@@ -12,6 +12,8 @@
 // The page talks only to this worker (/api/<api>/chat); the worker talks to
 // the gateway. Until the gateway is configured the worker answers 503 and the
 // page says so — no fake replies. Framed by the Demos shell.
+import { stagingNoteJs } from '../backend';
+
 export interface AgentPageConfig {
   /** /api/<api>/… on the worker */
   api: 'agent' | 'flights';
@@ -581,6 +583,8 @@ export function agentPage(cfg: AgentPageConfig): string {
     input.addEventListener('keyup', syncSend);
     syncSend();
   </script>
+  <!-- Staging host only: this demo still runs on the production gateway + engine. -->
+  <script>${stagingNoteJs('Runs on production \u00b7 the agent gateway is not on staging')}</script>
 </body>
 </html>`;
 }

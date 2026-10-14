@@ -6,11 +6,13 @@ export interface StatsEnv {
   CF_ACCOUNT_ID?: string;
   CF_ANALYTICS_TOKEN?: string;
   STATS_KEY?: string;
+  /** Analytics Engine dataset /stats reads — the staging worker sets its own (wrangler env.staging). */
+  DEMO_DATASET?: string;
 }
 
-const DATASET = 'botshield_demo_events';
+const ds = (env: StatsEnv) => env.DEMO_DATASET || 'botshield_demo_events';
 const DEMOS: Array<[string, string]> = [
-  ['ticketz', 'Ticketz · BotShield Gate'], ['agent', 'Ticketz · Agents Ask'], ['flights', 'Meridian Airlines · Agents Ask Pay'], ['trusted', 'Ticketz · Trusted Accounts'],
+  ['ticketz', 'Ticketz · BotShield Gate'], ['agent', 'Ticketz · Agents Ask'], ['flights', 'Meridian Airlines · Agents Ask Pay'], ['trusted', 'Ticketz · Secured Accounts'],
   ['vapez', 'Vapez · Age Gate'], ['signup', 'Commons · Sign-up Gate'], ['drop', 'Tread · Add-to-cart Gate'], ['firm', 'Whitlock & Barr · Enquiry Gate'],
   ['salesforce', 'Salesforce · Coral Cloud (click-out)'],
 ];
@@ -101,11 +103,11 @@ export async function statsPage(env: StatsEnv, request: Request): Promise<Respon
   const notBot = `blob5 != 'bot'`;
   try {
     const [byEvent30, byEvent7, daily, countries, devices] = await Promise.all([
-      sql(env, `SELECT blob2 AS demo, blob1 AS event, SUM(_sample_interval) AS n FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '30' DAY AND ${notBot} GROUP BY demo, event`),
-      sql(env, `SELECT blob2 AS demo, blob1 AS event, SUM(_sample_interval) AS n FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '7' DAY AND ${notBot} GROUP BY demo, event`),
-      sql(env, `SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) AS day, blob2 AS demo, SUM(_sample_interval) AS n FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 = 'view' AND blob2 != 'shell' AND ${notBot} GROUP BY day, demo ORDER BY day`),
-      sql(env, `SELECT blob4 AS country, SUM(_sample_interval) AS n FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 = 'view' AND ${notBot} GROUP BY country ORDER BY n DESC LIMIT 10`),
-      sql(env, `SELECT blob5 AS device, SUM(_sample_interval) AS n FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 = 'view' GROUP BY device ORDER BY n DESC`),
+      sql(env, `SELECT blob2 AS demo, blob1 AS event, SUM(_sample_interval) AS n FROM ${ds(env)} WHERE timestamp > NOW() - INTERVAL '30' DAY AND ${notBot} GROUP BY demo, event`),
+      sql(env, `SELECT blob2 AS demo, blob1 AS event, SUM(_sample_interval) AS n FROM ${ds(env)} WHERE timestamp > NOW() - INTERVAL '7' DAY AND ${notBot} GROUP BY demo, event`),
+      sql(env, `SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) AS day, blob2 AS demo, SUM(_sample_interval) AS n FROM ${ds(env)} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 = 'view' AND blob2 != 'shell' AND ${notBot} GROUP BY day, demo ORDER BY day`),
+      sql(env, `SELECT blob4 AS country, SUM(_sample_interval) AS n FROM ${ds(env)} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 = 'view' AND ${notBot} GROUP BY country ORDER BY n DESC LIMIT 10`),
+      sql(env, `SELECT blob5 AS device, SUM(_sample_interval) AS n FROM ${ds(env)} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 = 'view' GROUP BY device ORDER BY n DESC`),
     ]);
     const get = (rows: Row[], demo: string, event: string) => n(rows.find((r) => r.demo === demo && r.event === event)?.n);
     const v30 = (d: string) => (d === 'salesforce' ? get(byEvent30, 'salesforce', 'salesforce_click') : get(byEvent30, d, 'view'));
@@ -152,7 +154,7 @@ ${DEMOS.map(([k, label]) => `<tr><td>${esc(label)}</td><td>${fmt(v7(k))}</td><td
 
     return page(`<div><h1>Demo usage</h1><div class="sub">demo.botshield.ai · updated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC</div></div>
 ${totals}${dailyChart(daily)}
-<div class="grid">${agent}${flights}${gate('ticketz', 'Ticketz · BotShield Gate')}${gate('vapez', 'Vapez · Age Gate')}${gate('signup', 'Commons · Sign-up Gate')}${gate('drop', 'Tread · Add-to-cart Gate')}${gate('firm', 'Whitlock & Barr · Enquiry Gate')}${gate('trusted', 'Ticketz · Trusted Accounts')}</div>
+<div class="grid">${agent}${flights}${gate('ticketz', 'Ticketz · BotShield Gate')}${gate('vapez', 'Vapez · Age Gate')}${gate('signup', 'Commons · Sign-up Gate')}${gate('drop', 'Tread · Add-to-cart Gate')}${gate('firm', 'Whitlock & Barr · Enquiry Gate')}${gate('trusted', 'Ticketz · Secured Accounts')}</div>
 <div class="grid">${countryCard}${deviceCard}${await clickOuts(env)}</div>`);
   } catch (e) {
     return page(`<h1>Demo usage</h1><div class="card"><p class="err">Could not read the stats: ${esc((e as Error).message)}</p></div>`, 502);
@@ -160,7 +162,7 @@ ${totals}${dailyChart(daily)}
 }
 
 async function clickOuts(env: StatsEnv): Promise<string> {
-  const rows = await sql(env, `SELECT blob1 AS event, blob3 AS target, SUM(_sample_interval) AS n FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 IN ('cta_click', 'salesforce_click') AND blob5 != 'bot' GROUP BY event, target ORDER BY n DESC`);
+  const rows = await sql(env, `SELECT blob1 AS event, blob3 AS target, SUM(_sample_interval) AS n FROM ${ds(env)} WHERE timestamp > NOW() - INTERVAL '30' DAY AND blob1 IN ('cta_click', 'salesforce_click') AND blob5 != 'bot' GROUP BY event, target ORDER BY n DESC`);
   const body = rows.map((r) => `<tr><td>${esc(r.event === 'salesforce_click' ? 'Salesforce demo' : r.target || '—')}</td><td>${fmt(n(r.n))}</td></tr>`).join('') || '<tr><td>No click-outs yet</td><td></td></tr>';
   return `<div class="card"><h2>Click-outs · 30 days</h2><table><tbody>${body}</tbody></table><p class="note">Docs, Console, botshield.ai and the BotShield app links; the Salesforce demo.</p></div>`;
 }

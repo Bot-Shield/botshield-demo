@@ -7,6 +7,13 @@
 // Tread is a MOCK brand (the roster rule: no real brand on a customer surface).
 // Same widget and site key as the other demos; the scope is `add_to_cart`.
 // Served at /drop; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// PLACEHOLDER — no staging site key for the Tread gate exists in this repo or its history.
+// Paste the staging org's publishable key here; until then the staging host shows a note
+// and falls back to the production key (which the staging engine will refuse).
+const STAGING_SITE_KEY_DROP = 'pk_live_6a5d1057b1137db6f49b7d896fe8d2f7';
+
 export const dropHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -159,7 +166,7 @@ export const dropHtml = `<!DOCTYPE html>
         <div class="rows">
           <div class="k">What Tread received</div>
           <div class="row"><span>Cart</span><b id="claim">&mdash;</b></div>
-          <div class="row"><span>One per person</span><b style="color:#23cb78">held</b></div>
+          <div class="row"><span>Pair limit</span><b style="color:#23cb78">held</b></div>
           <div class="row"><span>Ceremony</span><b class="mono" id="cer">&mdash;</b></div>
           <p class="note">Never a name, never a card, never a device. Just that this pair went to a person who does not already have one.</p>
         </div>
@@ -179,7 +186,7 @@ export const dropHtml = `<!DOCTYPE html>
     </div>
   </div>
 
-  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
+  <script>document.write('<scr' + 'ipt src="' + ${SDK_SRC_JS} + '"></scr' + 'ipt>');</script>
   <script>
     (function () {
       var form = document.getElementById('form');
@@ -187,7 +194,8 @@ export const dropHtml = `<!DOCTYPE html>
       var bsVerify = document.getElementById('bsVerify');
 
       var params = new URLSearchParams(window.location.search);
-      var SITE_KEY = params.get('site_key') || 'pk_live_e5ad13b9791d524987f991eefdb7f6de';
+      ${stagingGateJs(STAGING_SITE_KEY_DROP, 'Tread')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_e5ad13b9791d524987f991eefdb7f6de');
       var SCOPE = params.get('scope') || 'add_to_cart';
       var MODE = params.get('mode') || 'private';
       bsVerify.setAttribute('site-key', SITE_KEY);

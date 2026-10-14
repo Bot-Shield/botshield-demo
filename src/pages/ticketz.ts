@@ -1,5 +1,10 @@
 // Ticketz — Human Gate at checkout (all-ages). Inline passkey beta on desktop,
 // QR / phone hand-off otherwise. Served at /ticketz; framed by the Demos shell.
+import { IS_STAGING_JS, SDK_SRC_JS, stagingGateJs } from '../backend';
+
+// Staging Ticketz key — the same one the page comment above has always named for cdn-staging.
+const STAGING_SITE_KEY_TICKETZ = 'pk_live_c71c420add027025b9e42c1ba9ff00ce';
+
 export const ticketzHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -408,12 +413,13 @@ export const ticketzHtml = `<!DOCTYPE html>
     ></botshield-verify>
   </div>
 
-  <!-- Demo controls: reset the widget state; the partner ref survives so the
-       second run demos the BotShield ID instant path. Chip appears after the
-       first successful verification; tap copies the ref. -->
+  <!-- Demo controls. Reset = the same buyer comes back: 3.3 asks again (a
+       fresh passkey tap on their phone, every pass). New visitor = a different
+       buyer (new partner ref). Chip appears after the first successful
+       verification; tap copies the ref. -->
   <div class="demo-controls">
     <button type="button" class="demo-reset" id="demoNewVisitor" title="Forget this visitor — next Verify runs the first-visit ceremony">New visitor</button>
-    <button type="button" class="demo-reset" id="demoReset">Reset</button>
+    <button type="button" class="demo-reset" id="demoReset" title="Same buyer, back again — every pass is a fresh passkey tap on their phone">Reset</button>
     <button type="button" class="demo-ref" id="demoRef" title="partner_user_ref — tap to copy"></button>
   </div>
 
@@ -437,9 +443,11 @@ export const ticketzHtml = `<!DOCTYPE html>
        PRODUCTION since 2026-09-13: prod DB carries the Ticketz partner with the
        seeded "Demo (Ticketz)" site key below and an active production
        ticket_purchase gate. The scanning phone must run the prod app build.
-       To demo against staging again: cdn-staging + pk_live_c71c420add027025b9e42c1ba9ff00ce. -->
-  <!-- ?sdk=next loads the prerelease widget (/next) for testing; default stays the stable /sdk.js. -->
-  <script>document.write('<scr' + 'ipt src="' + (window.location.search.indexOf('sdk=next') >= 0 ? 'https://cdn.botshield.ai/next/sdk.js' : 'https://cdn.botshield.ai/sdk.js?v=17') + '"></scr' + 'ipt>');</script>
+       Since demo/3-3 the HOST picks the backend (src/backend.ts): demo.botshield.ai
+       = prod CDN + prod key; demo-staging.botshield.ai / localhost = cdn-staging
+       /next + STAGING_SITE_KEY_TICKETZ. The scanning phone must match. -->
+  <!-- ?sdk=next (prod host only) loads the prerelease widget (/next); default stays the stable /sdk.js. -->
+  <script>document.write('<scr' + 'ipt src="' + ${SDK_SRC_JS} + '"></scr' + 'ipt>');</script>
 
   <script>
     // Dynamic event date — next Saturday ~2 weeks out
@@ -458,7 +466,8 @@ export const ticketzHtml = `<!DOCTYPE html>
     })();
 
     var params = new URLSearchParams(window.location.search);
-    var SITE_KEY = params.get('site_key') || 'pk_live_e398598c7f5af741b540abffd49ae74e';
+    ${stagingGateJs(STAGING_SITE_KEY_TICKETZ, 'Ticketz')}
+    var SITE_KEY = params.get('site_key') || (${IS_STAGING_JS} && STAGING_SITE_KEY ? STAGING_SITE_KEY : 'pk_live_e398598c7f5af741b540abffd49ae74e');
     var SCOPE = params.get('scope') || 'ticket_purchase';
     var MODE = params.get('mode') || 'private';
 
@@ -467,16 +476,15 @@ export const ticketzHtml = `<!DOCTYPE html>
     bsVerify.setAttribute('scope', SCOPE);
     bsVerify.setAttribute('mode', MODE);
 
-    // ── Partner user ref (BotShield ID continuity — the instant path) ──
+    // ── Partner user ref ──
     // A real partner sends their own logged-in user id here. The demo mints
-    // a stable stand-in once and keeps it in localStorage: the FIRST
-    // verification links it to the BotShield identity server-side
-    // (partner_user_linkages, link-on-verify default), so every later
-    // evaluate with the same ref resolves the user and returns the instant
-    // pass — result_state 'human_verified', the "Human Verified" pill, no QR.
-    // (Two-state contract: the retired reason/"MultiPass Active" state no
-    // longer crosses the wire — both runs read "Human Verified"; the tell is
-    // the missing QR.) ?fresh=1 mints a new ref to run the full QR flow again.
+    // a stable stand-in once and keeps it in localStorage (?fresh=1 mints a
+    // new one). 3.3: the gate ALWAYS asks — /signal/evaluate answers
+    // require_presence before every pass, so each run is a fresh passkey tap
+    // on the person's phone (inline when the passkey is on this device).
+    // That is the talk track for Reset: it asks again, fast when the phone is
+    // in hand, and that is the point — a password or a stolen session can't
+    // pass. There is no instant pass and no recent-proof window anymore.
     var REF_KEY = 'tkz_demo_user_ref';
     var VERIFIED_KEY = 'tkz_demo_verified_once';
     var userRef = localStorage.getItem(REF_KEY);
@@ -496,9 +504,9 @@ export const ticketzHtml = `<!DOCTYPE html>
       navigator.clipboard && navigator.clipboard.writeText(userRef);
     });
 
-    // Reset — back to the idle widget for another pass. The ref survives on
-    // purpose: the point of the second run is the instant path (BotShield ID
-    // continuity — verified with no QR).
+    // Reset — the same buyer comes back for another order. The ref survives
+    // on purpose: the second run shows the gate asking AGAIN — a fresh passkey
+    // tap, every pass. A password or a stolen session can't answer it.
     document.getElementById('demoReset').addEventListener('click', function() {
       bsVerify.reset();
       document.getElementById('confirmation').classList.remove('show');
@@ -506,9 +514,8 @@ export const ticketzHtml = `<!DOCTYPE html>
     });
 
     // New visitor — forget the partner ref (and the verified flag) so the next
-    // Verify is a FIRST visit again: pre-check → ceremony (passkey / QR). Use
-    // this to re-run the full flow on the show floor; Reset alone re-runs the
-    // instant path because the ref (and its BotShield ID linkage) survives.
+    // Verify is a different buyer: pre-check → ceremony (passkey / QR). Reset
+    // keeps the buyer; both ask for a passkey.
     document.getElementById('demoNewVisitor').addEventListener('click', function() {
       localStorage.removeItem(REF_KEY);
       localStorage.removeItem(VERIFIED_KEY);
@@ -540,6 +547,11 @@ export const ticketzHtml = `<!DOCTYPE html>
     // runs the purchase when the component emits botshield:checkout.
     bsVerify.addEventListener('botshield:success', function(e) {
       console.log('[Ticketz] BotShield verified:', e.detail);
+      // Pre-3.3 engine (prod until the promote) can still answer evaluate
+      // with 'pass' — the widget resolves with via:'precheck' and no ceremony.
+      // Accept it so the page keeps working, but it is not a feature we show:
+      // same toast, no special copy. On 3.3 every pass is via:'ceremony'.
+      if (e.detail && e.detail.via === 'precheck') console.info('[Ticketz] evaluate returned pass (pre-3.3 engine) — no ceremony this run.');
       var toast = document.getElementById('toast');
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3000);

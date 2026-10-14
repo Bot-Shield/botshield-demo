@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "node scripts/check-pages.mjs && wrangler deploy",
+    "deploy:staging": "node scripts/check-pages.mjs && wrangler deploy --env staging",
     "build": "wrangler deploy --dry-run",
     "check:pages": "node scripts/check-pages.mjs"
   },
