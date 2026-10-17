@@ -181,9 +181,22 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // Meridian: resuming needs the order too. The model only sees text turns on
   // the next call (tool results are not replayed), so the page carries it.
   let awaitingOrder: string | null = null;
+  // A page re-check ("Check approval <id> again") must only ever resume THAT card.
+  // If the model re-runs checkout without the approval id instead, the gateway sends
+  // a brand-new card — and the next re-check does it again, every ~20 s, with nobody
+  // typing (seen 2026-10-16). So on a re-check, a new card is never adopted: the page
+  // keeps waiting on the original, and the re-check prompt spells out the exact call.
+  const lastUser = clean[clean.length - 1].content;
+  const recheckOf = (lastUser.match(/^Check approval (\S+?)[\s.:]/) ?? [])[1] ?? null;
+  // Ticketz checkout args from this turn — carried into the re-check prompt so the
+  // resume call needs nothing from memory.
+  let checkoutArgs: { event?: string; seats?: number; total?: string } | null = null;
   for (const block of data.content ?? []) {
     if (block.type === 'text' && block.text?.trim()) { parts.push(block.text); events.push({ type: 'text', text: block.text }); }
-    else if (block.type === 'mcp_tool_use') events.push({ type: 'tool', name: block.name, args: JSON.stringify(block.input ?? {}).slice(0, 220) });
+    else if (block.type === 'mcp_tool_use') {
+      events.push({ type: 'tool', name: block.name, args: JSON.stringify(block.input ?? {}).slice(0, 220) });
+      if (block.name === 'checkout' && block.input?.event) checkoutArgs = { event: block.input.event, seats: block.input.seats, total: block.input.total };
+    }
     else if (block.type === 'mcp_tool_result') {
       const body = Array.isArray(block.content) ? block.content.map((c: any) => c?.text ?? '').join(' ') : String(block.content ?? '');
       const last = [...events].reverse().find((e) => e.type === 'tool' && !e.result);
@@ -197,7 +210,13 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       if (j?.status === 'approved_card_issued' && j.approval_id) notes.push(`card issued approval_id=${j.approval_id} for order_id=${j.order_id}`);
       if ((j?.status === 'paid' || j?.status === 'authorized' || j?.status === 'declined') && j.order_id) notes.push(`${j.status}: order_id=${j.order_id}${j.approval_id ? ` approval_id=${j.approval_id}` : ''} (${j.booking_reference ?? ''}, ${j.total ?? ''}) — for a repeat-charge demo call pay_hold with this order_id and demo="reuse"`);
       if (j?.error === 'hold_failed') notes.push(`hold failed for offer ${(() => { try { return JSON.stringify((events.find((e) => e.type === 'tool' && !e.result) ?? {}).args ?? '').slice(0, 80); } catch { return ''; } })()} — use the next offer`);
-      if (j?.status === 'approval_sent') {
+      if (j?.status === 'approval_sent' && recheckOf && j.approval_request_id !== recheckOf) {
+        // Wrong call on a re-check (see above): don't render or chase the stray card.
+        console.warn('[agent] re-check of', recheckOf, 'sent a new card instead of resuming it');
+        record(env, request, 'recheck_new_card', demo);
+        awaiting = recheckOf;
+      }
+      else if (j?.status === 'approval_sent') {
         awaiting = j.approval_request_id ?? awaiting;
         if (j.expires_at) awaitingExpiresAt = j.expires_at;
         if (j.order_id) awaitingOrder = j.order_id;
@@ -237,7 +256,11 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // (the analytics classifier keys on that).
   const awaitingPrompt = !awaiting ? null : profile.demo === 'flights'
     ? `Check approval ${awaiting} again: call book_flight with approval_request_id="${awaiting}"${awaitingOrder ? ` and order_id="${awaitingOrder}"` : ''} and the same offer and passenger as before. If it returns approved_card_issued, immediately call pay_hold with that order_id and approval_id, then confirm in one line. If still pending, say only "still pending". If declined or expired, say so.`
-    : `Check approval ${awaiting} again. If approved, finish the purchase; if still pending, say only "still pending"; if declined or expired, say so.`;
+    : checkoutArgs?.event
+      ? `Check approval ${awaiting} again: call checkout with approval_request_id="${awaiting}", event=${JSON.stringify(checkoutArgs.event)}, seats=${checkoutArgs.seats ?? 2}${checkoutArgs.total ? `, total=${JSON.stringify(checkoutArgs.total)}` : ''}. Never call checkout without approval_request_id here — that sends a second card. If it returns confirmed, confirm the order in one line. If still pending, say only "still pending". If declined or expired, say so.`
+      // No checkout call this turn (the model only talked): reuse the page's prompt as-is.
+      : recheckOf && awaiting === recheckOf ? lastUser
+      : `Check approval ${awaiting} again: call checkout with approval_request_id="${awaiting}" and the same event and seats as before. Never call checkout without approval_request_id here — that sends a second card. If it returns confirmed, confirm the order in one line. If still pending, say only "still pending". If declined or expired, say so.`;
   return json({ reply: parts.join('\n').trim(), memory: notes.length ? notes.join('\n') : null, events, awaiting, awaiting_order: awaitingOrder, awaiting_expires_at: awaitingExpiresAt, awaiting_prompt: awaitingPrompt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
 }
 
