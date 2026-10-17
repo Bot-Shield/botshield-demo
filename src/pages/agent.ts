@@ -239,6 +239,13 @@ export function agentPage(cfg: AgentPageConfig): string {
     var live = false;
     var LINK_KEY = '${cfg.storageKey}';
     var bindToken = sessionStorage.getItem(LINK_KEY) || null;
+    // The link token lives 24 h. Past that the gateway treats the agent as unlinked
+    // (checkout disappears) while this page still said "Linked" — drop it instead.
+    function linkExpired(t) {
+      try { var p = JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); return !p.exp || p.exp * 1000 < Date.now() + 60000; }
+      catch (e) { return true; }
+    }
+    if (bindToken && linkExpired(bindToken)) { bindToken = null; sessionStorage.removeItem(LINK_KEY); }
     var linkEl = document.getElementById('link');
     var linkText = document.getElementById('linkText');
     var linkBtn = document.getElementById('linkBtn');
@@ -535,6 +542,7 @@ export function agentPage(cfg: AgentPageConfig): string {
     async function ask(q, hidden) {
       if (!q) return;
       if (!live) { await checkHealth(true); if (!live) { add('sys', 'The ' + AGENT_NAME + ' agent is not connected right now \\u2014 try again in a moment.'); return; } }
+      if (bindToken && linkExpired(bindToken)) { bindToken = null; sessionStorage.removeItem(LINK_KEY); renderLink(); add('sys', 'Your link with BotShield expired (links last 24 hours). Link again to let the agent ask.'); if (hidden) { stopWaiting(); return; } }
       if (!hidden) { add('user', q); stopWaiting(); waitExpiresAt = 0; waitChecks = 0; waitPrompt = null; if (window.bsTrack) bsTrack('agent_chat_turn'); }
       turns.push({ role: 'user', content: q });
       input.value = '';
