@@ -191,6 +191,9 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
   // Ticketz checkout args from this turn — carried into the re-check prompt so the
   // resume call needs nothing from memory.
   let checkoutArgs: { event?: string; seats?: number; total?: string } | null = null;
+  // Set when a re-check went wrong once: the page stops re-checking on its own (so at
+  // most ONE stray card ever reaches the phone) and waits for the visitor instead.
+  let recheckPaused = false;
   for (const block of data.content ?? []) {
     if (block.type === 'text' && block.text?.trim()) { parts.push(block.text); events.push({ type: 'text', text: block.text }); }
     else if (block.type === 'mcp_tool_use') {
@@ -206,6 +209,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       if (Array.isArray(j?.offers) && j.offers.length) {
         notes.push(`search ${j.date ?? ''}: ` + j.offers.slice(0, 5).map((o: any) => `${o.flight ?? o.airline ?? '?'} ${o.total ?? ''} offer_id=${o.offer_id}`).join('; '));
       }
+      if (j?.status === 'approval_sent' && !j.order_id && j.approval_request_id) notes.push(`approval sent approval_request_id=${j.approval_request_id}${checkoutArgs?.event ? ` for checkout event=${JSON.stringify(checkoutArgs.event)} seats=${checkoutArgs.seats ?? ''}${checkoutArgs.total ? ` total=${checkoutArgs.total}` : ''}` : ''} — to finish, call checkout with this approval_request_id; never start a new checkout for the same purchase`);
       if (j?.status === 'approval_sent' && j.order_id) notes.push(`held order_id=${j.order_id} (${j.booking_reference ?? ''}, ${j.total ?? ''}) approval_request_id=${j.approval_request_id}`);
       if (j?.status === 'approved_card_issued' && j.approval_id) notes.push(`card issued approval_id=${j.approval_id} for order_id=${j.order_id}`);
       if ((j?.status === 'paid' || j?.status === 'authorized' || j?.status === 'declined') && j.order_id) notes.push(`${j.status}: order_id=${j.order_id}${j.approval_id ? ` approval_id=${j.approval_id}` : ''} (${j.booking_reference ?? ''}, ${j.total ?? ''}) — for a repeat-charge demo call pay_hold with this order_id and demo="reuse"`);
@@ -215,6 +219,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
         console.warn('[agent] re-check of', recheckOf, 'sent a new card instead of resuming it');
         record(env, request, 'recheck_new_card', demo);
         awaiting = recheckOf;
+        recheckPaused = true;
       }
       else if (j?.status === 'approval_sent') {
         awaiting = j.approval_request_id ?? awaiting;
@@ -261,7 +266,7 @@ async function agentChat(env: Env, request: Request, messages: ChatMessage[], bi
       // No checkout call this turn (the model only talked): reuse the page's prompt as-is.
       : recheckOf && awaiting === recheckOf ? lastUser
       : `Check approval ${awaiting} again: call checkout with approval_request_id="${awaiting}" and the same event and seats as before. Never call checkout without approval_request_id here — that sends a second card. If it returns confirmed, confirm the order in one line. If still pending, say only "still pending". If declined or expired, say so.`;
-  return json({ reply: parts.join('\n').trim(), memory: notes.length ? notes.join('\n') : null, events, awaiting, awaiting_order: awaitingOrder, awaiting_expires_at: awaitingExpiresAt, awaiting_prompt: awaitingPrompt, usage: data.usage ?? null, stop: data.stop_reason ?? null });
+  return json({ reply: parts.join('\n').trim(), memory: notes.length ? notes.join('\n') : null, events, awaiting, awaiting_order: awaitingOrder, awaiting_expires_at: awaitingExpiresAt, awaiting_prompt: awaitingPrompt, recheck_paused: recheckPaused, usage: data.usage ?? null, stop: data.stop_reason ?? null });
 }
 
 /** One line for the chat timeline, computed from the FULL tool result before truncation. */

@@ -575,7 +575,12 @@ export function agentPage(cfg: AgentPageConfig): string {
         if (!spoke && !stillPending) add('agent', j.reply || '(no reply)');
         // The notes are for the model's next turn only — never rendered.
         turns.push({ role: 'assistant', content: (j.reply || '') + (j.memory ? '\\n\\n[internal notes, never repeat to the user: ' + j.memory + ']' : '') });
-        if (j.awaiting) { addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' }); scheduleCheck(j.awaiting, j.awaiting_expires_at, j.awaiting_prompt); }
+        if (j.awaiting) {
+          addAsk({ request_id: j.awaiting, text: 'The purchase is waiting for your confirmation.' });
+          // The agent fumbled a re-check: stop checking on its own so it can't keep sending cards.
+          if (j.recheck_paused) { if (waitTimer) clearTimeout(waitTimer); waitTimer = null; waitPrompt = j.awaiting_prompt || waitPrompt; add('sys', 'Approve it on your phone, then type "check again".'); }
+          else scheduleCheck(j.awaiting, j.awaiting_expires_at, j.awaiting_prompt);
+        }
         setTimeout(function() { log.scrollTop = log.scrollHeight; }, 50);
       } catch (e) {
         clearTimeout(tick); clearTimeout(tick2);
