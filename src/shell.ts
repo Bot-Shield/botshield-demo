@@ -492,6 +492,11 @@ export function shellHtml(): string {
     frame.addEventListener('load', syncViewport);
     var initial = (new URLSearchParams(window.location.search).get('demo')) || window.location.hash.slice(1) || DEMOS[0].key;
     pick(initial, true);
+    // A link can ask for the explainer up front: ?how=1 raises the drawer on
+    // arrival, so someone who scanned a card reads what the demo proves before
+    // it starts. The scrim, the pill and Escape all put it away, same as ever.
+    // Without the parameter the demo still owns the first screen.
+    if (new URLSearchParams(window.location.search).get('how') === '1') setDrawer(true);
   </script>
 </body>
 </html>`;
