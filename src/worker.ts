@@ -303,6 +303,10 @@ async function linkProxy(env: Env, request: Request, path: 'start' | 'status', s
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // 2026-11-20 (Dev: "all those old demos gotta come down"): the Demos shell told the retired
+    // story (Human Gate, Link with BotShield, Pricing). Every address now goes to the 24-second
+    // demonstration on botshield.ai. A 302, so it can be undone by reverting this block.
+    return Response.redirect('https://botshield.ai/botshield-verified#see', 302);
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
